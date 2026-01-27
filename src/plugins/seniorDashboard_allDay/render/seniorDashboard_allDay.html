@@ -74,9 +74,9 @@
     // Create date object from ISO string to handle timezone correctly
     const currentDate = new Date('{{ current_dt }}');
 
-    // Format date to match listMonth date headers (e.g., "January 27, 2026")
-    // Using the same format that FullCalendar uses for listMonth day headers (without weekday)
+    // Format date with weekday (e.g., "Tuesday, January 27, 2026" or "Dienstag, 27. Januar 2026")
     const dateFormatter = new Intl.DateTimeFormat(locale, {
+        weekday: 'long',
         year: 'numeric',
         month: 'long',
         day: 'numeric',
