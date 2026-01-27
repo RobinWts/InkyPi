@@ -20,7 +20,35 @@
         </div>
     </div>
     <div class="dashboard-right">
-        <!-- Right side content will be added here -->
+        <div class="weather-container">
+            {% if weather and weather.current %}
+            <div class="weather-current">
+                <h2 class="weather-title">Jetzt</h2>
+                <div class="weather-current-content">
+                    <span class="weather-icon">{{ weather.current.icon }}</span>
+                    <span class="weather-temp">{{ weather.current.temperature|round|int }}°C</span>
+                    <span class="weather-wind">{{ weather.current.windspeed|round|int }} km/h</span>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if weather and weather.forecast %}
+            <div class="weather-forecast">
+                <h2 class="weather-title">Vorhersage</h2>
+                {% for day in weather.forecast %}
+                <div class="weather-day">
+                    <div class="weather-day-date">{{ day.date }}</div>
+                    <div class="weather-day-content">
+                        <span class="weather-icon">{{ day.icon }}</span>
+                        <span class="weather-temp-range">{{ day.temp_min|round|int }}–{{ day.temp_max|round|int
+                            }}°C</span>
+                        <span class="weather-precipitation">{{ day.precipitation|round|int }} mm</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
     </div>
 </div>
 

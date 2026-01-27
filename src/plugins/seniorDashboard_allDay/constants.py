@@ -90,3 +90,27 @@ LOCALE_MAP = {
     "zh-cn": "Chinese (Simplified)",
     "zh-tw": "Chinese (Traditional)"
 }
+
+WEATHER_ICONS = {
+    0: "☀️",   # klar
+    1: "🌤️",  # meist klar
+    2: "⛅",   # teilweise bewölkt
+    3: "☁️",   # bedeckt
+    45: "🌫️",  # Nebel
+    48: "🌫️",
+    51: "🌦️",  # Niesel
+    53: "🌦️",
+    55: "🌦️",
+    61: "🌧️",  # Regen
+    63: "🌧️",
+    65: "🌧️",
+    71: "❄️",  # Schnee
+    73: "❄️",
+    75: "❄️",
+    80: "🌦️",  # Schauer
+    81: "🌧️",
+    82: "🌧️",
+    95: "⛈️",  # Gewitter
+    96: "⛈️",
+    99: "⛈️",
+}

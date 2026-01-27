@@ -1,5 +1,5 @@
 from plugins.base_plugin.base_plugin import BasePlugin
-from plugins.seniorDashboard_allDay.constants import LOCALE_MAP, FONT_SIZES
+from plugins.seniorDashboard_allDay.constants import LOCALE_MAP, FONT_SIZES, WEATHER_ICONS
 from PIL import ImageColor
 import icalendar
 import recurring_ical_events
@@ -56,6 +56,9 @@ class SeniorDashboardAllDay(BasePlugin):
         # Get locale for date formatting
         locale_code = display_settings.get("language", "en")
         
+        # Fetch weather data
+        weather_data = self.fetch_weather_data(timezone)
+        
         template_params = {
             "view": view,
             "events": events,
@@ -64,7 +67,8 @@ class SeniorDashboardAllDay(BasePlugin):
             "plugin_settings": display_settings,
             "time_format": time_format,
             "font_scale": FONT_SIZES.get(settings.get("fontSize", "normal")),
-            "locale_code": locale_code
+            "locale_code": locale_code,
+            "weather": weather_data
         }
 
         image = self.render_image(dimensions, "seniorDashboard_allDay.html", "seniorDashboard_allDay.css", template_params)
@@ -145,3 +149,67 @@ class SeniorDashboardAllDay(BasePlugin):
         yiq = (r * 299 + g * 587 + b * 114) / 1000
 
         return '#000000' if yiq >= 150 else '#ffffff'
+
+    def get_weather_icon(self, code):
+        """Get weather icon emoji for a given weather code."""
+        return WEATHER_ICONS.get(code, "❓")
+
+    def fetch_weather_data(self, timezone):
+        """Fetch weather data from Open-Meteo API."""
+        URL = "https://api.open-meteo.com/v1/dwd-icon"
+        
+        # Default coordinates (can be made configurable later)
+        params = {
+            "latitude": 49.8728,
+            "longitude": 8.6512,
+            "current_weather": True,
+            "daily": "temperature_2m_max,temperature_2m_min,precipitation_sum,weathercode",
+            "forecast_days": 3,
+            "timezone": timezone
+        }
+        
+        try:
+            response = requests.get(URL, params=params, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+            
+            # Process current weather
+            current = data.get("current_weather", {})
+            current_weather = {
+                "icon": self.get_weather_icon(current.get("weathercode", 0)),
+                "temperature": current.get("temperature", 0),
+                "windspeed": current.get("windspeed", 0),
+                "weathercode": current.get("weathercode", 0)
+            }
+            
+            # Process daily forecast
+            daily = data.get("daily", {})
+            forecast = []
+            if "time" in daily:
+                for i, day in enumerate(daily["time"]):
+                    # Format date in German format (DD.MM.YYYY)
+                    try:
+                        date_obj = datetime.strptime(day, "%Y-%m-%d")
+                        formatted_date = date_obj.strftime("%d.%m.%Y")
+                    except:
+                        formatted_date = day  # Fallback to original if parsing fails
+                    
+                    forecast.append({
+                        "date": formatted_date,
+                        "icon": self.get_weather_icon(daily.get("weathercode", [0])[i] if i < len(daily.get("weathercode", [])) else 0),
+                        "temp_min": daily.get("temperature_2m_min", [0])[i] if i < len(daily.get("temperature_2m_min", [])) else 0,
+                        "temp_max": daily.get("temperature_2m_max", [0])[i] if i < len(daily.get("temperature_2m_max", [])) else 0,
+                        "precipitation": daily.get("precipitation_sum", [0])[i] if i < len(daily.get("precipitation_sum", [])) else 0,
+                        "weathercode": daily.get("weathercode", [0])[i] if i < len(daily.get("weathercode", [])) else 0
+                    })
+            
+            return {
+                "current": current_weather,
+                "forecast": forecast
+            }
+        except Exception as e:
+            logger.warning(f"Failed to fetch weather data: {str(e)}")
+            return {
+                "current": None,
+                "forecast": []
+            }

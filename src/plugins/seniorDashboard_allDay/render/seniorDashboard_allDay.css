@@ -22,6 +22,89 @@
 .dashboard-right {
   width: 50%;
   height: 100%;
+  padding: 20px;
+  font-family: "Jost";
+  overflow-y: auto;
+}
+
+.weather-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.weather-title {
+  font-size: calc(1.5 * var(--fc-table-font-size, 1em));
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: var(--fc-border-color, #000);
+}
+
+.weather-current {
+  width: 100%;
+}
+
+.weather-current-content {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-size: calc(1.2 * var(--fc-table-font-size, 1em));
+}
+
+.weather-icon {
+  font-size: calc(2 * var(--fc-table-font-size, 1em));
+  line-height: 1;
+}
+
+.weather-temp {
+  font-size: calc(1.5 * var(--fc-table-font-size, 1em));
+  font-weight: bold;
+}
+
+.weather-wind {
+  font-size: calc(1 * var(--fc-table-font-size, 1em));
+  color: #666;
+}
+
+.weather-forecast {
+  width: 100%;
+}
+
+.weather-day {
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.weather-day:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.weather-day-date {
+  font-size: calc(1.1 * var(--fc-table-font-size, 1em));
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: var(--fc-border-color, #000);
+}
+
+.weather-day-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: calc(1 * var(--fc-table-font-size, 1em));
+}
+
+.weather-temp-range {
+  font-weight: bold;
+}
+
+.weather-precipitation {
+  color: #666;
+  margin-left: auto;
 }
 
 .calendar {
