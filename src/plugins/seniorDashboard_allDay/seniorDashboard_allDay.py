@@ -49,6 +49,13 @@ class SeniorDashboardAllDay(BasePlugin):
         display_settings["displayWeekends"] = "true"
         display_settings["displayEventTime"] = "true"
         
+        # Ensure language is set (default to 'en' if not provided)
+        if "language" not in display_settings or not display_settings["language"]:
+            display_settings["language"] = "en"
+        
+        # Get locale for date formatting
+        locale_code = display_settings.get("language", "en")
+        
         template_params = {
             "view": view,
             "events": events,
@@ -56,7 +63,8 @@ class SeniorDashboardAllDay(BasePlugin):
             "timezone": timezone,
             "plugin_settings": display_settings,
             "time_format": time_format,
-            "font_scale": FONT_SIZES.get(settings.get("fontSize", "normal"))
+            "font_scale": FONT_SIZES.get(settings.get("fontSize", "normal")),
+            "locale_code": locale_code
         }
 
         image = self.render_image(dimensions, "seniorDashboard_allDay.html", "seniorDashboard_allDay.css", template_params)
