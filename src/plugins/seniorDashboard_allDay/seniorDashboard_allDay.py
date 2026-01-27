@@ -182,20 +182,20 @@ class SeniorDashboardAllDay(BasePlugin):
                 "weathercode": current.get("weathercode", 0)
             }
             
-            # Process daily forecast
+            # Process daily forecast (only first 2 days: Morgen and Übermorgen)
             daily = data.get("daily", {})
             forecast = []
             if "time" in daily:
-                for i, day in enumerate(daily["time"]):
-                    # Format date in German format (DD.MM.YYYY)
-                    try:
-                        date_obj = datetime.strptime(day, "%Y-%m-%d")
-                        formatted_date = date_obj.strftime("%d.%m.%Y")
-                    except:
-                        formatted_date = day  # Fallback to original if parsing fails
+                # Only process first 2 days
+                for i, day in enumerate(daily["time"][:2]):
+                    # Label as "Morgen" (tomorrow) or "Übermorgen" (day after tomorrow)
+                    if i == 0:
+                        date_label = "Morgen"
+                    else:
+                        date_label = "Übermorgen"
                     
                     forecast.append({
-                        "date": formatted_date,
+                        "date": date_label,
                         "icon": self.get_weather_icon(daily.get("weathercode", [0])[i] if i < len(daily.get("weathercode", [])) else 0),
                         "temp_min": daily.get("temperature_2m_min", [0])[i] if i < len(daily.get("temperature_2m_min", [])) else 0,
                         "temp_max": daily.get("temperature_2m_max", [0])[i] if i < len(daily.get("temperature_2m_max", [])) else 0,
