@@ -23,7 +23,6 @@
                             "calendarURLs[]": [
                                 "webcal://p118-caldav.icloud.com/published/2/MTQwNjAzNDU1ODE0MDYwM7HUJEuAlayW3-W2_XEY2Y2g8cvVGd9TTmOQVRhbm7Hye7a2NilMMsmHN9fWHV18mjlRBAAjAPnzn2n09tQ6IL8"
                             ],
-                            "viewMode": "listMonth",
                             "language": "de",
                             "displayTitle": "true",
                             "displayWeekends": "true",
@@ -41,7 +40,7 @@
                         "refresh": {
                             "interval": 3600
                         },
-                        "latest_refresh_time": "2026-01-27T16:11:12.139783+01:00"
+                        "latest_refresh_time": "2026-01-27T16:18:28.156914+01:00"
                     }
                 ],
                 "current_plugin_index": null
@@ -50,8 +49,8 @@
         "active_playlist": "Default"
     },
     "refresh_info": {
-        "refresh_time": "2026-01-27T16:11:12.139783+01:00",
-        "image_hash": "bbf1ac095f78f87ee1d9630decd7895b91d6d79dcd1e57c965ef4b093014e3c2",
+        "refresh_time": "2026-01-27T16:18:28.156914+01:00",
+        "image_hash": "d233de2ab8387132bb7e541306538d205dab85226c0a795f56449311a7042827",
         "refresh_type": "Playlist",
         "plugin_id": "seniorDashboard_allDay",
         "playlist": "Default",

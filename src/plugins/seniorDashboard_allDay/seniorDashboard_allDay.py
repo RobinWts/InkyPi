@@ -1,11 +1,8 @@
-import os
-from utils.app_utils import resolve_path, get_font
 from plugins.base_plugin.base_plugin import BasePlugin
 from plugins.seniorDashboard_allDay.constants import LOCALE_MAP, FONT_SIZES
-from PIL import Image, ImageColor, ImageDraw, ImageFont
+from PIL import ImageColor
 import icalendar
 import recurring_ical_events
-from io import BytesIO
 import logging
 import requests
 from datetime import datetime, timedelta
@@ -23,12 +20,7 @@ class SeniorDashboardAllDay(BasePlugin):
     def generate_image(self, settings, device_config):
         calendar_urls = settings.get('calendarURLs[]')
         calendar_colors = settings.get('calendarColors[]')
-        view = settings.get("viewMode")
-
-        if not view:
-            raise RuntimeError("View is required")
-        elif view not in ["timeGridDay", "timeGridWeek", "dayGrid", "dayGridMonth", "listMonth"]:
-            raise RuntimeError("Invalid view")
+        view = "listMonth"  # Fixed to list view
 
         if not calendar_urls:
             raise RuntimeError("At least one calendar URL is required")
@@ -45,21 +37,24 @@ class SeniorDashboardAllDay(BasePlugin):
         tz = pytz.timezone(timezone)
 
         current_dt = datetime.now(tz)
-        start, end = self.get_view_range(view, current_dt, settings)
+        start, end = self.get_view_range(current_dt)
         logger.debug(f"Fetching events for {start} --> [{current_dt}] --> {end}")
         events = self.fetch_ics_events(calendar_urls, calendar_colors, tz, start, end)
         if not events:
             logger.warn("No events found for ics url")
 
-        if view == 'timeGridWeek' and settings.get("displayPreviousDays") != "true":
-            view = 'timeGrid'
-
+        # Hardcode display options to True
+        display_settings = settings.copy()
+        display_settings["displayTitle"] = "true"
+        display_settings["displayWeekends"] = "true"
+        display_settings["displayEventTime"] = "true"
+        
         template_params = {
             "view": view,
             "events": events,
             "current_dt": current_dt.replace(minute=0, second=0, microsecond=0).isoformat(),
             "timezone": timezone,
-            "plugin_settings": settings,
+            "plugin_settings": display_settings,
             "time_format": time_format,
             "font_scale": FONT_SIZES.get(settings.get("fontSize", "normal"))
         }
@@ -94,26 +89,10 @@ class SeniorDashboardAllDay(BasePlugin):
 
         return parsed_events
     
-    def get_view_range(self, view, current_dt, settings):
+    def get_view_range(self, current_dt):
+        """Get the date range for listMonth view (5 weeks from today)."""
         start = datetime(current_dt.year, current_dt.month, current_dt.day)
-        if view == "timeGridDay":
-            end = start + timedelta(days=1)
-        elif view == "timeGridWeek":
-            if settings.get("displayPreviousDays") == "true":
-                week_start_day = int(settings.get("weekStartDay", 1))
-                python_week_start = (week_start_day - 1) % 7
-                offset = (current_dt.weekday() - python_week_start) % 7
-                start = current_dt - timedelta(days=offset)
-                start = datetime(start.year, start.month, start.day)
-            end = start + timedelta(days=7)
-        elif view == "dayGrid":
-            start = current_dt - timedelta(weeks=1)
-            end = current_dt + timedelta(weeks=int(settings.get("displayWeeks") or 4))
-        elif view == "dayGridMonth":
-            start = datetime(current_dt.year, current_dt.month, 1) - timedelta(weeks=1)
-            end = datetime(current_dt.year, current_dt.month, 1) + timedelta(weeks=6)
-        elif view == "listMonth":
-            end = start + timedelta(weeks=5)
+        end = start + timedelta(weeks=5)
         return start, end
         
     def parse_data_points(self, event, tz):
