@@ -1,0 +1,94 @@
+{
+  "version": "1.0",
+  "rules": {
+    "context_initialization": {
+      "description": "Starting point for each interaction (InkyPi plugin development)",
+      "steps": [
+        "ALWAYS read `README.md` for project overview and supported hardware/plugin concepts",
+        "ALWAYS read `docs/building_plugins.md` before creating or modifying any plugin",
+        "ALWAYS read `docs/development.md` before changing anything outside a plugin folder",
+        "If the task touches rendering/layout, inspect the plugin output patterns used by existing plugins in `src/plugins/` before writing new code"
+      ]
+    },
+    "operational_protocol": {
+      "description": "How to approach tasks for InkyPi plugins",
+      "before_action": [
+        "Create a MECE task breakdown",
+        "Identify whether the change is: (A) new plugin, (B) plugin enhancement, or (C) shared/core change — prefer (A) or (B)"
+      ],
+      "code_changes": [
+        "Read relevant code sections before editing",
+        "Preserve existing functionality and behavior",
+        "Preserve existing comments and structure unless they are clearly wrong",
+        "Keep changes minimal and localized to the plugin folder whenever possible",
+        "Maintain backwards compatibility with existing plugin settings where feasible"
+      ],
+      "development_responsibilities": [
+        "You are responsible for developing InkyPi plugins inside `src/plugins/<your_plugin>/`",
+        "You may create or update plugin assets required by InkyPi (e.g., icon, settings template, plugin metadata) as described in `docs/building_plugins.md`",
+        "You are NOT responsible for refactoring the InkyPi core system unless explicitly requested",
+        "Do not change shared/core code to 'fit' a plugin; instead adapt the plugin to the existing plugin interface and patterns"
+      ],
+      "plugin_building_rules": [
+        "Place new plugins under `src/plugins/<plugin_slug>/` (plugin_slug should be lowercase and snake/kebab-safe)",
+        "Follow the plugin folder/file conventions described in `docs/building_plugins.md` (python class file, optional settings template, icon, and any required metadata files)",
+        "Match existing plugin patterns for: initialization, settings access, rendering output generation, and refresh/update behavior",
+        "Avoid doing heavy work at import time; defer network calls and expensive computations to the plugin execution path",
+        "All network calls MUST have explicit timeouts and graceful fallback output"
+      ],
+      "logging_changes": [
+        "If the project uses a changelog or notes file mentioned in `docs/development.md`, update it ONLY when explicitly asked (append-only; never rewrite history)"
+      ],
+      "building_instructions": [
+        "Never run install/update scripts or service restart commands automatically; provide the exact commands for the user to run",
+        "Do not assume hardware access (e-ink display) during development; keep plugins testable with mocked data where possible"
+      ]
+    },
+    "safety_requirements": [
+      "ALWAYS maintain proper error handling and user-friendly fallbacks (display something useful even on failure)",
+      "ALWAYS use explicit timeouts for HTTP/API calls",
+      "ALWAYS validate and sanitize user-provided settings (strings, URLs, file paths, units, numeric ranges)",
+      "NEVER log secrets (API keys/tokens) or embed them in plugin code; use the project’s settings/secret mechanism",
+      "NEVER add dependencies lightly; prefer stdlib. If a dependency is required, justify it and follow the project’s dependency workflow from `docs/development.md`",
+      "Respect e-ink constraints: minimize refresh frequency and avoid unnecessary redraws"
+    ],
+    "coding_style": [
+      "Use Python best practices and follow the existing style in the repository",
+      "Prefer type hints for public plugin methods and complex data structures",
+      "Use clear, descriptive names (snake_case for variables/functions, PascalCase for classes)",
+      "Keep functions small and focused; extract helpers for repeated logic",
+      "Add concise comments only where they explain non-obvious decisions (avoid redundant narration)"
+    ],
+    "plugin_quality_standards": [
+      "Plugins must degrade gracefully: missing configuration, API failure, or no network should not crash the plugin",
+      "Prefer deterministic rendering: the same settings should produce consistent output",
+      "Cache expensive results when appropriate (especially API calls) to reduce rate-limit risk and speed up refresh",
+      "Ensure settings have sensible defaults and safe bounds"
+    ],
+    "code_organization": [
+      "Keep all plugin-specific code, assets, and templates inside the plugin’s folder",
+      "Do not create catch-all utility modules; if shared helpers are truly needed, propose a minimal shared utility and keep it generic",
+      "Keep files reasonably sized (preferably under ~900 lines); split large files into focused modules"
+    ],
+    "priorities": [
+      {
+        "source": "docs/building_plugins.md",
+        "weight": 1.0
+      },
+      {
+        "source": "docs/development.md",
+        "weight": 0.95
+      },
+      {
+        "source": "src/plugins/",
+        "weight": 0.9
+      }
+    ],
+    "project_directives": {
+      "name": "InkyPi",
+      "ai_first": true,
+      "primary_scope": "Plugins",
+      "primary_scope_path": "src/plugins/"
+    }
+  }
+}
