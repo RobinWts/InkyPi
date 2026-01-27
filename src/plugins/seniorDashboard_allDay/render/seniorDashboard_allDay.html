@@ -4,17 +4,24 @@
 
 <script src="{{static_dir}}/scripts/calendar.min.js" charset="UTF-8"></script>
 
-<div id="calendar" class="calendar" style="
---fc-page-bg-color: {{ plugin_settings.backgroundColor or white }};
---fc-border-color: {{ plugin_settings.textColor }};
---fc-today-bg-color: '';
---fc-event-border-color: {{ plugin_settings.textColor or white }};
+<div class="dashboard-container">
+    <div class="dashboard-left">
+        <div id="calendar" class="calendar" style="
+        --fc-page-bg-color: {{ plugin_settings.backgroundColor or white }};
+        --fc-border-color: {{ plugin_settings.textColor }};
+        --fc-today-bg-color: '';
+        --fc-event-border-color: {{ plugin_settings.textColor or white }};
 
---fc-small-font-size: {{ 0.85 * font_scale }}em;
---fc-title-font-size: {{ 1.75 * font_scale }}em;
---fc-table-font-size: {{ 1 * font_scale }}em;
-">
+        --fc-small-font-size: {{ 0.85 * font_scale }}em;
+        --fc-title-font-size: {{ 1.75 * font_scale }}em;
+        --fc-table-font-size: {{ 1 * font_scale }}em;
+        ">
 
+        </div>
+    </div>
+    <div class="dashboard-right">
+        <!-- Right side content will be added here -->
+    </div>
 </div>
 
 <script>
@@ -33,10 +40,10 @@
 
     const locale = "{{ plugin_settings.language or 'en' }}";
     const timezone = "{{ timezone }}";
-    
+
     // Create date object from ISO string to handle timezone correctly
     const currentDate = new Date('{{ current_dt }}');
-    
+
     // Format date to match listMonth date headers (e.g., "January 27, 2026")
     // Using the same format that FullCalendar uses for listMonth day headers (without weekday)
     const dateFormatter = new Intl.DateTimeFormat(locale, {
@@ -64,7 +71,7 @@
             center: 'title',
             right: ''
         },
-        datesSet: function() {
+        datesSet: function () {
             // Update the title with the formatted current date after calendar renders
             const titleElement = calendarEl.querySelector('.fc-toolbar-title');
             if (titleElement) {

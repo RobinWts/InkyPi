@@ -25,7 +25,7 @@
                             ],
                             "language": "de",
                             "fontSize": "large",
-                            "selectedFrame": "None",
+                            "selectedFrame": "Rectangle",
                             "topMargin": "",
                             "bottomMargin": "",
                             "leftMargin": "",
@@ -37,7 +37,39 @@
                         "refresh": {
                             "interval": 3600
                         },
-                        "latest_refresh_time": "2026-01-27T16:33:31.902164+01:00"
+                        "latest_refresh_time": "2026-01-27T16:38:10.000667+01:00"
+                    },
+                    {
+                        "plugin_id": "weather",
+                        "name": "Wetter",
+                        "plugin_settings": {
+                            "latitude": "7.18810087117902",
+                            "longitude": "7.20703125",
+                            "weatherProvider": "OpenWeatherMap",
+                            "units": "metric",
+                            "titleSelection": "location",
+                            "customTitle": "",
+                            "displayRefreshTime": "true",
+                            "displayMetrics": "true",
+                            "displayGraph": "true",
+                            "displayGraphIcons": "true",
+                            "graphIconStep": "2",
+                            "displayForecast": "true",
+                            "forecastDays": "3",
+                            "weatherTimeZone": "locationTimeZone",
+                            "selectedFrame": "None",
+                            "topMargin": "",
+                            "bottomMargin": "",
+                            "leftMargin": "",
+                            "rightMargin": "",
+                            "backgroundOption": "color",
+                            "backgroundColor": "#ffffff",
+                            "textColor": "#000000"
+                        },
+                        "refresh": {
+                            "interval": 60
+                        },
+                        "latest_refresh_time": null
                     }
                 ],
                 "current_plugin_index": null
@@ -46,8 +78,8 @@
         "active_playlist": "Default"
     },
     "refresh_info": {
-        "refresh_time": "2026-01-27T16:33:31.902164+01:00",
-        "image_hash": "6e85f37bba60c347f1df4e57ee49997cef5937c729d85e41cfec4999c70e28b4",
+        "refresh_time": "2026-01-27T16:38:10.000667+01:00",
+        "image_hash": "9274f84fe5d45a21307bcff7b0c033ca72b354aeb2b3ba5ac6f0b80692b2251d",
         "refresh_type": "Playlist",
         "plugin_id": "seniorDashboard_allDay",
         "playlist": "Default",
