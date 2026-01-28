@@ -39,7 +39,7 @@ class SeniorDashboardAllDay(BasePlugin):
         current_dt = datetime.now(tz)
         start, end = self.get_view_range(current_dt)
         logger.debug(f"Fetching events for {start} --> [{current_dt}] --> {end}")
-        events = self.fetch_ics_events(calendar_urls, calendar_colors, tz, start, end)
+        events = self.fetch_ics_events(calendar_urls, calendar_colors, tz, start, end, current_dt)
         if not events:
             logger.warn("No events found for ics url")
 
@@ -77,7 +77,7 @@ class SeniorDashboardAllDay(BasePlugin):
             raise RuntimeError("Failed to take screenshot, please check logs.")
         return image
     
-    def fetch_ics_events(self, calendar_urls, colors, tz, start_range, end_range):
+    def fetch_ics_events(self, calendar_urls, colors, tz, start_range, end_range, current_dt):
         parsed_events = []
 
         for calendar_url, color in zip(calendar_urls, colors):
@@ -87,6 +87,17 @@ class SeniorDashboardAllDay(BasePlugin):
 
             for event in events:
                 start, end, all_day = self.parse_data_points(event, tz)
+                # Filter out events that have fully ended in the past
+                try:
+                    # Use end time if available, otherwise start time
+                    end_iso = end or start
+                    end_dt = datetime.fromisoformat(end_iso)
+                    if end_dt <= current_dt:
+                        continue
+                except Exception:
+                    # If parsing fails, keep the event to avoid hiding valid data
+                    pass
+
                 parsed_event = {
                     "title": str(event.get("summary")),
                     "start": start,
