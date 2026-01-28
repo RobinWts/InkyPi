@@ -127,7 +127,7 @@
 }
 
 .weather-precipitation {
-  color: #666;
+  color: #0000FF;
   margin-left: auto;
 }
 
@@ -208,6 +208,7 @@ th {
 .fc-listMonth-view .fc-list-day.fc-day-today,
 .fc-list-view .fc-list-day.fc-day-today {
   background-color: #00FF00 !important;
+  color: #FFFFFF !important;
 }
 
 .fc-listMonth-view .fc-list-day.fc-day-today .fc-list-day-text,
@@ -217,6 +218,13 @@ th {
 .fc-list-view .fc-list-day.fc-day-today .fc-list-day-side-text,
 .fc-list-view .fc-list-day.fc-day-today .fc-list-day-cushion {
   background-color: #00FF00 !important;
+  color: #FFFFFF !important;
+}
+
+/* Ensure all text elements within today's header are white */
+.fc-listMonth-view .fc-list-day.fc-day-today *,
+.fc-list-view .fc-list-day.fc-day-today * {
+  color: #FFFFFF !important;
 }
 
 /* Ensure FullCalendar elements respect the 50% width constraint */
