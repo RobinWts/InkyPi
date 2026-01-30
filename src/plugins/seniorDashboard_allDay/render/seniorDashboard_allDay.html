@@ -54,71 +54,79 @@
     </div>
 </div>
 
+<script type="application/json" id="senior-dashboard-config">
+{{ {
+    "events": events,
+    "time_format_12h": time_format == "12h",
+    "locale": plugin_settings.language or "en",
+    "timezone": timezone,
+    "current_dt": current_dt
+} | tojson }}
+</script>
 <script>
-    const events = {{ events | tojson }};
+    (function () {
+        const configEl = document.getElementById('senior-dashboard-config');
+        const config = configEl ? JSON.parse(configEl.textContent) : {};
+        const calendarEvents = config.events || [];
+        const locale = config.locale || 'en';
+        const timezone = config.timezone || 'UTC';
+        const currentDt = config.current_dt || '';
+        const timeFormat12h = config.time_format_12h !== false;
 
-    document.addEventListener('DOMContentLoaded', function () {
-        const calendarEl = document.getElementById('calendar');
-        const timeFormat = {
-            hour: "numeric",
-            minute: "2-digit",
-            omitZeroMinute: {{ (time_format == "12h") | tojson
-    }},
-        hour12: {{ (time_format == "12h") | tojson }},
-        meridiem: 'short'
-        };
+        document.addEventListener('DOMContentLoaded', function () {
+            const calendarEl = document.getElementById('calendar');
+            const timeFormat = {
+                hour: "numeric",
+                minute: "2-digit",
+                omitZeroMinute: timeFormat12h,
+                hour12: timeFormat12h,
+                meridiem: 'short'
+            };
 
-    const locale = "{{ plugin_settings.language or 'en' }}";
-    const timezone = "{{ timezone }}";
+            const currentDate = new Date(currentDt);
+            const dateFormatter = new Intl.DateTimeFormat(locale, {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                timeZone: timezone
+            });
+            const formattedTitle = dateFormatter.format(currentDate);
 
-    // Create date object from ISO string to handle timezone correctly
-    const currentDate = new Date('{{ current_dt }}');
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'listMonth',
+                events: calendarEvents,
+                now: currentDt,
+                timeZone: timezone,
+                contentHeight: '100%',
+                expandRows: true,
+                locale: locale,
+                allDayText: 'Ganztägig',
+                noEventsContent: 'Nix los zur Zeit!',
+                eventTimeFormat: timeFormat,
+                displayEventTime: true,
+                weekends: true,
+                fixedWeekCount: false,
+                headerToolbar: {
+                    left: '',
+                    center: '',
+                    right: ''
+                },
+                datesSet: function () {
+                    const dashboardTitleEl = document.getElementById('dashboard-title');
+                    if (dashboardTitleEl) {
+                        dashboardTitleEl.textContent = formattedTitle;
+                    }
+                }
+            });
+            calendar.render();
 
-    // Format date with weekday (e.g., "Tuesday, January 27, 2026" or "Dienstag, 27. Januar 2026")
-    const dateFormatter = new Intl.DateTimeFormat(locale, {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        timeZone: timezone
-    });
-    const formattedTitle = dateFormatter.format(currentDate);
-
-    const calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'listMonth',
-        events: events,
-        now: '{{ current_dt }}',
-        timeZone: '{{ timezone }}',
-        contentHeight: '100%',
-        expandRows: true,
-        locale: locale,
-        allDayText: 'Ganztägig',
-        noEventsContent: 'Nix los zur Zeit!',
-        eventTimeFormat: timeFormat,
-        displayEventTime: true,
-        weekends: true,
-        fixedWeekCount: false,
-        headerToolbar: {
-            left: '',
-            center: '',
-            right: ''
-        },
-        datesSet: function () {
-            // Update the dashboard title with the formatted current date
             const dashboardTitleEl = document.getElementById('dashboard-title');
             if (dashboardTitleEl) {
                 dashboardTitleEl.textContent = formattedTitle;
             }
-        }
-    });
-    calendar.render();
-
-    // Set initial title
-    const dashboardTitleEl = document.getElementById('dashboard-title');
-    if (dashboardTitleEl) {
-        dashboardTitleEl.textContent = formattedTitle;
-    }
-    });
+        });
+    })();
 </script>
 
 {% endblock %}
