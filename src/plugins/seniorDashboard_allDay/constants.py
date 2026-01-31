@@ -13,6 +13,22 @@ LOCALE_MAP = {
     "de": "German",
 }
 
+# UI strings for localization (keyed by locale code)
+LABELS = {
+    "en": {
+        "allDayText": "All day",
+        "noEventsContent": "Nothing scheduled!",
+        "tomorrow": "Tomorrow",
+        "dayAfterTomorrow": "Day after tomorrow",
+    },
+    "de": {
+        "allDayText": "Ganztägig",
+        "noEventsContent": "Nix los zur Zeit!",
+        "tomorrow": "Morgen",
+        "dayAfterTomorrow": "Übermorgen",
+    },
+}
+
 WEATHER_ICONS = {
     0: "☀️",   # klar
     1: "🌤️",  # meist klar

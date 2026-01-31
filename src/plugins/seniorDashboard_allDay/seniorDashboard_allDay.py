@@ -1,5 +1,5 @@
 from plugins.base_plugin.base_plugin import BasePlugin
-from plugins.seniorDashboard_allDay.constants import LOCALE_MAP, FONT_SIZES, WEATHER_ICONS
+from plugins.seniorDashboard_allDay.constants import LOCALE_MAP, LABELS, FONT_SIZES, WEATHER_ICONS
 from PIL import ImageColor
 import icalendar
 import recurring_ical_events
@@ -60,12 +60,13 @@ class SeniorDashboardAllDay(BasePlugin):
         if "language" not in display_settings or not display_settings["language"]:
             display_settings["language"] = "en"
         
-        # Get locale for date formatting
+        # Get locale for date formatting and labels
         locale_code = display_settings.get("language", "en")
-        
-        # Fetch weather data
-        weather_data = self.fetch_weather_data(timezone)
-        
+        labels = LABELS.get(locale_code, LABELS["en"])
+
+        # Fetch weather data (uses locale for forecast day labels)
+        weather_data = self.fetch_weather_data(timezone, locale_code)
+
         template_params = {
             "view": view,
             "events": events,
@@ -75,6 +76,7 @@ class SeniorDashboardAllDay(BasePlugin):
             "time_format": time_format,
             "font_scale": FONT_SIZES.get(settings.get("fontSize", "normal")),
             "locale_code": locale_code,
+            "labels": labels,
             "weather": weather_data
         }
 
@@ -200,10 +202,11 @@ class SeniorDashboardAllDay(BasePlugin):
         """Get weather icon emoji for a given weather code."""
         return WEATHER_ICONS.get(code, "❓")
 
-    def fetch_weather_data(self, timezone):
+    def fetch_weather_data(self, timezone, locale_code="en"):
         """Fetch weather data from Open-Meteo API."""
         URL = "https://api.open-meteo.com/v1/dwd-icon"
-        
+        day_labels = LABELS.get(locale_code, LABELS["en"])
+
         # Default coordinates (can be made configurable later)
         params = {
             "latitude": 49.8728,
@@ -228,18 +231,12 @@ class SeniorDashboardAllDay(BasePlugin):
                 "weathercode": current.get("weathercode", 0)
             }
             
-            # Process daily forecast (only first 2 days: Morgen and Übermorgen)
+            # Process daily forecast (first 2 days: tomorrow and day after)
             daily = data.get("daily", {})
             forecast = []
             if "time" in daily:
-                # Only process first 2 days
                 for i, day in enumerate(daily["time"][:2]):
-                    # Label as "Morgen" (tomorrow) or "Übermorgen" (day after tomorrow)
-                    if i == 0:
-                        date_label = "Morgen"
-                    else:
-                        date_label = "Übermorgen"
-                    
+                    date_label = day_labels["tomorrow"] if i == 0 else day_labels["dayAfterTomorrow"]
                     forecast.append({
                         "date": date_label,
                         "icon": self.get_weather_icon(daily.get("weathercode", [0])[i] if i < len(daily.get("weathercode", [])) else 0),

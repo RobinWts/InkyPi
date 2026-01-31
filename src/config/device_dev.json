@@ -22,7 +22,7 @@
                                 "webcal://p118-caldav.icloud.com/published/2/MTQwNjAzNDU1ODE0MDYwM7HUJEuAlayW3-W2_XEY2Y2DrL3Kj3BzMuXFqOB1JbMgCLEB_Uci4Va1ynLhdgVF2alSuilECGHRw0aqYC0tczM"
                             ],
                             "language": "de",
-                            "fontSize": "large",
+                            "fontSize": "smaller",
                             "selectedFrame": "None",
                             "topMargin": "",
                             "bottomMargin": "",
@@ -35,7 +35,30 @@
                         "refresh": {
                             "interval": 3600
                         },
-                        "latest_refresh_time": "2026-01-31T17:40:30.312388+01:00"
+                        "latest_refresh_time": "2026-01-31T17:48:34.149657+01:00"
+                    },
+                    {
+                        "plugin_id": "seniorDashboard_allDay",
+                        "name": "leer",
+                        "plugin_settings": {
+                            "calendarURLs[]": [
+                                "webcal://p118-caldav.icloud.com/published/2/MTQwNjAzNDU1ODE0MDYwM7HUJEuAlayW3-W2_XEY2Y3_sdCFIbQ-8xoeTi7qODiziI6yueNG5DoRXVAbHLBkxbvHYbtnOrFaBCmE6JxucH8"
+                            ],
+                            "language": "de",
+                            "fontSize": "normal",
+                            "selectedFrame": "None",
+                            "topMargin": "",
+                            "bottomMargin": "",
+                            "leftMargin": "",
+                            "rightMargin": "",
+                            "backgroundOption": "color",
+                            "backgroundColor": "#ffffff",
+                            "textColor": "#000000"
+                        },
+                        "refresh": {
+                            "interval": 60
+                        },
+                        "latest_refresh_time": "2026-01-31T17:47:13.409557+01:00"
                     }
                 ],
                 "current_plugin_index": 2
@@ -44,8 +67,8 @@
         "active_playlist": "Default"
     },
     "refresh_info": {
-        "refresh_time": "2026-01-31T17:40:30.312388+01:00",
-        "image_hash": "09e1da193a534690198ca7ab73f85477173740908cc7d7cf86cebc9a39f9b8a4",
+        "refresh_time": "2026-01-31T17:48:34.149657+01:00",
+        "image_hash": "863370bf6ad34937ea568c0a8116869053e784f203b03bb1a651ed6037fab907",
         "refresh_type": "Playlist",
         "plugin_id": "seniorDashboard_allDay",
         "playlist": "Default",

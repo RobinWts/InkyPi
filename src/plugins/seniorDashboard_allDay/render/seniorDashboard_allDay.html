@@ -58,7 +58,8 @@
     "time_format_12h": time_format == "12h",
     "locale": plugin_settings.language or "en",
     "timezone": timezone,
-    "current_dt": current_dt
+    "current_dt": current_dt,
+    "labels": labels
 } | tojson }}
 </script>
 <script>
@@ -70,6 +71,7 @@
         const timezone = config.timezone || 'UTC';
         const currentDt = config.current_dt || '';
         const timeFormat12h = config.time_format_12h !== false;
+        const labels = config.labels || { allDayText: 'All day', noEventsContent: 'Nothing scheduled!' };
 
         document.addEventListener('DOMContentLoaded', function () {
             const calendarEl = document.getElementById('calendar');
@@ -118,8 +120,8 @@
                 contentHeight: '100%',
                 expandRows: true,
                 locale: locale,
-                allDayText: 'Ganztägig',
-                noEventsContent: 'Nix los zur Zeit!',
+                allDayText: labels.allDayText,
+                noEventsContent: labels.noEventsContent,
                 eventTimeFormat: timeFormat,
                 displayEventTime: true,
                 weekends: true,
