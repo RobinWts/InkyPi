@@ -5,13 +5,16 @@
   padding: 0;
 }
 
-/* Remove all top padding/margin from page and layout (plugin is rendered in body > .container) */
+/* Remove all top/bottom padding and margin from page and layout (plugin is rendered in body > .container) */
 body,
 .container,
 .dashboard-wrapper {
   padding-top: 0 !important;
+  padding-bottom: 0 !important;
   margin-top: 0 !important;
+  margin-bottom: 0 !important;
   border-top: none !important;
+  border-bottom: none !important;
 }
 
 .dashboard-wrapper {
@@ -51,7 +54,7 @@ body,
 .dashboard-right {
   width: 50%;
   height: 100%;
-  padding: 20px;
+  padding: 20px 20px 0 20px;
   font-family: "Jost";
   overflow-y: auto;
 }
@@ -102,8 +105,8 @@ body,
 }
 
 .weather-day {
-  margin-bottom: 20px;
-  padding-bottom: 15px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
   border-bottom: 1px solid #e0e0e0;
 }
 
@@ -147,7 +150,9 @@ body,
   font-family: "Jost";
   overflow: hidden;
   padding-top: 0 !important;
+  padding-bottom: 0 !important;
   margin-top: 0 !important;
+  margin-bottom: 0 !important;
 }
 
 
@@ -273,11 +278,13 @@ th {
   color: #FFFFFF !important;
 }
 
-/* Ensure FullCalendar elements respect the 50% width constraint and have no top spacing */
+/* Ensure FullCalendar elements respect the 50% width constraint and have no top/bottom spacing */
 .calendar .fc-view-harness,
 .calendar .fc-scroller,
 .calendar .fc-scroller-liquid-absolute {
   width: 100% !important;
   padding-top: 0 !important;
+  padding-bottom: 0 !important;
   margin-top: 0 !important;
+  margin-bottom: 0 !important;
 }
