@@ -204,6 +204,25 @@ th {
   font-size: var(--fc-table-font-size) !important;
 }
 
+/* Hide the colored calendar ID dot in list view and free space for event title */
+.fc-list-event .fc-list-event-graphic,
+.fc-list-event .fc-event-dot,
+.fc-list-event-graphic {
+  display: none !important;
+}
+
+/* Give event title full width where the dot was */
+.fc-list-event .fc-list-event-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fc-list-event .fc-list-event-time {
+  flex-shrink: 0;
+}
+
 /* Style today's date header in list views with pure green background for Waveshare EPD */
 .fc-list-day.fc-day-today {
   background-color: #00FF00 !important;
