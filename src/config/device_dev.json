@@ -35,7 +35,7 @@
                         "refresh": {
                             "interval": 3600
                         },
-                        "latest_refresh_time": "2026-01-31T17:38:07.093601+01:00"
+                        "latest_refresh_time": "2026-01-31T17:40:30.312388+01:00"
                     }
                 ],
                 "current_plugin_index": 2
@@ -44,7 +44,7 @@
         "active_playlist": "Default"
     },
     "refresh_info": {
-        "refresh_time": "2026-01-31T17:38:07.093601+01:00",
+        "refresh_time": "2026-01-31T17:40:30.312388+01:00",
         "image_hash": "09e1da193a534690198ca7ab73f85477173740908cc7d7cf86cebc9a39f9b8a4",
         "refresh_type": "Playlist",
         "plugin_id": "seniorDashboard_allDay",
