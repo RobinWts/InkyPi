@@ -35,7 +35,7 @@
                         "refresh": {
                             "interval": 3600
                         },
-                        "latest_refresh_time": "2026-01-31T17:48:34.149657+01:00"
+                        "latest_refresh_time": "2026-01-31T17:54:02.413893+01:00"
                     },
                     {
                         "plugin_id": "seniorDashboard_allDay",
@@ -59,6 +59,19 @@
                             "interval": 60
                         },
                         "latest_refresh_time": "2026-01-31T17:47:13.409557+01:00"
+                    },
+                    {
+                        "plugin_id": "clock",
+                        "name": "Uhr",
+                        "plugin_settings": {
+                            "selectedClockFace": "Gradient Clock",
+                            "primaryColor": "#db3246",
+                            "secondaryColor": "#000000"
+                        },
+                        "refresh": {
+                            "interval": 60
+                        },
+                        "latest_refresh_time": "2026-01-31T17:53:43.291425+01:00"
                     }
                 ],
                 "current_plugin_index": 2
@@ -67,7 +80,7 @@
         "active_playlist": "Default"
     },
     "refresh_info": {
-        "refresh_time": "2026-01-31T17:48:34.149657+01:00",
+        "refresh_time": "2026-01-31T17:54:02.413893+01:00",
         "image_hash": "863370bf6ad34937ea568c0a8116869053e784f203b03bb1a651ed6037fab907",
         "refresh_type": "Playlist",
         "plugin_id": "seniorDashboard_allDay",
