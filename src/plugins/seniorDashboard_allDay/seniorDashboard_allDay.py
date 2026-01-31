@@ -19,15 +19,18 @@ class SeniorDashboardAllDay(BasePlugin):
 
     def generate_image(self, settings, device_config):
         calendar_urls = settings.get('calendarURLs[]')
-        calendar_colors = settings.get('calendarColors[]')
-        view = "listWeek"  # Fixed to list view (today + next 2 days)
-
         if not calendar_urls:
             raise RuntimeError("At least one calendar URL is required")
         for url in calendar_urls:
             if not url.strip():
                 raise RuntimeError("Invalid calendar URL")
 
+        calendar_colors = settings.get('calendarColors[]')
+        default_color = '#007BFF'
+        if not calendar_colors or len(calendar_colors) < len(calendar_urls):
+            calendar_colors = [default_color] * len(calendar_urls)
+
+        view = "listWeek"  # Fixed to list view (today + next 2 days)
         dimensions = device_config.get_resolution()
         if device_config.get_config("orientation") == "vertical":
             dimensions = dimensions[::-1]

@@ -17,11 +17,9 @@
                         "plugin_id": "seniorDashboard_allDay",
                         "name": "Senior 1",
                         "plugin_settings": {
-                            "calendarColors[]": [
-                                "#000000"
-                            ],
                             "calendarURLs[]": [
-                                "webcal://p118-caldav.icloud.com/published/2/MTQwNjAzNDU1ODE0MDYwM7HUJEuAlayW3-W2_XEY2Y2g8cvVGd9TTmOQVRhbm7Hye7a2NilMMsmHN9fWHV18mjlRBAAjAPnzn2n09tQ6IL8"
+                                "webcal://p118-caldav.icloud.com/published/2/MTQwNjAzNDU1ODE0MDYwM7HUJEuAlayW3-W2_XEY2Y2g8cvVGd9TTmOQVRhbm7Hye7a2NilMMsmHN9fWHV18mjlRBAAjAPnzn2n09tQ6IL8",
+                                "webcal://p118-caldav.icloud.com/published/2/MTQwNjAzNDU1ODE0MDYwM7HUJEuAlayW3-W2_XEY2Y2DrL3Kj3BzMuXFqOB1JbMgCLEB_Uci4Va1ynLhdgVF2alSuilECGHRw0aqYC0tczM"
                             ],
                             "language": "de",
                             "fontSize": "large",
@@ -37,68 +35,7 @@
                         "refresh": {
                             "interval": 3600
                         },
-                        "latest_refresh_time": "2026-01-31T17:32:58.817341+01:00"
-                    },
-                    {
-                        "plugin_id": "weather",
-                        "name": "Wetter",
-                        "plugin_settings": {
-                            "latitude": "49.89767534466118",
-                            "longitude": "8.673405647277832",
-                            "weatherProvider": "OpenMeteo",
-                            "units": "metric",
-                            "titleSelection": "custom",
-                            "customTitle": "",
-                            "displayMetrics": "true",
-                            "moonPhase": "true",
-                            "displayGraphIcons": "true",
-                            "graphIconStep": "2",
-                            "displayForecast": "true",
-                            "forecastDays": "3",
-                            "selectedFrame": "None",
-                            "topMargin": "",
-                            "bottomMargin": "",
-                            "leftMargin": "",
-                            "rightMargin": "",
-                            "backgroundOption": "color",
-                            "backgroundColor": "#ffffff",
-                            "textColor": "#000000"
-                        },
-                        "refresh": {
-                            "interval": 60
-                        },
-                        "latest_refresh_time": "2026-01-31T15:46:20.821968+01:00"
-                    },
-                    {
-                        "plugin_id": "calendar",
-                        "name": "vid",
-                        "plugin_settings": {
-                            "calendarColors[]": [
-                                "#007bff"
-                            ],
-                            "calendarURLs[]": [
-                                "webcal://p118-caldav.icloud.com/published/2/MTQwNjAzNDU1ODE0MDYwM7HUJEuAlayW3-W2_XEY2Y2g8cvVGd9TTmOQVRhbm7Hye7a2NilMMsmHN9fWHV18mjlRBAAjAPnzn2n09tQ6IL8"
-                            ],
-                            "viewMode": "dayGrid",
-                            "language": "de",
-                            "displayTitle": "true",
-                            "displayWeekends": "true",
-                            "displayEventTime": "true",
-                            "displayWeeks": "2",
-                            "fontSize": "normal",
-                            "selectedFrame": "None",
-                            "topMargin": "",
-                            "bottomMargin": "",
-                            "leftMargin": "",
-                            "rightMargin": "",
-                            "backgroundOption": "color",
-                            "backgroundColor": "#ffffff",
-                            "textColor": "#000000"
-                        },
-                        "refresh": {
-                            "interval": 240
-                        },
-                        "latest_refresh_time": "2026-01-31T16:46:25.961299+01:00"
+                        "latest_refresh_time": "2026-01-31T17:38:07.093601+01:00"
                     }
                 ],
                 "current_plugin_index": 2
@@ -107,7 +44,7 @@
         "active_playlist": "Default"
     },
     "refresh_info": {
-        "refresh_time": "2026-01-31T17:32:58.817341+01:00",
+        "refresh_time": "2026-01-31T17:38:07.093601+01:00",
         "image_hash": "09e1da193a534690198ca7ab73f85477173740908cc7d7cf86cebc9a39f9b8a4",
         "refresh_type": "Playlist",
         "plugin_id": "seniorDashboard_allDay",
