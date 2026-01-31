@@ -104,7 +104,7 @@ class SeniorDashboardAllDay(BasePlugin):
                 print(f"[SeniorDashboard] Event #{event_num}: '{event_title}'")
                 print(f"                  Start: {start} | End: {end} | All-day: {all_day}")
                 
-                # Filter out events that have fully ended before today
+                # Filter out events that have fully ended (before today, or already ended today)
                 try:
                     # Use end time if available, otherwise start time
                     end_iso = end or start
@@ -114,12 +114,15 @@ class SeniorDashboardAllDay(BasePlugin):
                     if end_dt.tzinfo is None:
                         end_dt = tz.localize(end_dt)
                     
-                    # Only filter out events that ended before today (not current time)
+                    # Filter out events that ended before today
                     if end_dt.date() < current_day_start.date():
                         print(f"                  ❌ FILTERED OUT (ended {end_dt.date()} < {current_day_start.date()})")
                         continue
-                    else:
-                        print(f"                  ✅ INCLUDED (ended {end_dt.date()} >= {current_day_start.date()})")
+                    # Filter out today's timed events that have already ended (end time in the past)
+                    if end_dt.date() == current_dt.date() and not all_day and end_dt <= current_dt:
+                        print(f"                  ❌ FILTERED OUT (today's event already ended at {end_dt})")
+                        continue
+                    print(f"                  ✅ INCLUDED (ended {end_dt.date()} >= {current_day_start.date()})")
                 except Exception as e:
                     # If parsing fails, keep the event to avoid hiding valid data
                     print(f"                  ⚠️  Error parsing, keeping event: {e}")

@@ -37,7 +37,7 @@
                         "refresh": {
                             "interval": 3600
                         },
-                        "latest_refresh_time": "2026-01-31T13:09:25.266604+01:00"
+                        "latest_refresh_time": "2026-01-31T17:32:58.817341+01:00"
                     },
                     {
                         "plugin_id": "weather",
@@ -67,7 +67,7 @@
                         "refresh": {
                             "interval": 60
                         },
-                        "latest_refresh_time": "2026-01-27T17:20:39.424424+01:00"
+                        "latest_refresh_time": "2026-01-31T15:46:20.821968+01:00"
                     },
                     {
                         "plugin_id": "calendar",
@@ -98,17 +98,17 @@
                         "refresh": {
                             "interval": 240
                         },
-                        "latest_refresh_time": "2026-01-31T12:02:15.390675+01:00"
+                        "latest_refresh_time": "2026-01-31T16:46:25.961299+01:00"
                     }
                 ],
-                "current_plugin_index": null
+                "current_plugin_index": 2
             }
         ],
         "active_playlist": "Default"
     },
     "refresh_info": {
-        "refresh_time": "2026-01-31T13:09:25.266604+01:00",
-        "image_hash": "0fa92f976ce88ddb1bb75e8f7fc2b94fc7473ec8b44f87145408d26802e28ac5",
+        "refresh_time": "2026-01-31T17:32:58.817341+01:00",
+        "image_hash": "09e1da193a534690198ca7ab73f85477173740908cc7d7cf86cebc9a39f9b8a4",
         "refresh_type": "Playlist",
         "plugin_id": "seniorDashboard_allDay",
         "playlist": "Default",
