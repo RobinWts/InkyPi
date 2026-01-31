@@ -20,7 +20,7 @@ class SeniorDashboardAllDay(BasePlugin):
     def generate_image(self, settings, device_config):
         calendar_urls = settings.get('calendarURLs[]')
         calendar_colors = settings.get('calendarColors[]')
-        view = "listMonth"  # Fixed to list view
+        view = "listWeek"  # Fixed to list view (today + next 2 days)
 
         if not calendar_urls:
             raise RuntimeError("At least one calendar URL is required")
@@ -38,7 +38,11 @@ class SeniorDashboardAllDay(BasePlugin):
 
         current_dt = datetime.now(tz)
         start, end = self.get_view_range(current_dt)
-        logger.debug(f"Fetching events for {start} --> [{current_dt}] --> {end}")
+        print(f"\n{'='*80}")
+        print(f"[SeniorDashboard] Current time: {current_dt}")
+        print(f"[SeniorDashboard] Fetching events from {start} to {end}")
+        print(f"{'='*80}\n")
+        logger.info(f"Fetching events for this week and next week: {start} --> [{current_dt}] --> {end}")
         events = self.fetch_ics_events(calendar_urls, calendar_colors, tz, start, end, current_dt)
         if not events:
             logger.warn("No events found for ics url")
@@ -79,27 +83,50 @@ class SeniorDashboardAllDay(BasePlugin):
     
     def fetch_ics_events(self, calendar_urls, colors, tz, start_range, end_range, current_dt):
         parsed_events = []
+        # Use start of current day for filtering (not current time)
+        current_day_start = current_dt.replace(hour=0, minute=0, second=0, microsecond=0)
+        
+        print(f"[SeniorDashboard] Current day start for filtering: {current_day_start}")
 
         for calendar_url, color in zip(calendar_urls, colors):
             cal = self.fetch_calendar(calendar_url)
             events = recurring_ical_events.of(cal).between(start_range, end_range)
             contrast_color = self.get_contrast_color(color)
-
-            for event in events:
+            
+            events_list = list(events)
+            print(f"[SeniorDashboard] Fetched {len(events_list)} events from calendar")
+            
+            event_num = 0
+            for event in events_list:
+                event_num += 1
                 start, end, all_day = self.parse_data_points(event, tz)
-                # Filter out events that have fully ended in the past
+                event_title = str(event.get('summary'))
+                print(f"[SeniorDashboard] Event #{event_num}: '{event_title}'")
+                print(f"                  Start: {start} | End: {end} | All-day: {all_day}")
+                
+                # Filter out events that have fully ended before today
                 try:
                     # Use end time if available, otherwise start time
                     end_iso = end or start
                     end_dt = datetime.fromisoformat(end_iso)
-                    if end_dt <= current_dt:
+                    
+                    # Make naive datetime timezone-aware if needed for comparison
+                    if end_dt.tzinfo is None:
+                        end_dt = tz.localize(end_dt)
+                    
+                    # Only filter out events that ended before today (not current time)
+                    if end_dt.date() < current_day_start.date():
+                        print(f"                  ❌ FILTERED OUT (ended {end_dt.date()} < {current_day_start.date()})")
                         continue
-                except Exception:
+                    else:
+                        print(f"                  ✅ INCLUDED (ended {end_dt.date()} >= {current_day_start.date()})")
+                except Exception as e:
                     # If parsing fails, keep the event to avoid hiding valid data
+                    print(f"                  ⚠️  Error parsing, keeping event: {e}")
                     pass
 
                 parsed_event = {
-                    "title": str(event.get("summary")),
+                    "title": event_title,
                     "start": start,
                     "backgroundColor": color,
                     "textColor": contrast_color,
@@ -109,13 +136,15 @@ class SeniorDashboardAllDay(BasePlugin):
                     parsed_event['end'] = end
 
                 parsed_events.append(parsed_event)
-
+        
+        print(f"\n[SeniorDashboard] Total events after filtering: {len(parsed_events)}")
+        print(f"{'='*80}\n")
         return parsed_events
     
     def get_view_range(self, current_dt):
-        """Get the date range for listMonth view (5 weeks from today)."""
+        """Get the date range for this week and next week (2 weeks total)."""
         start = datetime(current_dt.year, current_dt.month, current_dt.day)
-        end = start + timedelta(weeks=5)
+        end = start + timedelta(weeks=2)
         return start, end
         
     def parse_data_points(self, event, tz):

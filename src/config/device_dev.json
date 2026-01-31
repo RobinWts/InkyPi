@@ -37,7 +37,7 @@
                         "refresh": {
                             "interval": 3600
                         },
-                        "latest_refresh_time": "2026-01-30T14:34:22.166351+01:00"
+                        "latest_refresh_time": "2026-01-31T12:14:36.525223+01:00"
                     },
                     {
                         "plugin_id": "weather",
@@ -68,6 +68,37 @@
                             "interval": 60
                         },
                         "latest_refresh_time": "2026-01-27T17:20:39.424424+01:00"
+                    },
+                    {
+                        "plugin_id": "calendar",
+                        "name": "vid",
+                        "plugin_settings": {
+                            "calendarColors[]": [
+                                "#007bff"
+                            ],
+                            "calendarURLs[]": [
+                                "webcal://p118-caldav.icloud.com/published/2/MTQwNjAzNDU1ODE0MDYwM7HUJEuAlayW3-W2_XEY2Y2g8cvVGd9TTmOQVRhbm7Hye7a2NilMMsmHN9fWHV18mjlRBAAjAPnzn2n09tQ6IL8"
+                            ],
+                            "viewMode": "dayGrid",
+                            "language": "de",
+                            "displayTitle": "true",
+                            "displayWeekends": "true",
+                            "displayEventTime": "true",
+                            "displayWeeks": "2",
+                            "fontSize": "normal",
+                            "selectedFrame": "None",
+                            "topMargin": "",
+                            "bottomMargin": "",
+                            "leftMargin": "",
+                            "rightMargin": "",
+                            "backgroundOption": "color",
+                            "backgroundColor": "#ffffff",
+                            "textColor": "#000000"
+                        },
+                        "refresh": {
+                            "interval": 240
+                        },
+                        "latest_refresh_time": "2026-01-31T12:02:15.390675+01:00"
                     }
                 ],
                 "current_plugin_index": null
@@ -76,8 +107,8 @@
         "active_playlist": "Default"
     },
     "refresh_info": {
-        "refresh_time": "2026-01-30T14:34:22.166351+01:00",
-        "image_hash": "f30195b815de3b65e9588b1f74d2d57d3e10c0f892ade7194b6c4655e1448b7f",
+        "refresh_time": "2026-01-31T12:14:36.525223+01:00",
+        "image_hash": "e2ce46f4de5f8067d74ae7091093de173b5f1b6c73e8d3fd83e8c55cd80ee7ae",
         "refresh_type": "Playlist",
         "plugin_id": "seniorDashboard_allDay",
         "playlist": "Default",

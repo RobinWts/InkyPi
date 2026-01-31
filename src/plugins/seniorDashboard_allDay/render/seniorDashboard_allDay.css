@@ -78,7 +78,7 @@
 }
 
 .weather-current .weather-temp {
-  font-size: calc(1.5 * 1.4 * 0.9 * var(--fc-table-font-size, 1em));
+  font-size: calc(1.5 * 1.4 * 0.8 * var(--fc-table-font-size, 1em));
   font-weight: bold;
 }
 
@@ -204,26 +204,21 @@ th {
   font-size: var(--fc-table-font-size) !important;
 }
 
-/* Style today's date header in listMonth view with pure green background for Waveshare EPD */
-.fc-listMonth-view .fc-list-day.fc-day-today,
-.fc-list-view .fc-list-day.fc-day-today {
+/* Style today's date header in list views with pure green background for Waveshare EPD */
+.fc-list-day.fc-day-today {
   background-color: #00FF00 !important;
   color: #FFFFFF !important;
 }
 
-.fc-listMonth-view .fc-list-day.fc-day-today .fc-list-day-text,
-.fc-listMonth-view .fc-list-day.fc-day-today .fc-list-day-side-text,
-.fc-listMonth-view .fc-list-day.fc-day-today .fc-list-day-cushion,
-.fc-list-view .fc-list-day.fc-day-today .fc-list-day-text,
-.fc-list-view .fc-list-day.fc-day-today .fc-list-day-side-text,
-.fc-list-view .fc-list-day.fc-day-today .fc-list-day-cushion {
+.fc-list-day.fc-day-today .fc-list-day-text,
+.fc-list-day.fc-day-today .fc-list-day-side-text,
+.fc-list-day.fc-day-today .fc-list-day-cushion {
   background-color: #00FF00 !important;
   color: #FFFFFF !important;
 }
 
 /* Ensure all text elements within today's header are white */
-.fc-listMonth-view .fc-list-day.fc-day-today *,
-.fc-list-view .fc-list-day.fc-day-today * {
+.fc-list-day.fc-day-today * {
   color: #FFFFFF !important;
 }
 

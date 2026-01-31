@@ -93,10 +93,29 @@
             });
             const formattedTitle = dateFormatter.format(currentDate);
 
+            // Calculate the 3-day range for display
+            const startDate = new Date(currentDt);
+            const endDate = new Date(currentDt);
+            endDate.setDate(endDate.getDate() + 3);
+
+            console.log('Current date:', currentDt);
+            console.log('Total events from backend:', calendarEvents.length);
+            console.log('Events:', calendarEvents);
+
             const calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'listMonth',
+                initialView: 'list',
+                views: {
+                    list: {
+                        duration: { days: 3 }
+                    }
+                },
                 events: calendarEvents,
                 now: currentDt,
+                initialDate: currentDt,
+                validRange: {
+                    start: startDate,
+                    end: endDate
+                },
                 timeZone: timezone,
                 contentHeight: '100%',
                 expandRows: true,
