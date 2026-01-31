@@ -44,7 +44,8 @@ body,
 }
 
 .dashboard-left {
-  width: 50%;
+  width: 66.666%;
+  flex: 0 0 66.666%;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -52,7 +53,8 @@ body,
 }
 
 .dashboard-right {
-  width: 50%;
+  width: 33.333%;
+  flex: 0 0 33.333%;
   height: 100%;
   padding: 20px 20px 0 20px;
   font-family: "Jost";
@@ -278,7 +280,7 @@ th {
   color: #FFFFFF !important;
 }
 
-/* Ensure FullCalendar elements respect the 50% width constraint and have no top/bottom spacing */
+/* Ensure FullCalendar elements fill the 2/3 width calendar column and have no top/bottom spacing */
 .calendar .fc-view-harness,
 .calendar .fc-scroller,
 .calendar .fc-scroller-liquid-absolute {

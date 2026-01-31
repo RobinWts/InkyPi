@@ -37,7 +37,7 @@
                         "refresh": {
                             "interval": 3600
                         },
-                        "latest_refresh_time": "2026-01-31T12:58:07.094376+01:00"
+                        "latest_refresh_time": "2026-01-31T13:09:25.266604+01:00"
                     },
                     {
                         "plugin_id": "weather",
@@ -107,8 +107,8 @@
         "active_playlist": "Default"
     },
     "refresh_info": {
-        "refresh_time": "2026-01-31T12:58:07.094376+01:00",
-        "image_hash": "24182e8f9ca1310e36d1eeb639298a5d5ff91ec66c13cc35bc2acd62a128e091",
+        "refresh_time": "2026-01-31T13:09:25.266604+01:00",
+        "image_hash": "0fa92f976ce88ddb1bb75e8f7fc2b94fc7473ec8b44f87145408d26802e28ac5",
         "refresh_type": "Playlist",
         "plugin_id": "seniorDashboard_allDay",
         "playlist": "Default",
