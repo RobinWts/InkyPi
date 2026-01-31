@@ -5,6 +5,15 @@
   padding: 0;
 }
 
+/* Remove all top padding/margin from page and layout (plugin is rendered in body > .container) */
+body,
+.container,
+.dashboard-wrapper {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+  border-top: none !important;
+}
+
 .dashboard-wrapper {
   width: 100%;
   height: 100%;
@@ -18,7 +27,8 @@
   font-size: calc(var(--fc-title-font-size, 1.75em) * 1.54);
   font-weight: bold;
   font-family: "Jost";
-  padding: 5px 0 0 0;
+  padding: 0 !important;
+  margin: 0 !important;
   color: #000000;
   flex-shrink: 0;
 }
@@ -136,7 +146,10 @@
   height: 100%;
   font-family: "Jost";
   overflow: hidden;
+  padding-top: 0 !important;
+  margin-top: 0 !important;
 }
+
 
 .calendar .fc {
   width: 100%;
@@ -144,7 +157,9 @@
 }
 
 .fc-toolbar.fc-header-toolbar {
-  margin-bottom: 0px !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-top: 0 !important;
 }
 
 .fc .fc-daygrid-body-natural .fc-daygrid-day-events {
@@ -258,9 +273,11 @@ th {
   color: #FFFFFF !important;
 }
 
-/* Ensure FullCalendar elements respect the 50% width constraint */
+/* Ensure FullCalendar elements respect the 50% width constraint and have no top spacing */
 .calendar .fc-view-harness,
 .calendar .fc-scroller,
 .calendar .fc-scroller-liquid-absolute {
   width: 100% !important;
+  padding-top: 0 !important;
+  margin-top: 0 !important;
 }
