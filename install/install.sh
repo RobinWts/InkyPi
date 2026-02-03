@@ -5,12 +5,13 @@
 # Description: This script automates the installation of InkyPI and creation of
 #              the InkyPI service.
 #
-# Usage: ./install.sh [-W <waveshare_device>]
+# Usage: ./install.sh [-W <waveshare_device>] [-M]
 #        -W <waveshare_device> (optional) Install for a Waveshare device,
 #                               specifying the device model type, e.g. epd7in3e.
+#        -M (optional) Install for mock display (no physical display).
+#                      Use for testing on a Pi without an e-ink screen.
 #
-#                               If not specified then the Pimoroni Inky display
-#                               is assumed.
+#        If neither -W nor -M is specified, the Pimoroni Inky display is assumed.
 # =============================================================================
 
 # Formatting stuff
@@ -46,19 +47,23 @@ PIP_REQUIREMENTS_FILE="$SCRIPT_DIR/requirements.txt"
 # empty means no WS support required, otherwise we expect the type of display
 # as per the WS naming convention.
 WS_TYPE=""
+MOCK_DISPLAY=0
 WS_REQUIREMENTS_FILE="$SCRIPT_DIR/ws-requirements.txt"
 
-# Parse the arguments, looking for the -W option.
+# Parse the arguments, looking for the -W and -M options.
 parse_arguments() {
-    while getopts ":W:" opt; do
+    while getopts ":W:M" opt; do
         case $opt in
             W) WS_TYPE=$OPTARG
                 echo "Optional parameter WS is set for Waveshare support.  Screen type is: $WS_TYPE"
                 ;;
+            M) MOCK_DISPLAY=1
+                echo "Mock display mode: no physical display (for testing without e-ink hardware)"
+                ;;
             \?) echo "Invalid option: -$OPTARG." >&2
                 exit 1
                 ;;
-            :) echo "Option -$OPTARG requires an the model type of the Waveshare screen." >&2
+            :) echo "Option -$OPTARG requires the model type of the Waveshare screen." >&2
                exit 1
                ;;
         esac
@@ -244,8 +249,10 @@ install_config() {
   CONFIG_DIR="$SRC_PATH/config"
   echo "Copying config files to $CONFIG_DIR"
 
-  # Check and copy device.config if it doesn't exist
-  if [ ! -f "$CONFIG_DIR/device.json" ]; then
+  if [[ "$MOCK_DISPLAY" -eq 1 ]]; then
+    cp "$CONFIG_BASE_DIR/device_mock.json" "$CONFIG_DIR/device.json"
+    show_loader "\tInstalling device.json for mock display (no physical screen)"
+  elif [ ! -f "$CONFIG_DIR/device.json" ]; then
     cp "$CONFIG_BASE_DIR/device.json" "$CONFIG_DIR/"
     show_loader "\tCopying device.config to $CONFIG_DIR"
   else
@@ -354,16 +361,19 @@ ask_for_reboot() {
   fi
 }
 
-# check if we have an argument for WS display support.  Parameter is not required
+# check if we have an argument for WS or mock display support.  Parameter is not required
 # to maintain default INKY display support.
 parse_arguments "$@"
 check_permissions
 stop_service
-# fetch the WS display driver if defined.
+# fetch the WS display driver if defined (skip for mock).
 if [[ -n "$WS_TYPE" ]]; then
   fetch_waveshare_driver
 fi
-enable_interfaces
+# skip SPI/I2C and display interfaces when using mock (no hardware).
+if [[ "$MOCK_DISPLAY" -ne 1 ]]; then
+  enable_interfaces
+fi
 install_debian_dependencies
 # check OS version for Bookworm to setup zramswap
 if [[ $(get_os_version) = "12" ]] ; then

@@ -1,0 +1,13 @@
+{
+    "name": "InkyPi",
+    "display_type": "mock",
+    "resolution": [
+        800,
+        480
+    ],
+    "output_dir": "/usr/local/inkypi/mock_display_output",
+    "orientation": "horizontal",
+    "inverted_image": false,
+    "scheduler_sleep_time": 60,
+    "startup": true
+}
