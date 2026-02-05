@@ -6,7 +6,7 @@
     padding: 2dvh;
     font-family: "Jost", sans-serif;
     container-type: size;
-    
+
     /* Font size variables based on size selection - scoped to container */
     --font-size-x-small: clamp(10px, min(3cqh, 2.5cqi), 16px);
     --font-size-small: clamp(12px, min(4cqh, 3cqi), 18px);
@@ -19,8 +19,8 @@
     text-align: center;
     font-weight: bold;
     font-size: clamp(16px, min(6cqh, 5cqi), 28px);
-    margin-bottom: 2dvh;
-    padding-bottom: 1dvh;
+    margin-bottom: 0.5dvh;
+    padding-bottom: 0.5dvh;
     border-bottom: 2px solid var(--text-color, #000000);
 }
 
@@ -55,26 +55,40 @@
     flex: 1 1 0;
     display: flex;
     flex-direction: column;
-    gap: 1dvh;
-    min-width: 0; /* Allow flex items to shrink below content size */
+    gap: 0;
+    min-width: 0;
+    /* Allow flex items to shrink below content size */
     box-sizing: border-box;
     margin: 0;
     padding: 0;
     align-items: stretch;
 }
 
+/* Reset all paragraph margins and padding - aggressive reset */
+.division p,
+.division p.output-line {
+    margin: 0 !important;
+    padding: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
 .output-line {
-    flex: 0 0 auto;
     width: 100%;
-    padding: 0.5dvh 0;
-    margin: 0;
+    margin: 0 !important;
+    padding: 0 !important;
     word-wrap: break-word;
     overflow-wrap: break-word;
     white-space: pre-wrap;
     line-height: 1.4;
     box-sizing: border-box;
     display: block;
-    align-self: stretch;
 }
 
 .output-line-title,
@@ -94,11 +108,16 @@
 }
 
 .output-line-divider {
+    border: none;
     border-top: 2px solid currentColor;
-    padding: 0;
-    margin: 1dvh 0;
+    padding: 0 !important;
+    margin: 0.2em 0 !important;
+    margin-top: 0.2em !important;
+    margin-bottom: 0.2em !important;
     height: 0;
-    min-height: 0;
+    width: 100%;
+    box-sizing: border-box;
+    display: block;
 }
 
 .output-line-dataoutput {

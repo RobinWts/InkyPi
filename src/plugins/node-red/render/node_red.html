@@ -15,23 +15,19 @@
         {% for division in divisions %}
         <div class="division">
             {% for line in division.outputLines %}
-            {% if line.type == 'divider' %}
-            <div class="output-line output-line-divider" style="color: {{ line.color }};">
-            </div>
-            {% else %}
-            <div class="output-line output-line-{{ line.type }}" 
-                 style="font-family: '{{ line.font }}', sans-serif; 
-                        font-size: var(--font-size-{{ line.size }}); 
-                        color: {{ line.color }};
-                        text-align: {{ line.alignment }} !important;
-                        width: 100%;
-                        max-width: 100%;
-                        margin: 0;
-                        padding: 0.5dvh 0;
-                        display: block;">
-                <span style="display: block; width: 100%; text-align: {{ line.alignment }} !important;">{{ line.display_text }}</span>
-            </div>
-            {% endif %}
+            {%- if line.type == 'divider' -%}
+            <hr class="output-line-divider" style="color: {{ line.color }}; border-color: {{ line.color }};">
+            {%- else -%}
+            <p class="output-line output-line-{{ line.type }}" 
+               style="font-family: '{{ line.font }}', sans-serif; 
+                      font-size: var(--font-size-{{ line.size }}); 
+                      color: {{ line.color }};
+                      text-align: {{ line.alignment }} !important;
+                      width: 100%;
+                      max-width: 100%;
+                      margin: 0;
+                      padding: 0;">{{ line.display_text }}</p>
+            {%- endif -%}
             {% endfor %}
         </div>
         {% endfor %}

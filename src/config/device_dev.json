@@ -72,7 +72,7 @@
                                 "Jost"
                             ],
                             "division_0_size[]": [
-                                "normal",
+                                "x-large",
                                 "normal",
                                 "normal",
                                 "normal",
@@ -117,7 +117,7 @@
                         "refresh": {
                             "interval": 300
                         },
-                        "latest_refresh_time": "2026-02-05T16:28:38.699878+00:00"
+                        "latest_refresh_time": "2026-02-05T16:35:09.218160+00:00"
                     }
                 ],
                 "current_plugin_index": null
@@ -126,8 +126,8 @@
         "active_playlist": null
     },
     "refresh_info": {
-        "refresh_time": "2026-02-05T16:28:38.699878+00:00",
-        "image_hash": "5775fbf53ac13f9b001a2e3545889d0a5e6526e4923a0ec3b95e5504f51feaa6",
+        "refresh_time": "2026-02-05T16:35:09.218160+00:00",
+        "image_hash": "4d92b0b41919103104c1291eb844c92ac011bc8d44a0d593037c7d115cb26b06",
         "refresh_type": "Playlist",
         "plugin_id": "node-red",
         "playlist": "Default",
