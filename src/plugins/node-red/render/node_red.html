@@ -1,5 +1,9 @@
 {% extends "plugin.html" %}
 
 {% block content %}
-<!-- Node-RED plugin content will go here -->
+<div class="node-red-container">
+    <div class="json-display">
+        <pre class="json-content">{{ json_string }}</pre>
+    </div>
+</div>
 {% endblock %}

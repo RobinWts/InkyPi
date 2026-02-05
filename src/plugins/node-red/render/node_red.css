@@ -1,1 +1,32 @@
-/* Node-RED plugin styles */
+.node-red-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    padding: 2dvh;
+    font-family: "Jost", sans-serif;
+    container-type: size;
+}
+
+.json-display {
+    flex: 1;
+    overflow: auto;
+    background: transparent;
+}
+
+.json-content {
+    margin: 0;
+    padding: 1.5dvh;
+    /* Responsive font sizing using container queries:
+       - Uses container height (cqh) or container inline size (cqi), whichever is smaller
+       - Clamp ensures minimum readable size (14px) and maximum (prevents text from being too large)
+       - Increased from 3cqh/2.5cqi to 5cqh/4cqi for better readability */
+    font-size: clamp(14px, min(5cqh, 4cqi), 24px);
+    font-family: "Courier New", monospace;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    color: var(--text-color, #000000);
+    /* Increased line-height for better readability on e-ink displays */
+    line-height: 1.6;
+    overflow-wrap: break-word;
+}

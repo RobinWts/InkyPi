@@ -1,16 +1,33 @@
-<!-- Node-RED Plugin Settings -->
-<div class="settings-container">
-    <h2>Node-RED Settings</h2>
-    <p>Configure your Node-RED integration settings below.</p>
-    
-    <!-- Settings will be added here -->
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (loadPluginSettings) {
-                // Prepopulate form fields with existing settings
-                // TODO: Add prepopulation logic when settings are defined
-            }
-        });
-    </script>
+<div class="form-group">
+    <label for="nodeRedUrl" class="form-label">Node-RED URL:</label>
+    <input type="text" id="nodeRedUrl" name="nodeRedUrl" placeholder="http://localhost:1880" required class="form-input">
+    <span class="form-hint">Base URL of your Node-RED instance (e.g., http://localhost:1880)</span>
 </div>
+
+<div class="form-group">
+    <label for="endpointPath" class="form-label">Endpoint Path:</label>
+    <input type="text" id="endpointPath" name="endpointPath" placeholder="/inkypi/data" required class="form-input">
+    <span class="form-hint">Path to your Node-RED HTTP endpoint (e.g., /inkypi/data)</span>
+</div>
+
+<div class="form-group">
+    <label for="timeout" class="form-label">Timeout (seconds):</label>
+    <input type="number" id="timeout" name="timeout" min="1" max="60" value="10" class="form-input">
+    <span class="form-hint">HTTP request timeout in seconds (default: 10)</span>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        if (loadPluginSettings) {
+            // Prepopulate form fields with existing settings
+            document.getElementById('nodeRedUrl').value = pluginSettings.nodeRedUrl || 'http://localhost:1880';
+            document.getElementById('endpointPath').value = pluginSettings.endpointPath || '/inkypi/data';
+            document.getElementById('timeout').value = pluginSettings.timeout || 10;
+        } else {
+            // Set default values
+            document.getElementById('nodeRedUrl').value = 'http://localhost:1880';
+            document.getElementById('endpointPath').value = '/inkypi/data';
+            document.getElementById('timeout').value = 10;
+        }
+    });
+</script>

@@ -34,16 +34,32 @@
                 "name": "Default",
                 "start_time": "00:00",
                 "end_time": "24:00",
-                "plugins": [],
+                "plugins": [
+                    {
+                        "plugin_id": "node-red",
+                        "name": "NR",
+                        "plugin_settings": {
+                            "nodeRedUrl": "http://192.168.2.200:1880",
+                            "endpointPath": "/inkypi/data",
+                            "timeout": "10"
+                        },
+                        "refresh": {
+                            "interval": 300
+                        },
+                        "latest_refresh_time": "2026-02-05T15:31:00.384269+00:00"
+                    }
+                ],
                 "current_plugin_index": null
             }
         ],
         "active_playlist": null
     },
     "refresh_info": {
-        "refresh_time": null,
-        "image_hash": null,
-        "refresh_type": null,
-        "plugin_id": null
+        "refresh_time": "2026-02-05T15:31:00.384269+00:00",
+        "image_hash": "8bbe8d4a4120d2efcad0ed82f9142577efa71b6a4bc9a9e5f5b47ab357a8be63",
+        "refresh_type": "Playlist",
+        "plugin_id": "node-red",
+        "playlist": "Default",
+        "plugin_instance": "NR"
     }
 }
