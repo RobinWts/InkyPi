@@ -30,6 +30,9 @@
     gap: 2dvw;
     flex: 1;
     overflow: auto;
+    width: 100%;
+    box-sizing: border-box;
+    align-items: flex-start;
 }
 
 /* Portrait orientation: stack divisions vertically */
@@ -49,24 +52,45 @@
 }
 
 .division {
-    flex: 1;
+    flex: 1 1 0;
     display: flex;
     flex-direction: column;
     gap: 1dvh;
     min-width: 0; /* Allow flex items to shrink below content size */
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    align-items: stretch;
 }
 
 .output-line {
-    padding: 0.5dvh 0.5dvw;
+    flex: 0 0 auto;
+    width: 100%;
+    padding: 0.5dvh 0;
+    margin: 0;
     word-wrap: break-word;
     overflow-wrap: break-word;
     white-space: pre-wrap;
     line-height: 1.4;
+    box-sizing: border-box;
+    display: block;
+    align-self: stretch;
+}
+
+.output-line-title,
+.output-line-dataoutput {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    text-align: inherit;
+    overflow: hidden;
 }
 
 .output-line-title {
     font-weight: bold;
-    text-align: center;
 }
 
 .output-line-divider {

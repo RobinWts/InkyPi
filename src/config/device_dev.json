@@ -46,19 +46,27 @@
                             "division_0_type[]": [
                                 "dataoutput",
                                 "divider",
-                                "dataoutput"
+                                "dataoutput",
+                                "dataoutput",
+                                "title"
                             ],
                             "division_0_value[]": [
                                 "temperature",
                                 "was",
-                                ""
+                                "timestamp",
+                                "H\u00e4",
+                                "TEXT"
                             ],
                             "division_0_format[]": [
                                 "Temp: {value}",
                                 "{value}",
-                                "Nix: {value}"
+                                "{value}",
+                                "H\u00e4?: {value}",
+                                "{value}"
                             ],
                             "division_0_font[]": [
+                                "Jost",
+                                "Jost",
                                 "Jost",
                                 "Jost",
                                 "Jost"
@@ -66,12 +74,23 @@
                             "division_0_size[]": [
                                 "normal",
                                 "normal",
+                                "normal",
+                                "normal",
                                 "normal"
                             ],
                             "division_0_color[]": [
                                 "#000000",
                                 "#aa7942",
-                                "#ff40ff"
+                                "#ff40ff",
+                                "#000000",
+                                "#000000"
+                            ],
+                            "division_0_alignment[]": [
+                                "left",
+                                "left",
+                                "center",
+                                "left",
+                                "left"
                             ],
                             "division_1_type[]": [
                                 "dataoutput"
@@ -90,12 +109,15 @@
                             ],
                             "division_1_color[]": [
                                 "#00f900"
+                            ],
+                            "division_1_alignment[]": [
+                                "left"
                             ]
                         },
                         "refresh": {
                             "interval": 300
                         },
-                        "latest_refresh_time": "2026-02-05T16:09:25.817919+00:00"
+                        "latest_refresh_time": "2026-02-05T16:28:38.699878+00:00"
                     }
                 ],
                 "current_plugin_index": null
@@ -104,8 +126,8 @@
         "active_playlist": null
     },
     "refresh_info": {
-        "refresh_time": "2026-02-05T16:09:25.817919+00:00",
-        "image_hash": "7ad2b1a63caa9fd43a38352ddb0db41cdd953b351ab0ee20aff83fc2759a0ce1",
+        "refresh_time": "2026-02-05T16:28:38.699878+00:00",
+        "image_hash": "5775fbf53ac13f9b001a2e3545889d0a5e6526e4923a0ec3b95e5504f51feaa6",
         "refresh_type": "Playlist",
         "plugin_id": "node-red",
         "playlist": "Default",

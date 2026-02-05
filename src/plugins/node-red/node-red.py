@@ -135,6 +135,65 @@ class NodeRed(BasePlugin):
             logger.error(f"Unexpected error fetching Node-RED data: {e}", exc_info=True)
             raise RuntimeError(f"Failed to fetch data from Node-RED: {str(e)}")
     
+    def render_image(self, dimensions, html_file, css_file=None, template_params={}):
+        """
+        Override render_image to log the rendered HTML for debugging.
+        """
+        import os
+        from utils.app_utils import resolve_path, get_fonts
+        from utils.image_utils import take_screenshot_html
+        
+        # Get paths (same as base class)
+        BASE_PLUGIN_DIR = os.path.join(resolve_path("plugins"), "base_plugin")
+        BASE_PLUGIN_RENDER_DIR = os.path.join(BASE_PLUGIN_DIR, "render")
+        STATIC_DIR = resolve_path("static")
+        
+        # Load CSS files
+        css_files = [os.path.join(BASE_PLUGIN_RENDER_DIR, "plugin.css")]
+        if css_file:
+            plugin_css = os.path.join(self.render_dir, css_file)
+            css_files.append(plugin_css)
+        
+        # Prepare template parameters
+        template_params["style_sheets"] = css_files
+        template_params["width"] = dimensions[0]
+        template_params["height"] = dimensions[1]
+        template_params["font_faces"] = get_fonts()
+        template_params["static_dir"] = STATIC_DIR
+        
+        # Use the parent's env if available, otherwise create one
+        if hasattr(self, 'env') and self.env:
+            template = self.env.get_template(html_file)
+        else:
+            from jinja2 import Environment, FileSystemLoader, select_autoescape
+            loader = FileSystemLoader([self.render_dir, BASE_PLUGIN_RENDER_DIR])
+            env = Environment(
+                loader=loader,
+                autoescape=select_autoescape(['html', 'xml'])
+            )
+            template = env.get_template(html_file)
+        
+        rendered_html = template.render(template_params)
+        
+        # Write the rendered HTML to preview.html in plugin directory for inspection
+        preview_path = os.path.join(self.get_plugin_dir(), "preview.html")
+        try:
+            with open(preview_path, 'w', encoding='utf-8') as f:
+                f.write(rendered_html)
+            logger.info(f"Rendered HTML written to: {preview_path}")
+        except Exception as e:
+            logger.warning(f"Failed to write preview.html: {e}")
+        
+        # Log the complete rendered HTML for debugging
+        logger.info("=" * 80)
+        logger.info("RENDERED HTML OUTPUT (for debugging):")
+        logger.info("=" * 80)
+        logger.info(rendered_html)
+        logger.info("=" * 80)
+        
+        # Convert to image
+        return take_screenshot_html(rendered_html, dimensions)
+    
     def _parse_divisions(self, settings):
         """Parse divisions from settings form data."""
         divisions = []
@@ -163,6 +222,7 @@ class NodeRed(BasePlugin):
             font_keys = [k for k in settings.keys() if k == f'division_{div_idx}_font[]' or k.startswith(f'division_{div_idx}_font[')]
             size_keys = [k for k in settings.keys() if k == f'division_{div_idx}_size[]' or k.startswith(f'division_{div_idx}_size[')]
             color_keys = [k for k in settings.keys() if k == f'division_{div_idx}_color[]' or k.startswith(f'division_{div_idx}_color[')]
+            alignment_keys = [k for k in settings.keys() if k == f'division_{div_idx}_alignment[]' or k.startswith(f'division_{div_idx}_alignment[')]
             
             # Handle array format (settings may come as arrays or single values)
             def get_array_value(keys):
@@ -183,10 +243,11 @@ class NodeRed(BasePlugin):
             fonts = get_array_value(font_keys)
             sizes = get_array_value(size_keys)
             colors = get_array_value(color_keys)
+            alignments = get_array_value(alignment_keys)
             
             # Build output lines
             output_lines = []
-            max_lines = max(len(types), len(values), len(formats), len(fonts), len(sizes), len(colors))
+            max_lines = max(len(types), len(values), len(formats), len(fonts), len(sizes), len(colors), len(alignments))
             
             for i in range(max_lines):
                 output_line = {
@@ -195,7 +256,8 @@ class NodeRed(BasePlugin):
                     'format': formats[i] if i < len(formats) else '{value}',
                     'font': fonts[i] if i < len(fonts) else 'Jost',
                     'size': sizes[i] if i < len(sizes) else 'normal',
-                    'color': colors[i] if i < len(colors) else '#000000'
+                    'color': colors[i] if i < len(colors) else '#000000',
+                    'alignment': alignments[i] if i < len(alignments) else 'left'
                 }
                 output_lines.append(output_line)
             
@@ -215,6 +277,7 @@ class NodeRed(BasePlugin):
             'font': line.get('font', 'Jost'),
             'size': line.get('size', 'normal'),
             'color': line.get('color', '#000000'),
+            'alignment': line.get('alignment', 'left'),
             'display_text': ''
         }
         
