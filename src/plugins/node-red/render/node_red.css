@@ -6,9 +6,82 @@
     padding: 2dvh;
     font-family: "Jost", sans-serif;
     container-type: size;
+    
+    /* Font size variables based on size selection - scoped to container */
+    --font-size-x-small: clamp(10px, min(3cqh, 2.5cqi), 16px);
+    --font-size-small: clamp(12px, min(4cqh, 3cqi), 18px);
+    --font-size-normal: clamp(14px, min(5cqh, 4cqi), 22px);
+    --font-size-large: clamp(16px, min(6cqh, 5cqi), 26px);
+    --font-size-x-large: clamp(18px, min(7cqh, 6cqi), 30px);
 }
 
-.json-display {
+.page-title {
+    text-align: center;
+    font-weight: bold;
+    font-size: clamp(16px, min(6cqh, 5cqi), 28px);
+    margin-bottom: 2dvh;
+    padding-bottom: 1dvh;
+    border-bottom: 2px solid var(--text-color, #000000);
+}
+
+.divisions-wrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 2dvw;
+    flex: 1;
+    overflow: auto;
+}
+
+/* Portrait orientation: stack divisions vertically */
+@media (orientation: portrait) {
+    .divisions-wrapper {
+        flex-direction: column;
+        gap: 2dvh;
+    }
+}
+
+/* Landscape orientation: side by side */
+@media (orientation: landscape) {
+    .divisions-wrapper {
+        flex-direction: row;
+        gap: 2dvw;
+    }
+}
+
+.division {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1dvh;
+    min-width: 0; /* Allow flex items to shrink below content size */
+}
+
+.output-line {
+    padding: 0.5dvh 0.5dvw;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    line-height: 1.4;
+}
+
+.output-line-title {
+    font-weight: bold;
+    text-align: center;
+}
+
+.output-line-divider {
+    border-top: 2px solid currentColor;
+    padding: 0;
+    margin: 1dvh 0;
+    height: 0;
+    min-height: 0;
+}
+
+.output-line-dataoutput {
+    /* Default styling for data output */
+}
+
+.json-fallback {
     flex: 1;
     overflow: auto;
     background: transparent;
@@ -17,16 +90,11 @@
 .json-content {
     margin: 0;
     padding: 1.5dvh;
-    /* Responsive font sizing using container queries:
-       - Uses container height (cqh) or container inline size (cqi), whichever is smaller
-       - Clamp ensures minimum readable size (14px) and maximum (prevents text from being too large)
-       - Increased from 3cqh/2.5cqi to 5cqh/4cqi for better readability */
     font-size: clamp(14px, min(5cqh, 4cqi), 24px);
     font-family: "Courier New", monospace;
     white-space: pre-wrap;
     word-wrap: break-word;
     color: var(--text-color, #000000);
-    /* Increased line-height for better readability on e-ink displays */
     line-height: 1.6;
     overflow-wrap: break-word;
 }

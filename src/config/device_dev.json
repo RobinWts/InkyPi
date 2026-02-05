@@ -41,12 +41,61 @@
                         "plugin_settings": {
                             "nodeRedUrl": "http://192.168.2.200:1880",
                             "endpointPath": "/inkypi/data",
-                            "timeout": "10"
+                            "timeout": "10",
+                            "pageTitle": "JSON Parsing!",
+                            "division_0_type[]": [
+                                "dataoutput",
+                                "divider",
+                                "dataoutput"
+                            ],
+                            "division_0_value[]": [
+                                "temperature",
+                                "was",
+                                ""
+                            ],
+                            "division_0_format[]": [
+                                "Temp: {value}",
+                                "{value}",
+                                "Nix: {value}"
+                            ],
+                            "division_0_font[]": [
+                                "Jost",
+                                "Jost",
+                                "Jost"
+                            ],
+                            "division_0_size[]": [
+                                "normal",
+                                "normal",
+                                "normal"
+                            ],
+                            "division_0_color[]": [
+                                "#000000",
+                                "#aa7942",
+                                "#ff40ff"
+                            ],
+                            "division_1_type[]": [
+                                "dataoutput"
+                            ],
+                            "division_1_value[]": [
+                                "humidity"
+                            ],
+                            "division_1_format[]": [
+                                "Feuchte: {value}%"
+                            ],
+                            "division_1_font[]": [
+                                "DS-Digital"
+                            ],
+                            "division_1_size[]": [
+                                "large"
+                            ],
+                            "division_1_color[]": [
+                                "#00f900"
+                            ]
                         },
                         "refresh": {
                             "interval": 300
                         },
-                        "latest_refresh_time": "2026-02-05T15:31:00.384269+00:00"
+                        "latest_refresh_time": "2026-02-05T16:09:25.817919+00:00"
                     }
                 ],
                 "current_plugin_index": null
@@ -55,8 +104,8 @@
         "active_playlist": null
     },
     "refresh_info": {
-        "refresh_time": "2026-02-05T15:31:00.384269+00:00",
-        "image_hash": "8bbe8d4a4120d2efcad0ed82f9142577efa71b6a4bc9a9e5f5b47ab357a8be63",
+        "refresh_time": "2026-02-05T16:09:25.817919+00:00",
+        "image_hash": "7ad2b1a63caa9fd43a38352ddb0db41cdd953b351ab0ee20aff83fc2759a0ce1",
         "refresh_type": "Playlist",
         "plugin_id": "node-red",
         "playlist": "Default",

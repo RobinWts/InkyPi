@@ -16,18 +16,368 @@
     <span class="form-hint">HTTP request timeout in seconds (default: 10)</span>
 </div>
 
+<div class="form-group">
+    <label for="pageTitle" class="form-label">Page Title (optional):</label>
+    <input type="text" id="pageTitle" name="pageTitle" placeholder="Enter page title..." class="form-input">
+    <span class="form-hint">Optional title displayed centered at the top</span>
+</div>
+
+<style>
+    .divisions-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        margin: 1rem 0;
+    }
+    
+    .division {
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 1rem;
+        background: #f9f9f9;
+    }
+    
+    .division-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .division-title {
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+    
+    .output-lines-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .output-line {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 0.75rem;
+        background: white;
+    }
+    
+    .output-line-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+    
+    .output-line-controls {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+    
+    .delete-btn {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 0.25rem 0.5rem;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 0.9rem;
+    }
+    
+    .delete-btn:hover {
+        background: #c82333;
+    }
+    
+    .add-btn {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 0.5rem 0;
+    }
+    
+    .add-btn:hover {
+        background: #218838;
+    }
+    
+    .form-input-small {
+        padding: 0.25rem;
+        font-size: 0.9rem;
+    }
+</style>
+
+<div class="form-group">
+    <label class="form-label">Divisions:</label>
+    <div id="divisionsContainer" class="divisions-container"></div>
+    <button type="button" class="add-btn" id="addDivisionBtn">+ Add Division</button>
+</div>
+
 <script>
+    let divisionCount = 0;
+    let outputLineCount = 0;
+    
+    const FONTS = ['Jost', 'DS-Digital', 'Napoli', 'Dogica'];
+    const SIZES = ['x-small', 'small', 'normal', 'large', 'x-large'];
+    
+    function createOutputLine(divisionId, lineData = null) {
+        const lineId = `line_${outputLineCount++}`;
+        const type = lineData?.type || 'dataoutput';
+        const value = lineData?.value || '';
+        const format = lineData?.format || '{value}';
+        const font = lineData?.font || 'Jost';
+        const size = lineData?.size || 'normal';
+        const color = lineData?.color || '#000000';
+        
+        const lineDiv = document.createElement('div');
+        lineDiv.className = 'output-line';
+        lineDiv.id = lineId;
+        
+        lineDiv.innerHTML = `
+            <div class="output-line-header">
+                <span class="form-label">Output Line</span>
+                <button type="button" class="delete-btn" onclick="deleteOutputLine('${lineId}')">Delete</button>
+            </div>
+            <div class="output-line-controls">
+                <div>
+                    <label class="form-label">Type:</label>
+                    <select name="division_${divisionId}_type[]" class="form-input form-input-small" onchange="updateOutputLineType('${lineId}', this.value)">
+                        <option value="title" ${type === 'title' ? 'selected' : ''}>Title</option>
+                        <option value="divider" ${type === 'divider' ? 'selected' : ''}>Divider</option>
+                        <option value="dataoutput" ${type === 'dataoutput' ? 'selected' : ''}>Data Output</option>
+                    </select>
+                </div>
+                <div id="${lineId}_valueContainer" style="display: ${type === 'divider' ? 'none' : 'block'}">
+                    <label class="form-label" id="${lineId}_valueLabel">${type === 'dataoutput' ? 'JSON Key:' : 'Text:'}</label>
+                    <input type="text" name="division_${divisionId}_value[]" value="${value}" placeholder="${type === 'dataoutput' ? 'e.g., temperature or sensor.temp' : 'Enter text'}" class="form-input form-input-small">
+                </div>
+                <div id="${lineId}_formatContainer" style="display: ${type === 'dataoutput' ? 'block' : 'none'}">
+                    <label class="form-label">Format:</label>
+                    <input type="text" name="division_${divisionId}_format[]" value="${format}" placeholder="{value}°C" class="form-input form-input-small">
+                </div>
+                <div id="${lineId}_fontContainer" style="display: ${type === 'divider' ? 'none' : 'block'}">
+                    <label class="form-label">Font:</label>
+                    <select name="division_${divisionId}_font[]" class="form-input form-input-small">
+                        ${FONTS.map(f => `<option value="${f}" ${font === f ? 'selected' : ''}>${f}</option>`).join('')}
+                    </select>
+                </div>
+                <div id="${lineId}_sizeContainer" style="display: ${type === 'divider' ? 'none' : 'block'}">
+                    <label class="form-label">Size:</label>
+                    <select name="division_${divisionId}_size[]" class="form-input form-input-small">
+                        ${SIZES.map(s => `<option value="${s}" ${size === s ? 'selected' : ''}>${s}</option>`).join('')}
+                    </select>
+                </div>
+                <div id="${lineId}_colorContainer" style="display: block;">
+                    <label class="form-label">Color:</label>
+                    <input type="color" name="division_${divisionId}_color[]" value="${color}" class="form-input-small" style="width: 100%; height: 2rem;">
+                </div>
+            </div>
+        `;
+        
+        return lineDiv;
+    }
+    
+    function updateOutputLineType(lineId, type) {
+        const valueLabel = document.getElementById(`${lineId}_valueLabel`);
+        const valueInput = document.querySelector(`#${lineId} input[name*="_value[]"]`);
+        const valueContainer = document.getElementById(`${lineId}_valueContainer`);
+        const formatContainer = document.getElementById(`${lineId}_formatContainer`);
+        const fontContainer = document.getElementById(`${lineId}_fontContainer`);
+        const sizeContainer = document.getElementById(`${lineId}_sizeContainer`);
+        const colorContainer = document.getElementById(`${lineId}_colorContainer`);
+        
+        if (type === 'divider') {
+            // Hide text, format, font, and size for divider, but keep color
+            valueContainer.style.display = 'none';
+            formatContainer.style.display = 'none';
+            fontContainer.style.display = 'none';
+            sizeContainer.style.display = 'none';
+            colorContainer.style.display = 'block';
+        } else if (type === 'dataoutput') {
+            valueContainer.style.display = 'block';
+            valueLabel.textContent = 'JSON Key:';
+            valueInput.placeholder = 'e.g., temperature or sensor.temp';
+            formatContainer.style.display = 'block';
+            fontContainer.style.display = 'block';
+            sizeContainer.style.display = 'block';
+            colorContainer.style.display = 'block';
+        } else {
+            // Title type
+            valueContainer.style.display = 'block';
+            valueLabel.textContent = 'Text:';
+            valueInput.placeholder = 'Enter text';
+            formatContainer.style.display = 'none';
+            fontContainer.style.display = 'block';
+            sizeContainer.style.display = 'block';
+            colorContainer.style.display = 'block';
+        }
+    }
+    
+    function deleteOutputLine(lineId) {
+        document.getElementById(lineId).remove();
+    }
+    
+    function createDivision(divisionData = null) {
+        const divisionId = divisionCount++;
+        const outputLines = divisionData?.outputLines || [];
+        
+        const divisionDiv = document.createElement('div');
+        divisionDiv.className = 'division';
+        divisionDiv.id = `division_${divisionId}`;
+        
+        divisionDiv.innerHTML = `
+            <div class="division-header">
+                <span class="division-title">Division ${divisionId + 1}</span>
+                <button type="button" class="delete-btn" onclick="deleteDivision('division_${divisionId}')">Delete Division</button>
+            </div>
+            <div class="output-lines-container" id="division_${divisionId}_lines"></div>
+            <button type="button" class="add-btn" onclick="addOutputLine('division_${divisionId}')">+ Add Output Line</button>
+        `;
+        
+        const container = document.getElementById('divisionsContainer');
+        container.appendChild(divisionDiv);
+        
+        const linesContainer = document.getElementById(`division_${divisionId}_lines`);
+        if (outputLines.length > 0) {
+            outputLines.forEach(line => {
+                linesContainer.appendChild(createOutputLine(divisionId, line));
+            });
+        } else {
+            // Add one default line
+            linesContainer.appendChild(createOutputLine(divisionId));
+        }
+    }
+    
+    function addOutputLine(divisionId) {
+        const linesContainer = document.getElementById(`${divisionId}_lines`);
+        const divId = divisionId.replace('division_', '');
+        linesContainer.appendChild(createOutputLine(divId));
+    }
+    
+    function deleteDivision(divisionId) {
+        document.getElementById(divisionId).remove();
+    }
+    
+    function parseDivisionsFromSettings(settings) {
+        const divisions = [];
+        
+        // Find all division indices from settings keys
+        // Handle both "division_0_type[]" and "division_0_type[0]" formats
+        const divisionIndices = new Set();
+        for (const key in settings) {
+            if (key.startsWith('division_') && (key.includes('_type[]') || key.includes('_type['))) {
+                // Extract division index from key like "division_0_type[]" or "division_0_type[0]"
+                const match = key.match(/division_(\d+)_type/);
+                if (match) {
+                    divisionIndices.add(parseInt(match[1]));
+                }
+            }
+        }
+        
+        // Sort to maintain order
+        const sortedIndices = Array.from(divisionIndices).sort((a, b) => a - b);
+        
+        // Reconstruct each division
+        for (const divIdx of sortedIndices) {
+            // Get arrays for this division - try both [] and [0] formats
+            const getArrayValue = (baseKey) => {
+                // Try array notation first (most common)
+                const arrayKey = `${baseKey}[]`;
+                if (settings[arrayKey] !== undefined) {
+                    const val = settings[arrayKey];
+                    // Handle both array and single value cases
+                    if (Array.isArray(val)) {
+                        return val.filter(x => x !== undefined && x !== null && x !== '');
+                    } else if (val !== undefined && val !== null && val !== '') {
+                        return [val];
+                    }
+                    return [];
+                }
+                
+                // Try indexed notation (division_0_type[0], division_0_type[1], etc.)
+                const indexedValues = [];
+                let index = 0;
+                while (true) {
+                    const indexedKey = `${baseKey}[${index}]`;
+                    if (settings[indexedKey] !== undefined && settings[indexedKey] !== null && settings[indexedKey] !== '') {
+                        indexedValues.push(settings[indexedKey]);
+                        index++;
+                    } else {
+                        break;
+                    }
+                }
+                
+                return indexedValues;
+            };
+            
+            const types = getArrayValue(`division_${divIdx}_type`);
+            const values = getArrayValue(`division_${divIdx}_value`);
+            const formats = getArrayValue(`division_${divIdx}_format`);
+            const fonts = getArrayValue(`division_${divIdx}_font`);
+            const sizes = getArrayValue(`division_${divIdx}_size`);
+            const colors = getArrayValue(`division_${divIdx}_color`);
+            
+            // Build output lines
+            const outputLines = [];
+            const maxLines = Math.max(
+                types.length,
+                values.length,
+                formats.length,
+                fonts.length,
+                sizes.length,
+                colors.length
+            );
+            
+            for (let i = 0; i < maxLines; i++) {
+                outputLines.push({
+                    type: types[i] || 'dataoutput',
+                    value: values[i] || '',
+                    format: formats[i] || '{value}',
+                    font: fonts[i] || 'Jost',
+                    size: sizes[i] || 'normal',
+                    color: colors[i] || '#000000'
+                });
+            }
+            
+            if (outputLines.length > 0) {
+                divisions.push({ outputLines: outputLines });
+            }
+        }
+        
+        return divisions;
+    }
+    
     document.addEventListener('DOMContentLoaded', () => {
+        // Load basic settings
         if (loadPluginSettings) {
-            // Prepopulate form fields with existing settings
             document.getElementById('nodeRedUrl').value = pluginSettings.nodeRedUrl || 'http://localhost:1880';
             document.getElementById('endpointPath').value = pluginSettings.endpointPath || '/inkypi/data';
             document.getElementById('timeout').value = pluginSettings.timeout || 10;
+            document.getElementById('pageTitle').value = pluginSettings.pageTitle || '';
+            
+            // Parse divisions from flat form structure
+            const divisions = parseDivisionsFromSettings(pluginSettings);
+            
+            if (divisions.length > 0) {
+                divisions.forEach(div => createDivision(div));
+            } else {
+                // No divisions found, create default
+                createDivision();
+            }
         } else {
             // Set default values
             document.getElementById('nodeRedUrl').value = 'http://localhost:1880';
             document.getElementById('endpointPath').value = '/inkypi/data';
             document.getElementById('timeout').value = 10;
+            document.getElementById('pageTitle').value = '';
+            // Create one default division with one output line
+            createDivision();
         }
+        
+        // Handle add division button
+        document.getElementById('addDivisionBtn').onclick = () => createDivision();
     });
 </script>
