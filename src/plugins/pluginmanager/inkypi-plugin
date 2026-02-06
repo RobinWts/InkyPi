@@ -156,8 +156,9 @@ install_from_url() {
         [[ -d "$dir" ]] || continue
         dirname="$(basename "$dir")"
         [[ "$dirname" == ".git" ]] && continue
-        if [[ -d "$dir/render" ]] && [[ -f "$dir/plugin-info.json" ]]; then
-            if [[ -n "$(jq -r '.id // empty' "$dir/plugin-info.json")" ]]; then
+        if [[ -f "$dir/plugin-info.json" ]]; then
+            PLUGIN_ID="$(jq -r '.id // empty' "$dir/plugin-info.json")"
+            if [[ -n "$PLUGIN_ID" ]] && [[ "$PLUGIN_ID" == "$dirname" ]]; then
                 PLUGIN_FOLDER="$dirname"
                 (( FOUND_COUNT++ )) || true
             fi
@@ -165,7 +166,7 @@ install_from_url() {
     done
 
     if [[ $FOUND_COUNT -eq 0 ]]; then
-        echo "[ERROR] No valid InkyPi plugin found in repository (need a folder containing render/ and plugin-info.json with id)"
+        echo "[ERROR] No valid InkyPi plugin found in repository (need a folder containing plugin-info.json with id matching the folder name)"
         exit 1
     fi
 
