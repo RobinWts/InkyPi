@@ -1,0 +1,35 @@
+"""Plugin Manager plugin - manages installation and uninstallation of third-party plugins."""
+
+from plugins.base_plugin.base_plugin import BasePlugin
+from PIL import Image
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+class PluginManager(BasePlugin):
+    """Plugin for managing third-party plugins installation/uninstallation."""
+    
+    def generate_settings_template(self):
+        """Add third-party plugins list to template parameters."""
+        template_params = super().generate_settings_template()
+        # Access device_config via Flask's current_app
+        try:
+            from flask import current_app
+            device_config = current_app.config.get('DEVICE_CONFIG')
+            if device_config:
+                third_party = [p for p in device_config.get_plugins() if p.get("repository")]
+                template_params['third_party_plugins'] = third_party
+            else:
+                template_params['third_party_plugins'] = []
+        except (RuntimeError, ImportError):
+            # Not in Flask context or Flask not available
+            template_params['third_party_plugins'] = []
+        return template_params
+    
+    def generate_image(self, settings, device_config):
+        """Return a placeholder image - this plugin is UI-only."""
+        # Create a simple placeholder image
+        width, height = device_config.get_resolution()
+        img = Image.new('RGB', (width, height), color='white')
+        return img

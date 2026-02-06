@@ -1,0 +1,5 @@
+{
+    "display_name": "Plugin Manager",
+    "id": "pluginmanager",
+    "class": "PluginManager"
+}
