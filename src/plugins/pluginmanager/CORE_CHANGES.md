@@ -1,10 +1,49 @@
-# Core Changes Required for Plugin Blueprint Support
+# Core Changes Required for Plugin Manager
 
-## Overview
+## Quick Start - How to Apply the Patch
 
-The pluginmanager plugin requires minimal core changes to enable Flask blueprint registration. These changes are **generic** and benefit all plugins, not just pluginmanager.
+**For users who just want to use the Plugin Manager:**
 
-## Why Core Changes Are Necessary
+1. Open a terminal/SSH session on your Raspberry Pi
+2. Navigate to your InkyPi directory (usually `/home/pi/InkyPi`)
+3. Run the patch script:
+   ```bash
+   cd /home/pi/InkyPi
+   bash src/plugins/pluginmanager/patch-core.sh
+   ```
+4. The script will automatically:
+   - Apply the necessary core changes
+   - Restart the InkyPi service
+5. Reload the Plugin Manager page in your web browser
+
+**That's it!** After patching, the Plugin Manager will work fully from the web interface.
+
+---
+
+## What This Patch Does (Simple Explanation)
+
+The Plugin Manager needs to add some API routes to work properly. However, due to how Flask (the web framework) works, these routes must be registered before the web server starts.
+
+**The patch does two things:**
+
+1. **Adds a generic function** (`register_plugin_blueprints`) that allows any plugin to register its own API routes
+2. **Calls this function** during InkyPi startup so plugin routes are available
+
+**Why manual patching is needed:**
+- The patch button in the UI can't work because it needs the routes to be registered first
+- This creates a "chicken and egg" problem: we need routes to patch, but we need to patch to get routes
+- The solution is a one-time manual patch via command line
+
+**After patching:**
+- The Plugin Manager works completely from the web interface
+- No more manual steps needed
+- Other plugins can also use this mechanism to add their own API routes
+
+---
+
+## Technical Details
+
+### Why Core Changes Are Necessary
 
 Flask's architecture requires that blueprints be registered **before** the application starts serving requests. The execution order in InkyPi is:
 
@@ -20,9 +59,9 @@ Flask's architecture requires that blueprints be registered **before** the appli
 - Plugins don't have direct access to the Flask app instance during import
 - Even if they did, Flask doesn't support registering blueprints after serving starts
 
-## Required Core Changes
+### Required Core Changes
 
-### 1. Plugin Registry Enhancement (`src/plugins/plugin_registry.py`)
+#### 1. Plugin Registry Enhancement (`src/plugins/plugin_registry.py`)
 
 Added a generic function to register blueprints from any plugin:
 
@@ -51,7 +90,7 @@ def register_plugin_blueprints(app):
 
 **Why it's generic**: This mechanism works for **any** plugin, not just pluginmanager. Any plugin can implement `get_blueprint()` to register its own routes.
 
-### 2. Application Initialization (`src/inkypi.py`)
+#### 2. Application Initialization (`src/inkypi.py`)
 
 Added a single function call to register plugin blueprints:
 
@@ -75,7 +114,7 @@ register_plugin_blueprints(app)
 
 **Why it's minimal**: This is a single function call that enables blueprint support for all plugins. No plugin-specific code.
 
-## How Plugins Use This Mechanism
+### How Plugins Use This Mechanism
 
 Any plugin can register blueprints by:
 
@@ -100,7 +139,7 @@ Any plugin can register blueprints by:
 
 3. **The core automatically registers it** when the app starts.
 
-## Benefits of This Approach
+### Benefits of This Approach
 
 1. **Generic**: Works for any plugin, not just pluginmanager
 2. **Minimal**: Only two small changes to core code
@@ -108,24 +147,27 @@ Any plugin can register blueprints by:
 4. **Optional**: Plugins that don't need blueprints are unaffected
 5. **Future-proof**: Enables any plugin to add API routes
 
-## Files Modified
+### Files Modified
 
-- `src/plugins/plugin_registry.py` - Added `register_plugin_blueprints()` function
-- `src/inkypi.py` - Added call to `register_plugin_blueprints(app)`
+- `src/plugins/plugin_registry.py` - Added `register_plugin_blueprints()` function (~15 lines)
+- `src/inkypi.py` - Added import and call to `register_plugin_blueprints(app)` (~2 lines)
 
-## Files NOT Modified (Plugin-Specific)
+### Files NOT Modified (Plugin-Specific)
 
 All pluginmanager-specific code remains in:
 - `src/plugins/pluginmanager/pluginmanager.py` - Plugin class
 - `src/plugins/pluginmanager/api.py` - API routes blueprint
 - `src/plugins/pluginmanager/settings.html` - UI template
 - `src/plugins/pluginmanager/inkypi-plugin` - CLI script
+- `src/plugins/pluginmanager/patch_core.py` - Patching logic
+- `src/plugins/pluginmanager/patch-core.sh` - Patch script
 
 ## Conclusion
 
 These core changes are **necessary** due to Flask's architecture constraints, but they are:
-- **Minimal** (two small additions)
-- **Generic** (benefit all plugins)
+- **Minimal** (two small additions, ~17 lines total)
+- **Generic** (benefit all plugins, not just pluginmanager)
 - **Well-documented** (clear purpose and usage)
+- **One-time** (apply once, then Plugin Manager works fully from UI)
 
 The pluginmanager plugin is otherwise completely self-contained, with all its functionality, routes, and UI residing in the plugin directory.
