@@ -169,7 +169,8 @@
             The pluginmanager plugin requires core changes to work properly.<br>
             Run the patch script manually from the command line:
         </p>
-        <div style="margin: 0 0 24px 0; padding: 16px; background: rgba(0, 0, 0, 0.1); border-radius: 6px; font-family: monospace; font-size: 13px; text-align: left; overflow-x: auto;">
+        <div
+            style="margin: 0 0 24px 0; padding: 16px; background: rgba(0, 0, 0, 0.1); border-radius: 6px; font-family: monospace; font-size: 13px; text-align: left; overflow-x: auto;">
             <code style="color: var(--text-primary, #333);">
                 {% if project_root %}
                 cd {{ project_root }}<br>
@@ -196,9 +197,8 @@
         </div>
         {% endif %}
         <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-            <a href="{{ url_for('plugin.image', plugin_id='pluginmanager', filename='CORE_CHANGES.md') }}"
-                target="_blank" class="action-button"
-                style="text-decoration: none; display: inline-block;">
+            <a href="https://github.com/RobinWts/InkyPi-Plugin-PluginManager/blob/main/pluginmanager/CORE_CHANGES.md"
+                target="_blank" class="action-button" style="text-decoration: none; display: inline-block;">
                 View Documentation
             </a>
         </div>
