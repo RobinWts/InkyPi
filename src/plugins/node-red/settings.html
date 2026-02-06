@@ -119,6 +119,28 @@
         line-height: 1.2;
     }
     
+    .order-btn {
+        background: #6c757d;
+        color: white;
+        border: none;
+        padding: 0.2rem 0.4rem;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        transition: background 0.2s;
+        min-width: 1.8rem;
+    }
+    
+    .order-btn:hover:not(:disabled) {
+        background: #5a6268;
+    }
+    
+    .order-btn:disabled {
+        background: #e9ecef;
+        color: #adb5bd;
+        cursor: not-allowed;
+    }
+    
     .delete-btn {
         background: #dc3545;
         color: white;
@@ -132,6 +154,12 @@
     
     .delete-btn:hover {
         background: #c82333;
+    }
+    
+    .output-line-actions {
+        display: flex;
+        gap: 0.3rem;
+        align-items: center;
     }
     
     .add-btn {
@@ -208,8 +236,12 @@
         
         lineDiv.innerHTML = `
             <div class="output-line-header">
-                <span class="form-label">Output Line ${outputLineCount}</span>
-                <button type="button" class="delete-btn" onclick="deleteOutputLine('${lineId}')" title="Delete this output line">×</button>
+                <span class="form-label">Output Line</span>
+                <div class="output-line-actions">
+                    <button type="button" class="order-btn" onclick="moveOutputLineUp('${lineId}')" title="Move up">↑</button>
+                    <button type="button" class="order-btn" onclick="moveOutputLineDown('${lineId}')" title="Move down">↓</button>
+                    <button type="button" class="delete-btn" onclick="deleteOutputLine('${lineId}')" title="Delete this output line">×</button>
+                </div>
             </div>
             <div class="output-line-controls">
                 <div>
@@ -297,7 +329,60 @@
     }
     
     function deleteOutputLine(lineId) {
-        document.getElementById(lineId).remove();
+        const lineElement = document.getElementById(lineId);
+        const container = lineElement.parentElement;
+        lineElement.remove();
+        updateOutputLineNumbers(container);
+        updateOrderButtons(container);
+    }
+    
+    function moveOutputLineUp(lineId) {
+        const lineElement = document.getElementById(lineId);
+        const container = lineElement.parentElement;
+        const previousSibling = lineElement.previousElementSibling;
+        
+        if (previousSibling) {
+            container.insertBefore(lineElement, previousSibling);
+            updateOutputLineNumbers(container);
+            updateOrderButtons(container);
+        }
+    }
+    
+    function moveOutputLineDown(lineId) {
+        const lineElement = document.getElementById(lineId);
+        const container = lineElement.parentElement;
+        const nextSibling = lineElement.nextElementSibling;
+        
+        if (nextSibling) {
+            container.insertBefore(nextSibling, lineElement);
+            updateOutputLineNumbers(container);
+            updateOrderButtons(container);
+        }
+    }
+    
+    function updateOutputLineNumbers(container) {
+        const lines = container.querySelectorAll('.output-line');
+        lines.forEach((line, index) => {
+            const label = line.querySelector('.output-line-header .form-label');
+            if (label) {
+                label.textContent = `Output Line ${index + 1}`;
+            }
+        });
+    }
+    
+    function updateOrderButtons(container) {
+        const lines = Array.from(container.querySelectorAll('.output-line'));
+        lines.forEach((line, index) => {
+            const upBtn = line.querySelector('button[onclick*="moveOutputLineUp"]');
+            const downBtn = line.querySelector('button[onclick*="moveOutputLineDown"]');
+            
+            if (upBtn) {
+                upBtn.disabled = index === 0;
+            }
+            if (downBtn) {
+                downBtn.disabled = index === lines.length - 1;
+            }
+        });
     }
     
     function createDivision(divisionData = null) {
@@ -331,12 +416,18 @@
             // Add one default line
             linesContainer.appendChild(createOutputLine(divisionId));
         }
+        
+        // Update line numbers and order buttons after adding lines
+        updateOutputLineNumbers(linesContainer);
+        updateOrderButtons(linesContainer);
     }
     
     function addOutputLine(divisionId) {
         const linesContainer = document.getElementById(`${divisionId}_lines`);
         const divId = divisionId.replace('division_', '');
         linesContainer.appendChild(createOutputLine(divId));
+        updateOutputLineNumbers(linesContainer);
+        updateOrderButtons(linesContainer);
     }
     
     function deleteDivision(divisionId) {

@@ -45,23 +45,23 @@
                             "pageTitle": "JSON Parsing!",
                             "division_0_type[]": [
                                 "dataoutput",
-                                "divider",
                                 "dataoutput",
+                                "divider",
                                 "dataoutput",
                                 "title"
                             ],
                             "division_0_value[]": [
                                 "temperature",
+                                "H\u00e4",
                                 "was",
                                 "timestamp",
-                                "H\u00e4",
                                 "TEXT"
                             ],
                             "division_0_format[]": [
                                 "Temp: {value}",
-                                "{value}",
-                                "{value}",
                                 "H\u00e4?: {value}",
+                                "{value}",
+                                "{value}",
                                 "{value}"
                             ],
                             "division_0_font[]": [
@@ -80,16 +80,16 @@
                             ],
                             "division_0_color[]": [
                                 "#000000",
+                                "#000000",
                                 "#aa7942",
                                 "#ff40ff",
-                                "#000000",
                                 "#000000"
                             ],
                             "division_0_alignment[]": [
                                 "left",
                                 "left",
-                                "center",
                                 "left",
+                                "center",
                                 "left"
                             ],
                             "division_1_type[]": [
@@ -117,7 +117,7 @@
                         "refresh": {
                             "interval": 300
                         },
-                        "latest_refresh_time": "2026-02-06T15:32:11.092802+00:00"
+                        "latest_refresh_time": "2026-02-06T15:35:45.625594+00:00"
                     }
                 ],
                 "current_plugin_index": null
@@ -126,8 +126,8 @@
         "active_playlist": null
     },
     "refresh_info": {
-        "refresh_time": "2026-02-06T15:32:11.092802+00:00",
-        "image_hash": "ecdc69e235fe4a7b85a22b1a4391530f29fd7450132264b9b916f6854e073330",
+        "refresh_time": "2026-02-06T15:35:45.625594+00:00",
+        "image_hash": "5b69483381afa37ac987f2417bf7f82891b6ccc2196f6e5c0cf3b400a650b923",
         "refresh_type": "Playlist",
         "plugin_id": "node-red",
         "playlist": "Default",
