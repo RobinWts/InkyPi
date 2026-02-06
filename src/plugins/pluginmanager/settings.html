@@ -137,9 +137,48 @@
         background: rgba(76, 175, 80, 0.2);
         border-color: rgba(76, 175, 80, 0.5);
     }
+    
+    .core-patch-warning {
+        background: rgba(255, 152, 0, 0.15) !important;
+        border: 1px solid rgba(255, 152, 0, 0.4) !important;
+    }
+    
+    [data-theme="dark"] .core-patch-warning {
+        background: rgba(255, 152, 0, 0.2) !important;
+        border-color: rgba(255, 152, 0, 0.5) !important;
+    }
+    
+    [data-theme="dark"] .core-patch-warning p {
+        color: #eee !important;
+    }
+    
+    [data-theme="dark"] .core-patch-warning ul {
+        color: #aaa !important;
+    }
 </style>
 
 <div class="plugin-manage-container">
+    {% if core_needs_patch %}
+    <div class="core-patch-warning" style="margin-bottom: 24px; padding: 16px; border-radius: 8px; background: rgba(255, 152, 0, 0.15); border: 1px solid rgba(255, 152, 0, 0.4);">
+        <p style="margin: 0 0 12px 0; color: var(--text-primary, #333); font-weight: bold;">
+            ⚠️ Core files need to be patched
+        </p>
+        <p style="margin: 0 0 12px 0; color: var(--text-secondary, #666); font-size: 13px;">
+            The pluginmanager plugin requires core changes to work properly. Click "Patch Core Files" to automatically apply the necessary changes.
+        </p>
+        {% if core_patch_missing %}
+        <ul style="margin: 0 0 12px 0; padding-left: 20px; color: var(--text-secondary, #666); font-size: 12px;">
+            {% for missing in core_patch_missing %}
+            <li>{{ missing }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        <button type="button" id="patch-core-btn" class="action-button" onclick="patchCoreFiles()">
+            Patch Core Files
+        </button>
+    </div>
+    {% endif %}
+    
     <h2 class="form-label" style="margin-bottom: 12px;">Installed third-party plugins</h2>
     <div id="plugins-list">
         {% if third_party_plugins %}
@@ -202,7 +241,60 @@
     }
 
     function reloadPage() {
+        // Always reload to main page, not back to pluginmanager settings
         window.location.href = '{{ url_for("main.main_page") }}';
+    }
+    
+    async function patchCoreFiles() {
+        const patchBtn = document.getElementById('patch-core-btn');
+        if (!patchBtn) return;
+        
+        if (!confirm('This will modify core InkyPi files to add blueprint registration support. Continue?')) {
+            return;
+        }
+        
+        patchBtn.disabled = true;
+        patchBtn.textContent = 'Patching...';
+        
+        try {
+            // Try to use url_for if available, otherwise use direct URL
+            let patchUrl = '/pluginmanager-api/patch-core';
+            try {
+                // Try to get URL from Flask (may fail if blueprint not registered)
+                const flaskUrl = '{{ url_for("pluginmanager_api.patch_core") }}';
+                if (flaskUrl && !flaskUrl.includes('pluginmanager_api.patch_core')) {
+                    patchUrl = flaskUrl;
+                }
+            } catch (e) {
+                // Blueprint not registered yet, use direct URL (will get 404, handled below)
+            }
+            
+            const response = await fetch(patchUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            
+            // Handle 404 (blueprint not registered)
+            if (response.status === 404) {
+                showMessage(false, 'API endpoint not available. The pluginmanager blueprint is not registered. Please patch core files manually using the patch-core.sh script in the plugin directory, or see CORE_CHANGES.md for manual instructions.');
+                patchBtn.disabled = false;
+                patchBtn.textContent = 'Patch Core Files';
+                return;
+            }
+            
+            const data = await response.json().catch(() => ({}));
+            if (response.ok && data.success) {
+                showSuccessWithReload('Core files patched successfully. The service is restarting — click "Reload page" when it\'s back.');
+            } else {
+                showMessage(false, data.error || 'Patch failed');
+                patchBtn.disabled = false;
+                patchBtn.textContent = 'Patch Core Files';
+            }
+        } catch (e) {
+            showMessage(false, 'Request failed: ' + e.message + '. The blueprint may not be registered yet. Please patch core files manually or restart the service.');
+            patchBtn.disabled = false;
+            patchBtn.textContent = 'Patch Core Files';
+        }
     }
 
     async function updatePlugin(pluginId, btn) {
@@ -211,7 +303,7 @@
         }
         btn.disabled = true;
         try {
-            const response = await fetch('{{ url_for("plugin_manage.update_plugin") }}', {
+            const response = await fetch('{{ url_for("pluginmanager_api.update_plugin") }}', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ plugin_id: pluginId })
@@ -235,7 +327,7 @@
         }
         btn.disabled = true;
         try {
-            const response = await fetch('{{ url_for("plugin_manage.uninstall_plugin") }}', {
+            const response = await fetch('{{ url_for("pluginmanager_api.uninstall_plugin") }}', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ plugin_id: pluginId })
@@ -295,7 +387,7 @@
             return;
         }
         try {
-            const response = await fetch('{{ url_for("plugin_manage.install_plugin") }}', {
+            const response = await fetch('{{ url_for("pluginmanager_api.install_plugin") }}', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ url: url })

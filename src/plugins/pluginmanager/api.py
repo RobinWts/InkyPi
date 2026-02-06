@@ -11,6 +11,17 @@ logger = logging.getLogger(__name__)
 
 plugin_manage_bp = Blueprint("pluginmanager_api", __name__)
 
+# Import patch functionality
+try:
+    from .patch_core import check_core_patched, patch_core_files
+except ImportError:
+    # Fallback if relative import fails
+    import sys
+    plugin_dir = os.path.dirname(__file__)
+    if plugin_dir not in sys.path:
+        sys.path.insert(0, plugin_dir)
+    from patch_core import check_core_patched, patch_core_files
+
 
 def _project_dir():
     """Project root (parent of src/)."""
@@ -214,3 +225,83 @@ def update_plugin():
                       result.returncode, output.strip())
     
     return jsonify({"success": True})
+
+
+@plugin_manage_bp.route("/pluginmanager-api/check-patch", methods=["GET"])
+def check_patch():
+    """Check if core files need patching."""
+    try:
+        is_patched, missing = check_core_patched()
+        return jsonify({
+            "success": True,
+            "is_patched": is_patched,
+            "missing_parts": missing
+        })
+    except Exception as e:
+        logger.exception("Failed to check patch status")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@plugin_manage_bp.route("/pluginmanager-api/patch-core", methods=["POST"])
+def patch_core():
+    """Patch core files to add blueprint registration support."""
+    try:
+        # Use the patch script (similar to install/uninstall using CLI script)
+        patch_script = os.path.join(os.path.dirname(__file__), "patch-core.sh")
+        if not os.path.isfile(patch_script):
+            # Fallback to direct Python call if script doesn't exist
+            success, error = patch_core_files()
+            if not success:
+                return jsonify({"success": False, "error": error}), 500
+            
+            # Restart service
+            appname = os.environ.get("APPNAME")
+            if appname:
+                import subprocess
+                project_dir = _project_dir()
+                env = {**os.environ, "PROJECT_DIR": project_dir}
+                try:
+                    subprocess.run(
+                        ["sudo", "systemctl", "restart", f"{appname}.service"],
+                        env=env,
+                        cwd=project_dir,
+                        capture_output=True,
+                        text=True,
+                        timeout=10,
+                    )
+                except Exception as e:
+                    logger.warning(f"Could not restart service: {e}")
+            
+            return jsonify({"success": True, "message": "Core files patched successfully"})
+        
+        # Use patch script (preferred method)
+        project_dir = _project_dir()
+        env = {**os.environ, "PROJECT_DIR": project_dir}
+        
+        result = subprocess.run(
+            ["bash", patch_script],
+            env=env,
+            cwd=project_dir,
+            capture_output=True,
+            text=True,
+            timeout=60,
+        )
+        
+        output = (result.stdout or "") + "\n" + (result.stderr or "")
+        patch_succeeded = "[INFO] Done" in output or result.returncode == 0
+        
+        if not patch_succeeded:
+            err_msg = result.stderr.strip() or result.stdout.strip() or "Patch failed"
+            logger.warning("Core patch failed: %s", err_msg)
+            return jsonify({"success": False, "error": err_msg}), 400
+        
+        if result.returncode != 0:
+            logger.warning("Core patch completed but script exited with code %d: %s", 
+                          result.returncode, output.strip())
+        
+        return jsonify({"success": True, "message": "Core files patched successfully"})
+    except subprocess.TimeoutExpired:
+        return jsonify({"success": False, "error": "Patch timed out"}), 500
+    except Exception as e:
+        logger.exception("Failed to patch core files")
+        return jsonify({"success": False, "error": str(e)}), 500
