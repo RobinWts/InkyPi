@@ -18,6 +18,41 @@
 
 **That's it!** After patching, the Plugin Manager will work fully from the web interface.
 
+### Undoing the Patch
+
+If you need to undo the patch, you can restore the original core files:
+
+1. Open a terminal/SSH session on your Raspberry Pi
+2. Navigate to your InkyPi directory:
+   ```bash
+   cd /home/pi/InkyPi
+   ```
+3. Restore the original files using git:
+   ```bash
+   git checkout src/plugins/plugin_registry.py src/inkypi.py
+   ```
+   Or if you want to pull the latest changes from the repository:
+   ```bash
+   git pull
+   ```
+4. Run the update script to ensure all changes are properly applied:
+   ```bash
+   sudo bash install/update.sh
+   ```
+5. Restart the InkyPi service (if the update script didn't already do this):
+   ```bash
+   sudo systemctl restart inkypi.service
+   ```
+   (Replace `inkypi` with your service name if different)
+
+**What happens after undoing:**
+- The Plugin Manager will stop working and will show the patch warning message instead
+- **All installed third-party plugins will continue to work normally** - they don't depend on the Plugin Manager to function
+- You can still manage plugins manually using the CLI script (`install/cli/inkypi-plugin`)
+- To use the Plugin Manager UI again, simply re-run the patch script
+
+**Note**: The patch changes are minimal and safe. Undoing them only affects the Plugin Manager's ability to register its API routes. All other InkyPi functionality remains unchanged.
+
 ---
 
 ## What This Patch Does (Simple Explanation)
