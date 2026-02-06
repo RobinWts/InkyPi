@@ -174,4 +174,5 @@ mock_display_output/
 /src/static/styles/
 
 src/plugins/seniorDashboard_allDay
+src/plugins/sensor_quote
 .cursorrules
