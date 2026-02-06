@@ -3,6 +3,7 @@
 from plugins.base_plugin.base_plugin import BasePlugin
 from PIL import Image
 import logging
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -48,6 +49,13 @@ class PluginManager(BasePlugin):
             else:
                 # Skip loading plugins when unpatched
                 template_params['third_party_plugins'] = []
+                # Add project root path for patch command display
+                try:
+                    from config import Config
+                    project_root = os.path.dirname(Config.BASE_DIR)
+                    template_params['project_root'] = project_root
+                except:
+                    template_params['project_root'] = None
         except (RuntimeError, ImportError):
             # Not in Flask context or Flask not available
             template_params['third_party_plugins'] = []
