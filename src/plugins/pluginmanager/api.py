@@ -1,5 +1,4 @@
-"""Blueprint for managing third-party plugins (install/uninstall) from the web UI.
-API routes only - UI is handled by the pluginmanager plugin."""
+"""API routes for pluginmanager plugin - handles install/uninstall/update of third-party plugins."""
 
 import os
 import subprocess
@@ -8,21 +7,26 @@ from urllib.parse import urlparse
 from flask import Blueprint, request, jsonify, current_app
 import logging
 
-from config import Config
-
 logger = logging.getLogger(__name__)
 
-plugin_manage_bp = Blueprint("plugin_manage", __name__)
+plugin_manage_bp = Blueprint("pluginmanager_api", __name__)
 
 
 def _project_dir():
     """Project root (parent of src/)."""
-    return os.path.dirname(Config.BASE_DIR)
+    # Get BASE_DIR from config, go up one level
+    try:
+        from config import Config
+        return os.path.dirname(Config.BASE_DIR)
+    except ImportError:
+        # Fallback: assume we're in src/plugins/pluginmanager, go up 3 levels
+        return os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 
 def _cli_script():
     """Path to the inkypi-plugin CLI script in the pluginmanager plugin."""
-    return os.path.join(_project_dir(), "src", "plugins", "pluginmanager", "inkypi-plugin")
+    plugin_dir = os.path.dirname(__file__)
+    return os.path.join(plugin_dir, "inkypi-plugin")
 
 
 def _third_party_plugins():
@@ -52,7 +56,7 @@ def _validate_install_url(url):
     return True, None
 
 
-@plugin_manage_bp.route("/manage-plugins/install", methods=["POST"])
+@plugin_manage_bp.route("/pluginmanager-api/install", methods=["POST"])
 def install_plugin():
     """Install a plugin from a Git repository URL. Uses CLI install-from-url."""
     data = request.get_json() or {}
@@ -102,7 +106,7 @@ def install_plugin():
     return jsonify({"success": True})
 
 
-@plugin_manage_bp.route("/manage-plugins/uninstall", methods=["POST"])
+@plugin_manage_bp.route("/pluginmanager-api/uninstall", methods=["POST"])
 def uninstall_plugin():
     """Uninstall a third-party plugin by id. Only allows plugins with repository set."""
     data = request.get_json() or {}
@@ -155,7 +159,7 @@ def uninstall_plugin():
     return jsonify({"success": True})
 
 
-@plugin_manage_bp.route("/manage-plugins/update", methods=["POST"])
+@plugin_manage_bp.route("/pluginmanager-api/update", methods=["POST"])
 def update_plugin():
     """Update a third-party plugin by reinstalling from its repository. Only allows plugins with repository set."""
     data = request.get_json() or {}

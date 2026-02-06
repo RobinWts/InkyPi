@@ -10,6 +10,12 @@ logger = logging.getLogger(__name__)
 class PluginManager(BasePlugin):
     """Plugin for managing third-party plugins installation/uninstallation."""
     
+    @classmethod
+    def get_blueprint(cls):
+        """Return the Flask blueprint for this plugin's API routes."""
+        from . import api
+        return api.plugin_manage_bp
+    
     def generate_settings_template(self):
         """Add third-party plugins list to template parameters."""
         template_params = super().generate_settings_template()

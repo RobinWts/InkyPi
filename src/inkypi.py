@@ -30,9 +30,8 @@ from blueprints.settings import settings_bp
 from blueprints.plugin import plugin_bp
 from blueprints.playlist import playlist_bp
 from blueprints.apikeys import apikeys_bp
-from blueprints.plugin_manage import plugin_manage_bp
 from jinja2 import ChoiceLoader, FileSystemLoader
-from plugins.plugin_registry import load_plugins
+from plugins.plugin_registry import load_plugins, get_plugin_instance
 from waitress import serve
 
 
@@ -81,7 +80,21 @@ app.register_blueprint(settings_bp)
 app.register_blueprint(plugin_bp)
 app.register_blueprint(playlist_bp)
 app.register_blueprint(apikeys_bp)
-app.register_blueprint(plugin_manage_bp)
+
+# Register plugin blueprints (plugins can expose blueprints via get_blueprint() static method)
+try:
+    pluginmanager_config = device_config.get_plugin("pluginmanager")
+    if pluginmanager_config:
+        # Access the plugin class to call the static method
+        from plugins.plugin_registry import PLUGIN_CLASSES
+        pluginmanager_class = PLUGIN_CLASSES.get("pluginmanager")
+        if pluginmanager_class and hasattr(pluginmanager_class, 'get_blueprint'):
+            bp = pluginmanager_class.get_blueprint()
+            if bp:
+                app.register_blueprint(bp)
+                logger.info("Registered blueprint for pluginmanager plugin")
+except Exception as e:
+    logger.debug(f"Could not register pluginmanager blueprint: {e}")
 
 # Register opener for HEIF/HEIC images
 register_heif_opener()

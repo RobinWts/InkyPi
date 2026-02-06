@@ -211,7 +211,7 @@
         }
         btn.disabled = true;
         try {
-            const response = await fetch('{{ url_for("plugin_manage.update_plugin") }}', {
+            const response = await fetch('{{ url_for("pluginmanager_api.update_plugin") }}', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ plugin_id: pluginId })
@@ -235,7 +235,7 @@
         }
         btn.disabled = true;
         try {
-            const response = await fetch('{{ url_for("plugin_manage.uninstall_plugin") }}', {
+            const response = await fetch('{{ url_for("pluginmanager_api.uninstall_plugin") }}', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ plugin_id: pluginId })
@@ -295,7 +295,7 @@
             return;
         }
         try {
-            const response = await fetch('{{ url_for("plugin_manage.install_plugin") }}', {
+            const response = await fetch('{{ url_for("pluginmanager_api.install_plugin") }}', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ url: url })
