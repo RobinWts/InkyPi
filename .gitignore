@@ -175,4 +175,5 @@ mock_display_output/
 
 src/plugins/seniorDashboard_allDay
 src/plugins/sensor_quote
+src/plugins/plugin_template
 .cursorrules

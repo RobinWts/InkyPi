@@ -27,10 +27,13 @@ print('[INFO] Core files patched successfully')
 
 echo "[INFO] Done"
 
-# Restart service if APPNAME is set
-if [[ -n "${APPNAME:-}" ]]; then
-    echo "[INFO] Restarting $APPNAME service."
-    sudo systemctl restart "$APPNAME.service" 2>&1 || echo "[WARN] Service restart failed"
+# Determine service name for restart (default to inkypi if APPNAME not set)
+SERVICE_NAME="${APPNAME:-inkypi}"
+
+# Restart service if it exists
+if systemctl list-unit-files --type=service 2>/dev/null | grep -q "^${SERVICE_NAME}.service"; then
+    echo "[INFO] Restarting ${SERVICE_NAME} service."
+    sudo systemctl restart "${SERVICE_NAME}.service" 2>&1 || echo "[WARN] Service restart failed"
 else
-    echo "[INFO] APPNAME not set, skipping service restart (e.g. development mode)"
+    echo "[INFO] Service ${SERVICE_NAME}.service not found, skipping restart (e.g. development mode)"
 fi
