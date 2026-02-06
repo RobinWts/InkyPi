@@ -1,0 +1,131 @@
+# Core Changes Required for Plugin Blueprint Support
+
+## Overview
+
+The pluginmanager plugin requires minimal core changes to enable Flask blueprint registration. These changes are **generic** and benefit all plugins, not just pluginmanager.
+
+## Why Core Changes Are Necessary
+
+Flask's architecture requires that blueprints be registered **before** the application starts serving requests. The execution order in InkyPi is:
+
+1. Flask app is created (`app = Flask(__name__)`)
+2. Plugins are loaded (`load_plugins(...)`)
+3. Core blueprints are registered (`app.register_blueprint(...)`)
+4. Application starts serving (`serve(app, ...)`)
+
+**Key Constraint**: Blueprints cannot be registered after `serve()` is called. Flask builds its routing table at registration time, and this must happen before the server starts.
+
+**Why Plugins Can't Self-Register**:
+- Plugins are loaded via `importlib` before the Flask app is fully configured
+- Plugins don't have direct access to the Flask app instance during import
+- Even if they did, Flask doesn't support registering blueprints after serving starts
+
+## Required Core Changes
+
+### 1. Plugin Registry Enhancement (`src/plugins/plugin_registry.py`)
+
+Added a generic function to register blueprints from any plugin:
+
+```python
+def register_plugin_blueprints(app):
+    """Register blueprints from plugins that expose them via get_blueprint() method.
+    
+    This is a generic mechanism that allows any plugin to register Flask blueprints
+    by implementing a get_blueprint() class method that returns a Blueprint instance.
+    
+    Args:
+        app: Flask application instance to register blueprints with
+    """
+    for plugin_id, plugin_instance in PLUGIN_CLASSES.items():
+        try:
+            if hasattr(plugin_instance, 'get_blueprint'):
+                bp = plugin_instance.get_blueprint()
+                if bp:
+                    app.register_blueprint(bp)
+                    logger.info(f"Registered blueprint for plugin '{plugin_id}'")
+        except Exception as e:
+            logger.warning(f"Failed to register blueprint for plugin '{plugin_id}': {e}")
+```
+
+**What it does**: Iterates through all loaded plugins, checks if they expose a `get_blueprint()` method, and registers any returned blueprints with the Flask app.
+
+**Why it's generic**: This mechanism works for **any** plugin, not just pluginmanager. Any plugin can implement `get_blueprint()` to register its own routes.
+
+### 2. Application Initialization (`src/inkypi.py`)
+
+Added a single function call to register plugin blueprints:
+
+```python
+from plugins.plugin_registry import load_plugins, get_plugin_instance, register_plugin_blueprints
+
+# ... existing code ...
+
+# Register Blueprints
+app.register_blueprint(main_bp)
+app.register_blueprint(settings_bp)
+app.register_blueprint(plugin_bp)
+app.register_blueprint(playlist_bp)
+app.register_blueprint(apikeys_bp)
+
+# Register blueprints from plugins (generic mechanism - any plugin can expose blueprints)
+register_plugin_blueprints(app)
+```
+
+**What it does**: Calls the generic registration function after core blueprints are registered but before the app starts serving.
+
+**Why it's minimal**: This is a single function call that enables blueprint support for all plugins. No plugin-specific code.
+
+## How Plugins Use This Mechanism
+
+Any plugin can register blueprints by:
+
+1. **Creating a blueprint module** (e.g., `api.py`):
+   ```python
+   from flask import Blueprint
+   plugin_bp = Blueprint("pluginname_api", __name__)
+   
+   @plugin_bp.route("/pluginname-api/endpoint")
+   def endpoint():
+       return {"success": True}
+   ```
+
+2. **Exposing the blueprint** in the plugin class:
+   ```python
+   class PluginName(BasePlugin):
+       @classmethod
+       def get_blueprint(cls):
+           from . import api
+           return api.plugin_bp
+   ```
+
+3. **The core automatically registers it** when the app starts.
+
+## Benefits of This Approach
+
+1. **Generic**: Works for any plugin, not just pluginmanager
+2. **Minimal**: Only two small changes to core code
+3. **Self-contained**: Plugin code stays in the plugin directory
+4. **Optional**: Plugins that don't need blueprints are unaffected
+5. **Future-proof**: Enables any plugin to add API routes
+
+## Files Modified
+
+- `src/plugins/plugin_registry.py` - Added `register_plugin_blueprints()` function
+- `src/inkypi.py` - Added call to `register_plugin_blueprints(app)`
+
+## Files NOT Modified (Plugin-Specific)
+
+All pluginmanager-specific code remains in:
+- `src/plugins/pluginmanager/pluginmanager.py` - Plugin class
+- `src/plugins/pluginmanager/api.py` - API routes blueprint
+- `src/plugins/pluginmanager/settings.html` - UI template
+- `src/plugins/pluginmanager/inkypi-plugin` - CLI script
+
+## Conclusion
+
+These core changes are **necessary** due to Flask's architecture constraints, but they are:
+- **Minimal** (two small additions)
+- **Generic** (benefit all plugins)
+- **Well-documented** (clear purpose and usage)
+
+The pluginmanager plugin is otherwise completely self-contained, with all its functionality, routes, and UI residing in the plugin directory.
