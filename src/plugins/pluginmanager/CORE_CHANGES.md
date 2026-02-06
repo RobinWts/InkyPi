@@ -174,35 +174,8 @@ Any plugin can register blueprints by:
 
 3. **The core automatically registers it** when the app starts.
 
-### Benefits of This Approach
-
-1. **Generic**: Works for any plugin, not just pluginmanager
-2. **Minimal**: Only two small changes to core code
-3. **Self-contained**: Plugin code stays in the plugin directory
-4. **Optional**: Plugins that don't need blueprints are unaffected
-5. **Future-proof**: Enables any plugin to add API routes
-
 ### Files Modified
 
 - `src/plugins/plugin_registry.py` - Added `register_plugin_blueprints()` function (~15 lines)
 - `src/inkypi.py` - Added import and call to `register_plugin_blueprints(app)` (~2 lines)
 
-### Files NOT Modified (Plugin-Specific)
-
-All pluginmanager-specific code remains in:
-- `src/plugins/pluginmanager/pluginmanager.py` - Plugin class
-- `src/plugins/pluginmanager/api.py` - API routes blueprint
-- `src/plugins/pluginmanager/settings.html` - UI template
-- `src/plugins/pluginmanager/inkypi-plugin` - CLI script
-- `src/plugins/pluginmanager/patch_core.py` - Patching logic
-- `src/plugins/pluginmanager/patch-core.sh` - Patch script
-
-## Conclusion
-
-These core changes are **necessary** due to Flask's architecture constraints, but they are:
-- **Minimal** (two small additions, ~17 lines total)
-- **Generic** (benefit all plugins, not just pluginmanager)
-- **Well-documented** (clear purpose and usage)
-- **One-time** (apply once, then Plugin Manager works fully from UI)
-
-The pluginmanager plugin is otherwise completely self-contained, with all its functionality, routes, and UI residing in the plugin directory.
