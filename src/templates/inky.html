@@ -65,7 +65,7 @@
             <h1>{{ config.name }}</h1>
             <button class="settings-button dark-mode-toggle" title="Toggle Dark Mode"
                 aria-label="Toggle Dark Mode"></button>
-            <a href="{{ url_for('plugin_manage.plugin_manage_page') }}" class="settings-button" title="Manage plugins">
+            <a href="{{ url_for('plugin.plugin_page', plugin_id='pluginmanager') }}" class="settings-button" title="Manage plugins">
                 <span style="font-size: 20px;">🧩</span>
             </a>
             <a href="{{ url_for('apikeys.apikeys_page') }}" class="settings-button" title="API Keys">

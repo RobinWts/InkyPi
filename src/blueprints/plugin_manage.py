@@ -1,10 +1,11 @@
-"""Blueprint for managing third-party plugins (install/uninstall) from the web UI."""
+"""Blueprint for managing third-party plugins (install/uninstall) from the web UI.
+API routes only - UI is handled by the pluginmanager plugin."""
 
 import os
 import subprocess
 from urllib.parse import urlparse
 
-from flask import Blueprint, request, jsonify, current_app, render_template
+from flask import Blueprint, request, jsonify, current_app
 import logging
 
 from config import Config
@@ -20,8 +21,8 @@ def _project_dir():
 
 
 def _cli_script():
-    """Path to the inkypi-plugin CLI script."""
-    return os.path.join(_project_dir(), "install", "cli", "inkypi-plugin")
+    """Path to the inkypi-plugin CLI script in the pluginmanager plugin."""
+    return os.path.join(_project_dir(), "src", "plugins", "pluginmanager", "inkypi-plugin")
 
 
 def _third_party_plugins():
@@ -49,13 +50,6 @@ def _validate_install_url(url):
     if host not in ("github.com", "www.github.com"):
         return False, "Only GitHub.com repository URLs are accepted"
     return True, None
-
-
-@plugin_manage_bp.route("/manage-plugins")
-def plugin_manage_page():
-    """Render the plugin management page with list of third-party plugins."""
-    third_party = _third_party_plugins()
-    return render_template("plugin_manage.html", third_party_plugins=third_party)
 
 
 @plugin_manage_bp.route("/manage-plugins/install", methods=["POST"])
