@@ -22,23 +22,32 @@ class PluginManager(BasePlugin):
         # Access device_config via Flask's current_app
         try:
             from flask import current_app
-            device_config = current_app.config.get('DEVICE_CONFIG')
-            if device_config:
-                third_party = [p for p in device_config.get_plugins() if p.get("repository")]
-                template_params['third_party_plugins'] = third_party
-            else:
-                template_params['third_party_plugins'] = []
             
-            # Check if core files need patching
+            # Check if core files need patching FIRST
+            core_needs_patch = False
+            core_patch_missing = []
             try:
                 from .patch_core import check_core_patched
                 is_patched, missing = check_core_patched()
-                template_params['core_needs_patch'] = not is_patched
-                template_params['core_patch_missing'] = missing
+                core_needs_patch = not is_patched
+                core_patch_missing = missing
             except Exception as e:
                 logger.warning(f"Could not check patch status: {e}")
-                template_params['core_needs_patch'] = False
-                template_params['core_patch_missing'] = []
+            
+            template_params['core_needs_patch'] = core_needs_patch
+            template_params['core_patch_missing'] = core_patch_missing
+            
+            # Only load plugins if core is patched (skip unnecessary work)
+            if not core_needs_patch:
+                device_config = current_app.config.get('DEVICE_CONFIG')
+                if device_config:
+                    third_party = [p for p in device_config.get_plugins() if p.get("repository")]
+                    template_params['third_party_plugins'] = third_party
+                else:
+                    template_params['third_party_plugins'] = []
+            else:
+                # Skip loading plugins when unpatched
+                template_params['third_party_plugins'] = []
         except (RuntimeError, ImportError):
             # Not in Flask context or Flask not available
             template_params['third_party_plugins'] = []

@@ -227,6 +227,22 @@ def update_plugin():
     return jsonify({"success": True})
 
 
+@plugin_manage_bp.route("/pluginmanager-api/core-changes", methods=["GET"])
+def serve_core_changes():
+    """Serve the CORE_CHANGES.md file."""
+    try:
+        import os
+        md_path = os.path.join(os.path.dirname(__file__), "CORE_CHANGES.md")
+        if os.path.exists(md_path):
+            from flask import send_file
+            return send_file(md_path, mimetype='text/markdown', as_attachment=False)
+        else:
+            return jsonify({"error": "CORE_CHANGES.md not found"}), 404
+    except Exception as e:
+        logger.exception("Failed to serve CORE_CHANGES.md")
+        return jsonify({"error": str(e)}), 500
+
+
 @plugin_manage_bp.route("/pluginmanager-api/check-patch", methods=["GET"])
 def check_patch():
     """Check if core files need patching."""

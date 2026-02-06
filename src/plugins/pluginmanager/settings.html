@@ -159,25 +159,35 @@
 
 <div class="plugin-manage-container">
     {% if core_needs_patch %}
-    <div class="core-patch-warning" style="margin-bottom: 24px; padding: 16px; border-radius: 8px; background: rgba(255, 152, 0, 0.15); border: 1px solid rgba(255, 152, 0, 0.4);">
-        <p style="margin: 0 0 12px 0; color: var(--text-primary, #333); font-weight: bold;">
-            ⚠️ Core files need to be patched
+    <div class="core-patch-warning" style="padding: 32px 24px; border-radius: 8px; text-align: center; max-width: 600px; margin: 40px auto;">
+        <div style="font-size: 64px; margin-bottom: 20px;">⚠️</div>
+        <p style="margin: 0 0 16px 0; color: var(--text-primary, #333); font-weight: bold; font-size: 20px;">
+            Core files need to be patched
         </p>
-        <p style="margin: 0 0 12px 0; color: var(--text-secondary, #666); font-size: 13px;">
-            The pluginmanager plugin requires core changes to work properly. Click "Patch Core Files" to automatically apply the necessary changes.
+        <p style="margin: 0 0 24px 0; color: var(--text-secondary, #666); font-size: 15px; line-height: 1.6;">
+            The pluginmanager plugin requires core changes to work properly.<br>
+            Click "Patch Core Files" to automatically apply the necessary changes.
         </p>
         {% if core_patch_missing %}
-        <ul style="margin: 0 0 12px 0; padding-left: 20px; color: var(--text-secondary, #666); font-size: 12px;">
-            {% for missing in core_patch_missing %}
-            <li>{{ missing }}</li>
-            {% endfor %}
-        </ul>
+        <div style="margin: 0 0 24px 0; padding: 16px; background: rgba(0, 0, 0, 0.05); border-radius: 6px; text-align: left;">
+            <p style="margin: 0 0 10px 0; font-weight: bold; font-size: 13px; color: var(--text-primary, #333);">Missing components:</p>
+            <ul style="margin: 0; padding-left: 24px; color: var(--text-secondary, #666); font-size: 13px; line-height: 1.8;">
+                {% for missing in core_patch_missing %}
+                <li>{{ missing }}</li>
+                {% endfor %}
+            </ul>
+        </div>
         {% endif %}
-        <button type="button" id="patch-core-btn" class="action-button" onclick="patchCoreFiles()">
-            Patch Core Files
-        </button>
+        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+            <button type="button" id="patch-core-btn" class="action-button" onclick="patchCoreFiles()">
+                Patch Core Files
+            </button>
+            <a href="{{ url_for('plugin.image', plugin_id='pluginmanager', filename='CORE_CHANGES.md') }}" target="_blank" class="action-button" style="text-decoration: none; display: inline-block; background: var(--button-secondary-bg, #6c757d);">
+                More Info
+            </a>
+        </div>
     </div>
-    {% endif %}
+    {% else %}
     
     <h2 class="form-label" style="margin-bottom: 12px;">Installed third-party plugins</h2>
     <div id="plugins-list">
@@ -218,6 +228,7 @@
         <p id="plugin-action-success-msg"></p>
         <button type="button" class="action-button" onclick="reloadPage()">Reload page</button>
     </div>
+    {% endif %}
 </div>
 
 <script>
@@ -257,18 +268,8 @@
         patchBtn.textContent = 'Patching...';
         
         try {
-            // Try to use url_for if available, otherwise use direct URL
-            let patchUrl = '/pluginmanager-api/patch-core';
-            try {
-                // Try to get URL from Flask (may fail if blueprint not registered)
-                const flaskUrl = '{{ url_for("pluginmanager_api.patch_core") }}';
-                if (flaskUrl && !flaskUrl.includes('pluginmanager_api.patch_core')) {
-                    patchUrl = flaskUrl;
-                }
-            } catch (e) {
-                // Blueprint not registered yet, use direct URL (will get 404, handled below)
-            }
-            
+            // Use direct URL since blueprint might not be registered yet
+            const patchUrl = '/pluginmanager-api/patch-core';
             const response = await fetch(patchUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' }
@@ -303,7 +304,8 @@
         }
         btn.disabled = true;
         try {
-            const response = await fetch('{{ url_for("pluginmanager_api.update_plugin") }}', {
+            // Use direct URL since blueprint might not be registered yet
+            const response = await fetch('/pluginmanager-api/update', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ plugin_id: pluginId })
@@ -327,7 +329,8 @@
         }
         btn.disabled = true;
         try {
-            const response = await fetch('{{ url_for("pluginmanager_api.uninstall_plugin") }}', {
+            // Use direct URL since blueprint might not be registered yet
+            const response = await fetch('/pluginmanager-api/uninstall', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ plugin_id: pluginId })
@@ -387,7 +390,8 @@
             return;
         }
         try {
-            const response = await fetch('{{ url_for("pluginmanager_api.install_plugin") }}', {
+            // Use direct URL since blueprint might not be registered yet
+            const response = await fetch('/pluginmanager-api/install', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ url: url })
