@@ -566,19 +566,15 @@
             document.getElementById('htmlMode').checked = htmlMode;
             document.getElementById('htmlMode').value = htmlMode ? 'true' : 'false';
             
-            // Parse divisions from flat form structure (only if not HTML mode)
-            if (!htmlMode) {
-                const divisions = parseDivisionsFromSettings(pluginSettings);
-                
-                if (divisions.length > 0) {
-                    divisions.forEach(div => createDivision(div));
-                } else {
-                    // No divisions found, create default
-                    createDivision();
-                }
+            // Always restore divisions from saved settings so they are not lost when switching back from HTML mode
+            const divisions = parseDivisionsFromSettings(pluginSettings);
+            if (divisions.length > 0) {
+                divisions.forEach(div => createDivision(div));
+            } else {
+                createDivision();
             }
             
-            // Update UI based on mode
+            // Show/hide JSON-only sections based on mode
             toggleModeDisplay();
         } else {
             // Set default values
