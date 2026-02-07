@@ -34,16 +34,50 @@
                 "name": "Default",
                 "start_time": "00:00",
                 "end_time": "24:00",
-                "plugins": [],
+                "plugins": [
+                    {
+                        "plugin_id": "calendar",
+                        "name": "gfds",
+                        "plugin_settings": {
+                            "calendarColors[]": [
+                                "#007bff"
+                            ],
+                            "calendarURLs[]": [
+                                "https://calendars.icloud.com/holidays/de_de.ics/"
+                            ],
+                            "viewMode": "dayGridMonth",
+                            "language": "en",
+                            "displayTitle": "true",
+                            "displayWeekends": "true",
+                            "displayEventTime": "true",
+                            "weekStartDay": "0",
+                            "fontSize": "normal",
+                            "selectedFrame": "None",
+                            "topMargin": "",
+                            "bottomMargin": "",
+                            "leftMargin": "",
+                            "rightMargin": "",
+                            "backgroundOption": "color",
+                            "backgroundColor": "#ffffff",
+                            "textColor": "#000000"
+                        },
+                        "refresh": {
+                            "interval": 120
+                        },
+                        "latest_refresh_time": "2026-02-07T14:29:34.283967+00:00"
+                    }
+                ],
                 "current_plugin_index": null
             }
         ],
         "active_playlist": null
     },
     "refresh_info": {
-        "refresh_time": null,
-        "image_hash": null,
-        "refresh_type": null,
-        "plugin_id": null
+        "refresh_time": "2026-02-07T14:29:34.283967+00:00",
+        "image_hash": "66a90205cb890a27d786ef2716190365a5d83b7cdff54ffb3c8584917efa04a1",
+        "refresh_type": "Playlist",
+        "plugin_id": "calendar",
+        "playlist": "Default",
+        "plugin_instance": "gfds"
     }
 }
