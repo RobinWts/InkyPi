@@ -4,11 +4,18 @@ from io import BytesIO
 import os
 import logging
 import hashlib
+import sys
 import tempfile
 import subprocess
 import shutil
 
 logger = logging.getLogger(__name__)
+
+# Default Chrome/Chromium locations on macOS (not typically on PATH).
+MACOS_BROWSER_PATHS = [
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "/Applications/Chromium.app/Contents/MacOS/Chromium",
+]
 
 def get_image(image_url):
     response = requests.get(image_url, timeout=30)
@@ -107,13 +114,18 @@ def take_screenshot_html(html_str, dimensions, timeout_ms=None):
     return image
 
 def _find_chromium_binary():
-    """Find the first available Chromium-based binary in system PATH."""
-    candidates = ["chromium-headless-shell", "chromium", "chrome"]
-    for candidate in candidates:
+    """Find the first available Chromium-based binary (in PATH or known macOS locations)."""
+    path_candidates = ["chromium-headless-shell", "chromium", "chrome"]
+    for candidate in path_candidates:
         path = shutil.which(candidate)
         if path:
             logger.debug(f"Found browser binary: {candidate} at {path}")
-            return candidate
+            return path
+    if sys.platform == "darwin":
+        for path in MACOS_BROWSER_PATHS:
+            if os.path.isfile(path):
+                logger.debug(f"Using macOS browser at {path}")
+                return path
     return None
 
 
