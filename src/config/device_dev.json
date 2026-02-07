@@ -34,16 +34,105 @@
                 "name": "Default",
                 "start_time": "00:00",
                 "end_time": "24:00",
-                "plugins": [],
-                "current_plugin_index": null
+                "plugins": [
+                    {
+                        "plugin_id": "node-red",
+                        "name": "NR",
+                        "plugin_settings": {
+                            "nodeRedUrl": "http://192.168.2.200:1880",
+                            "endpointPath": "/inkypi/data",
+                            "timeout": "10",
+                            "pageTitle": "",
+                            "division_0_type[]": [
+                                "dataoutput",
+                                "dataoutput"
+                            ],
+                            "division_0_value[]": [
+                                "temperature",
+                                "timestamp"
+                            ],
+                            "division_0_format[]": [
+                                "{value}C",
+                                "{value}"
+                            ],
+                            "division_0_font[]": [
+                                "Jost",
+                                "Jost"
+                            ],
+                            "division_0_size[]": [
+                                "normal",
+                                "normal"
+                            ],
+                            "division_0_color[]": [
+                                "#000000",
+                                "#000000"
+                            ],
+                            "division_0_alignment[]": [
+                                "left",
+                                "left"
+                            ]
+                        },
+                        "refresh": {
+                            "interval": 300
+                        },
+                        "latest_refresh_time": "2026-02-07T12:02:31.823632+00:00"
+                    },
+                    {
+                        "plugin_id": "node-red",
+                        "name": "html",
+                        "plugin_settings": {
+                            "nodeRedUrl": "http://192.168.2.200:1880",
+                            "endpointPath": "/inkypi/datahtml",
+                            "timeout": "10",
+                            "htmlMode": "true"
+                        },
+                        "refresh": {
+                            "interval": 300
+                        },
+                        "latest_refresh_time": "2026-02-07T10:37:52.005283+00:00"
+                    },
+                    {
+                        "plugin_id": "calendar",
+                        "name": "dsa",
+                        "plugin_settings": {
+                            "calendarColors[]": [
+                                "#007bff"
+                            ],
+                            "calendarURLs[]": [
+                                "webcal://p118-caldav.icloud.com/published/2/MTQwNjAzNDU1ODE0MDYwM7HUJEuAlayW3-W2_XEY2Y3NginMnQW9z79YWK5Cfsu7DpZq0UDgoVOGcj06O0vjkyTJ-LDogGcUS0acKPulbdc"
+                            ],
+                            "viewMode": "listMonth",
+                            "language": "en",
+                            "displayTitle": "true",
+                            "displayWeekends": "true",
+                            "displayEventTime": "true",
+                            "fontSize": "x-small",
+                            "selectedFrame": "None",
+                            "topMargin": "",
+                            "bottomMargin": "",
+                            "leftMargin": "",
+                            "rightMargin": "",
+                            "backgroundOption": "color",
+                            "backgroundColor": "#ffffff",
+                            "textColor": "#000000"
+                        },
+                        "refresh": {
+                            "interval": 120
+                        },
+                        "latest_refresh_time": "2026-02-07T13:55:24.373642+00:00"
+                    }
+                ],
+                "current_plugin_index": 0
             }
         ],
-        "active_playlist": null
+        "active_playlist": "Default"
     },
     "refresh_info": {
-        "refresh_time": null,
-        "image_hash": null,
-        "refresh_type": null,
-        "plugin_id": null
+        "refresh_time": "2026-02-07T13:55:24.373642+00:00",
+        "image_hash": "9678e0fc7d84f651e676e09f35a72dc663ce06bf5aadf2d9f7f452febc980884",
+        "refresh_type": "Playlist",
+        "plugin_id": "calendar",
+        "playlist": "Default",
+        "plugin_instance": "dsa"
     }
 }

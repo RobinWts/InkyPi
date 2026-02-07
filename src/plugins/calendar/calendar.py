@@ -63,6 +63,10 @@ class Calendar(BasePlugin):
             "time_format": time_format,
             "font_scale": FONT_SIZES.get(settings.get("fontSize", "normal"))
         }
+        if view == "listMonth":
+            # Pass 5-week range so list view shows all fetched events (not just current month)
+            template_params["list_view_start"] = tz.localize(start).isoformat()
+            template_params["list_view_end"] = tz.localize(end).isoformat()
 
         image = self.render_image(dimensions, "calendar.html", "calendar.css", template_params)
 

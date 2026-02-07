@@ -26,39 +26,41 @@
         const timeFormat = {
             hour: "numeric",
             minute: "2-digit",
-            omitZeroMinute: {{ (time_format == "12h") | tojson }},
-            hour12: {{ (time_format == "12h") | tojson }},
-            meridiem: 'short'
+            omitZeroMinute: {{ (time_format == "12h") | tojson
+    }},
+        hour12: {{ (time_format == "12h") | tojson }},
+        meridiem: 'short'
         };
 
-        const calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: '{{ view }}',
-            events: events,
-            now: '{{ current_dt }}',
-            timeZone: '{{ timezone }}',
-            contentHeight: '100%',
-            slotDuration: '01:00:00',
-            expandRows: true,
-            locale: "{{ plugin_settings.language or 'en' }}",
-            firstDay: "{{ plugin_settings.weekStartDay or 0}}",
-            slotLabelFormat: timeFormat,
-            slotMinTime: "{{ plugin_settings.startTimeInterval or 00}}:00:00",
-            slotMaxTime: "{{ plugin_settings.endTimeInterval or 24}}:00:00",
-            eventTimeFormat: timeFormat,
-            displayEventTime: {{ (plugin_settings.displayEventTime == "true") | tojson}},
-            weekends:  {{ (plugin_settings.displayWeekends == "true") | tojson}},
-            nowIndicator: {{ (plugin_settings.displayNowIndicator == "true") | tojson}},
-            fixedWeekCount: false,
-            {% if view == 'timeGrid' %}duration: {days : 7 },{% endif %}
-            {% if view == 'dayGrid' %}duration: {weeks : "{{ plugin_settings.displayWeeks or 4}}" },{% endif %}
-            headerToolbar: {
-                left: '',
-                center: "{{ 'title' if plugin_settings.displayTitle == 'true' else '' }}",
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: '{{ view }}',
+        events: events,
+        now: '{{ current_dt }}',
+        timeZone: '{{ timezone }}',
+        contentHeight: '100%',
+        slotDuration: '01:00:00',
+        expandRows: true,
+        locale: "{{ plugin_settings.language or 'en' }}",
+        firstDay: "{{ plugin_settings.weekStartDay or 0}}",
+        slotLabelFormat: timeFormat,
+        slotMinTime: "{{ plugin_settings.startTimeInterval or 00}}:00:00",
+        slotMaxTime: "{{ plugin_settings.endTimeInterval or 24}}:00:00",
+        eventTimeFormat: timeFormat,
+        displayEventTime: {{ (plugin_settings.displayEventTime == "true") | tojson}},
+    weekends: { { (plugin_settings.displayWeekends == "true") | tojson } },
+    nowIndicator: { { (plugin_settings.displayNowIndicator == "true") | tojson } },
+    fixedWeekCount: false,
+        {% if view == 'timeGrid' %}duration: { days: 7 }, {% endif %}
+    {% if view == 'dayGrid' %} duration: { weeks: "{{ plugin_settings.displayWeeks or 4}}" }, {% endif %}
+    {% if view == 'listMonth' %}visibleRange: { start: '{{ list_view_start }}', end: '{{ list_view_end }}' },{% endif %}
+    headerToolbar: {
+        left: '',
+            center: "{{ 'title' if plugin_settings.displayTitle == 'true' else '' }}",
                 right: ''
-            },
-            slotDuration: "01:00:00"
+    },
+    slotDuration: "01:00:00"
         });
-        calendar.render();
+    calendar.render();
     });
 </script>
 
