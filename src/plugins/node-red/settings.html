@@ -17,9 +17,19 @@
 </div>
 
 <div class="form-group">
+    <label for="htmlMode" class="form-label">HTML Mode:</label>
+    <div class="toggle-container">
+        <input type="checkbox" id="htmlMode" name="htmlMode" class="toggle-checkbox" value="false"
+            onclick="this.value = this.checked ? 'true' : 'false'; toggleModeDisplay();">
+        <label for="htmlMode" class="toggle-label"></label>
+    </div>
+    <span class="form-hint">When enabled, Node-RED should send complete HTML code. When disabled, Node-RED sends JSON which is parsed according to the layout configuration below.</span>
+</div>
+
+<div class="form-group" id="pageTitleGroup">
     <label for="pageTitle" class="form-label">Page Title (optional):</label>
     <input type="text" id="pageTitle" name="pageTitle" placeholder="Enter page title..." class="form-input">
-    <span class="form-hint">Optional title displayed centered at the top</span>
+    <span class="form-hint">Optional title displayed centered at the top (JSON mode only)</span>
 </div>
 
 <style>
@@ -526,6 +536,23 @@
         return divisions;
     }
     
+    function toggleModeDisplay() {
+        const htmlMode = document.getElementById('htmlMode').checked;
+        const pageTitleGroup = document.getElementById('pageTitleGroup');
+        const divisionsContainer = document.getElementById('divisionsContainer');
+        const divisionsGroup = divisionsContainer ? divisionsContainer.closest('.form-group') : null;
+        
+        if (htmlMode) {
+            // Hide JSON parsing configuration
+            if (pageTitleGroup) pageTitleGroup.style.display = 'none';
+            if (divisionsGroup) divisionsGroup.style.display = 'none';
+        } else {
+            // Show JSON parsing configuration
+            if (pageTitleGroup) pageTitleGroup.style.display = 'block';
+            if (divisionsGroup) divisionsGroup.style.display = 'block';
+        }
+    }
+    
     document.addEventListener('DOMContentLoaded', () => {
         // Load basic settings
         if (loadPluginSettings) {
@@ -534,23 +561,41 @@
             document.getElementById('timeout').value = pluginSettings.timeout || 10;
             document.getElementById('pageTitle').value = pluginSettings.pageTitle || '';
             
-            // Parse divisions from flat form structure
-            const divisions = parseDivisionsFromSettings(pluginSettings);
+            // Load HTML mode setting
+            const htmlMode = pluginSettings.htmlMode === 'true';
+            document.getElementById('htmlMode').checked = htmlMode;
+            document.getElementById('htmlMode').value = htmlMode ? 'true' : 'false';
             
-            if (divisions.length > 0) {
-                divisions.forEach(div => createDivision(div));
-            } else {
-                // No divisions found, create default
-                createDivision();
+            // Parse divisions from flat form structure (only if not HTML mode)
+            if (!htmlMode) {
+                const divisions = parseDivisionsFromSettings(pluginSettings);
+                
+                if (divisions.length > 0) {
+                    divisions.forEach(div => createDivision(div));
+                } else {
+                    // No divisions found, create default
+                    createDivision();
+                }
             }
+            
+            // Update UI based on mode
+            toggleModeDisplay();
         } else {
             // Set default values
             document.getElementById('nodeRedUrl').value = 'http://localhost:1880';
             document.getElementById('endpointPath').value = '/inkypi/data';
             document.getElementById('timeout').value = 10;
             document.getElementById('pageTitle').value = '';
-            // Create one default division with one output line
-            createDivision();
+            document.getElementById('htmlMode').checked = false;
+            document.getElementById('htmlMode').value = 'false';
+            
+            // Create one default division with one output line (only in JSON mode)
+            if (!document.getElementById('htmlMode').checked) {
+                createDivision();
+            }
+            
+            // Update UI based on mode
+            toggleModeDisplay();
         }
         
         // Handle add division button

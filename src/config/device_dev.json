@@ -42,92 +42,64 @@
                             "nodeRedUrl": "http://192.168.2.200:1880",
                             "endpointPath": "/inkypi/data",
                             "timeout": "10",
-                            "pageTitle": "JSON Parsing!",
+                            "pageTitle": "",
                             "division_0_type[]": [
                                 "dataoutput",
-                                "dataoutput",
-                                "divider",
-                                "dataoutput",
-                                "title"
+                                "dataoutput"
                             ],
                             "division_0_value[]": [
                                 "temperature",
-                                "H\u00e4",
-                                "was",
-                                "timestamp",
-                                "TEXT"
+                                "timestamp"
                             ],
                             "division_0_format[]": [
-                                "Temp: {value}",
-                                "H\u00e4?: {value}",
-                                "{value}",
-                                "{value}",
+                                "{value}C",
                                 "{value}"
                             ],
                             "division_0_font[]": [
                                 "Jost",
-                                "Jost",
-                                "Jost",
-                                "Jost",
                                 "Jost"
                             ],
                             "division_0_size[]": [
-                                "x-large",
-                                "normal",
-                                "normal",
                                 "normal",
                                 "normal"
                             ],
                             "division_0_color[]": [
                                 "#000000",
-                                "#000000",
-                                "#aa7942",
-                                "#ff40ff",
                                 "#000000"
                             ],
                             "division_0_alignment[]": [
                                 "left",
-                                "left",
-                                "left",
-                                "center",
-                                "left"
-                            ],
-                            "division_1_type[]": [
-                                "dataoutput"
-                            ],
-                            "division_1_value[]": [
-                                "humidity"
-                            ],
-                            "division_1_format[]": [
-                                "Feuchte: {value}%"
-                            ],
-                            "division_1_font[]": [
-                                "DS-Digital"
-                            ],
-                            "division_1_size[]": [
-                                "large"
-                            ],
-                            "division_1_color[]": [
-                                "#00f900"
-                            ],
-                            "division_1_alignment[]": [
                                 "left"
                             ]
                         },
                         "refresh": {
                             "interval": 300
                         },
-                        "latest_refresh_time": "2026-02-06T15:35:45.625594+00:00"
+                        "latest_refresh_time": "2026-02-07T12:02:31.823632+00:00"
+                    },
+                    {
+                        "plugin_id": "node-red",
+                        "name": "html",
+                        "plugin_settings": {
+                            "nodeRedUrl": "http://192.168.2.200:1880",
+                            "endpointPath": "/inkypi/datahtml",
+                            "timeout": "10",
+                            "htmlMode": "true"
+                        },
+                        "refresh": {
+                            "interval": 300
+                        },
+                        "latest_refresh_time": "2026-02-07T10:37:52.005283+00:00"
                     }
                 ],
-                "current_plugin_index": null
+                "current_plugin_index": 0
             }
         ],
-        "active_playlist": null
+        "active_playlist": "Default"
     },
     "refresh_info": {
-        "refresh_time": "2026-02-06T15:35:45.625594+00:00",
-        "image_hash": "5b69483381afa37ac987f2417bf7f82891b6ccc2196f6e5c0cf3b400a650b923",
+        "refresh_time": "2026-02-07T12:02:31.823632+00:00",
+        "image_hash": "d1cee200e72f8692afed35394d2d378b0e841b763e631237042870a074dbdbe9",
         "refresh_type": "Playlist",
         "plugin_id": "node-red",
         "playlist": "Default",

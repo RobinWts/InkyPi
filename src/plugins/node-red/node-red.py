@@ -8,6 +8,8 @@ from PIL import Image
 import logging
 import requests
 import json
+import os
+from utils.image_utils import take_screenshot_html
 
 logger = logging.getLogger(__name__)
 
@@ -56,60 +58,87 @@ class NodeRed(BasePlugin):
             # Check for HTTP errors
             response.raise_for_status()
             
-            # Parse JSON response
-            try:
-                data = response.json()
-                logger.info(f"Successfully fetched JSON data from Node-RED")
-                logger.debug(f"JSON Data: {json.dumps(data, indent=2)}")
-            except json.JSONDecodeError as e:
-                logger.error(f"Invalid JSON response: {e}")
-                logger.debug(f"Response content: {response.text[:500]}")
-                raise RuntimeError("Node-RED returned invalid JSON data.")
-            
             # Get display dimensions
             dimensions = device_config.get_resolution()
             if device_config.get_config("orientation") == "vertical":
                 dimensions = dimensions[::-1]
             
-            # Process layout configuration
-            page_title = settings.get('pageTitle', '').strip()
-            divisions = self._parse_divisions(settings)
+            # Check if HTML mode is enabled
+            html_mode = settings.get('htmlMode', 'false') == 'true'
             
-            # If no divisions configured, show raw JSON as fallback
-            if not divisions:
-                logger.warning("No divisions configured, displaying raw JSON")
-                json_string = json.dumps(data, indent=2, ensure_ascii=False)
-                template_params = {
-                    "page_title": page_title,
-                    "divisions": [],
-                    "json_fallback": json_string,
-                    "endpoint_url": full_url,
-                    "plugin_settings": settings
-                }
-            else:
-                # Process each division and extract data
-                processed_divisions = []
-                for division in divisions:
-                    processed_lines = []
-                    for line in division.get('outputLines', []):
-                        processed_line = self._process_output_line(line, data)
-                        processed_lines.append(processed_line)
-                    processed_divisions.append({'outputLines': processed_lines})
+            if html_mode:
+                # HTML Mode: Node-RED sends complete HTML, render it directly
+                logger.info("HTML Mode enabled - rendering HTML directly from Node-RED")
+                html_content = response.text
+                logger.debug(f"HTML Content length: {len(html_content)} characters")
+                logger.debug(f"HTML Content preview: {html_content[:500]}")
                 
-                template_params = {
-                    "page_title": page_title,
-                    "divisions": processed_divisions,
-                    "endpoint_url": full_url,
-                    "plugin_settings": settings
-                }
-            
-            # Render the data
-            image = self.render_image(
-                dimensions,
-                "node_red.html",
-                "node_red.css",
-                template_params
-            )
+                # Write HTML to preview file for debugging
+                preview_path = os.path.join(self.get_plugin_dir(), "preview.html")
+                try:
+                    with open(preview_path, 'w', encoding='utf-8') as f:
+                        f.write(html_content)
+                    logger.info(f"HTML written to preview file: {preview_path}")
+                except Exception as e:
+                    logger.warning(f"Failed to write preview.html: {e}")
+                
+                # Render HTML directly using take_screenshot_html
+                image = take_screenshot_html(html_content, dimensions)
+                logger.info("Successfully rendered HTML from Node-RED")
+                return image
+            else:
+                # JSON Mode: Parse JSON and use layout configuration
+                logger.info("JSON Mode enabled - parsing JSON and using layout configuration")
+                
+                # Parse JSON response
+                try:
+                    data = response.json()
+                    logger.info(f"Successfully fetched JSON data from Node-RED")
+                    logger.debug(f"JSON Data: {json.dumps(data, indent=2)}")
+                except json.JSONDecodeError as e:
+                    logger.error(f"Invalid JSON response: {e}")
+                    logger.debug(f"Response content: {response.text[:500]}")
+                    raise RuntimeError("Node-RED returned invalid JSON data.")
+                
+                # Process layout configuration
+                page_title = settings.get('pageTitle', '').strip()
+                divisions = self._parse_divisions(settings)
+                
+                # If no divisions configured, show raw JSON as fallback
+                if not divisions:
+                    logger.warning("No divisions configured, displaying raw JSON")
+                    json_string = json.dumps(data, indent=2, ensure_ascii=False)
+                    template_params = {
+                        "page_title": page_title,
+                        "divisions": [],
+                        "json_fallback": json_string,
+                        "endpoint_url": full_url,
+                        "plugin_settings": settings
+                    }
+                else:
+                    # Process each division and extract data
+                    processed_divisions = []
+                    for division in divisions:
+                        processed_lines = []
+                        for line in division.get('outputLines', []):
+                            processed_line = self._process_output_line(line, data)
+                            processed_lines.append(processed_line)
+                        processed_divisions.append({'outputLines': processed_lines})
+                    
+                    template_params = {
+                        "page_title": page_title,
+                        "divisions": processed_divisions,
+                        "endpoint_url": full_url,
+                        "plugin_settings": settings
+                    }
+                
+                # Render the data using template
+                image = self.render_image(
+                    dimensions,
+                    "node_red.html",
+                    "node_red.css",
+                    template_params
+                )
             
             logger.info("Successfully generated image from Node-RED data")
             return image
