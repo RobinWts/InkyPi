@@ -31,7 +31,7 @@
             meridiem: 'short'
         };
 
-        const calendar = new FullCalendar.Calendar(calendarEl, {
+        const calendarOptions = {
             initialView: '{{ view }}',
             events: events,
             now: '{{ current_dt }}',
@@ -57,7 +57,11 @@
                 right: ''
             },
             slotDuration: "01:00:00"
-        });
+        };
+        {% if view == 'listMonth' and list_range_start is defined and list_range_end is defined %}
+        calendarOptions.visibleRange = { start: '{{ list_range_start }}', end: '{{ list_range_end }}' };
+        {% endif %}
+        const calendar = new FullCalendar.Calendar(calendarEl, calendarOptions);
         calendar.render();
     });
 </script>

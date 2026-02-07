@@ -63,6 +63,10 @@ class Calendar(BasePlugin):
             "time_format": time_format,
             "font_scale": FONT_SIZES.get(settings.get("fontSize", "normal"))
         }
+        if view == "listMonth":
+            list_end = current_dt.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(weeks=5)
+            template_params["list_range_start"] = current_dt.isoformat()
+            template_params["list_range_end"] = list_end.isoformat()
 
         image = self.render_image(dimensions, "calendar.html", "calendar.css", template_params)
 
@@ -113,7 +117,8 @@ class Calendar(BasePlugin):
             start = datetime(current_dt.year, current_dt.month, 1) - timedelta(weeks=1)
             end = datetime(current_dt.year, current_dt.month, 1) + timedelta(weeks=6)
         elif view == "listMonth":
-            end = start + timedelta(weeks=5)
+            start = current_dt  # from now
+            end = start.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(weeks=5)
         return start, end
         
     def parse_data_points(self, event, tz):
