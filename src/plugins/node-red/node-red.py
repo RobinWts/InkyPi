@@ -82,8 +82,8 @@ class NodeRed(BasePlugin):
                 except Exception as e:
                     logger.warning(f"Failed to write preview.html: {e}")
                 
-                # Render HTML with e-ink crisp (2x render + B&W binarize) for readability
-                image = take_screenshot_html(html_content, dimensions, eink_crisp=True)
+                # Render HTML directly using take_screenshot_html
+                image = take_screenshot_html(html_content, dimensions)
                 logger.info("Successfully rendered HTML from Node-RED")
                 return image
             else:
@@ -214,8 +214,8 @@ class NodeRed(BasePlugin):
             logger.warning(f"Failed to write preview.html: {e}")
         
         
-        # Convert to image with e-ink crisp (2x render + B&W binarize) for readability
-        return take_screenshot_html(rendered_html, dimensions, eink_crisp=True)
+        # Convert to image
+        return take_screenshot_html(rendered_html, dimensions)
     
     def _parse_divisions(self, settings):
         """Parse divisions from settings form data."""

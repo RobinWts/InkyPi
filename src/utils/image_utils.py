@@ -88,19 +88,7 @@ def compute_image_hash(image):
     img_bytes = image.tobytes()
     return hashlib.sha256(img_bytes).hexdigest()
 
-def _binarize_for_eink(image):
-    """Convert image to crisp black/white (no gray) for e-ink readability.
-    Uses a hard threshold so anti-aliased text becomes sharp edges."""
-    img = image.convert("L")
-    dither = getattr(Image, "Dither", None)
-    if dither is not None and hasattr(dither, "NONE"):
-        img = img.convert("1", dither=dither.NONE)
-    else:
-        img = img.point(lambda x: 255 if x >= 128 else 0).convert("1")
-    return img.convert("RGB")
-
-
-def take_screenshot_html(html_str, dimensions, timeout_ms=None, eink_crisp=False):
+def take_screenshot_html(html_str, dimensions, timeout_ms=None):
     image = None
     try:
         # Create a temporary HTML file
@@ -108,7 +96,7 @@ def take_screenshot_html(html_str, dimensions, timeout_ms=None, eink_crisp=False
             html_file.write(html_str.encode("utf-8"))
             html_file_path = html_file.name
 
-        image = take_screenshot(html_file_path, dimensions, timeout_ms, eink_crisp=eink_crisp)
+        image = take_screenshot(html_file_path, dimensions, timeout_ms)
 
         # Remove html file
         os.remove(html_file_path)
@@ -142,7 +130,7 @@ def _find_chromium_binary():
     return None
 
 
-def take_screenshot(target, dimensions, timeout_ms=None, eink_crisp=False):
+def take_screenshot(target, dimensions, timeout_ms=None):
     image = None
     try:
         # Find available browser binary
@@ -155,17 +143,12 @@ def take_screenshot(target, dimensions, timeout_ms=None, eink_crisp=False):
         with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as img_file:
             img_file_path = img_file.name
 
-        # E-ink crisp: render at 2x resolution then downscale for sharper text
-        shot_w, shot_h = dimensions[0], dimensions[1]
-        if eink_crisp:
-            shot_w, shot_h = dimensions[0] * 2, dimensions[1] * 2
-
         command = [
             browser,
             target,
             "--headless",
             f"--screenshot={img_file_path}",
-            f"--window-size={shot_w},{shot_h}",
+            f"--window-size={dimensions[0]},{dimensions[1]}",
             "--disable-dev-shm-usage",
             "--disable-gpu",
             "--use-gl=swiftshader",
@@ -180,6 +163,8 @@ def take_screenshot(target, dimensions, timeout_ms=None, eink_crisp=False):
             "--renderer-process-limit=1",
             "--no-zygote",
             "--no-sandbox",
+            # Crisp text for e-ink: disable LCD/subpixel and subpixel positioning so
+            # B&W palette conversion stays sharp (Chromium content + gfx switches).
             "--disable-lcd-text",
             "--disable-font-subpixel-positioning",
         ]
@@ -196,12 +181,8 @@ def take_screenshot(target, dimensions, timeout_ms=None, eink_crisp=False):
         with Image.open(img_file_path) as img:
             image = img.copy()
 
+        # Remove image files
         os.remove(img_file_path)
-
-        # E-ink crisp: downscale from 2x then binarize to pure B&W (no gray)
-        if eink_crisp and image is not None:
-            image = image.resize((dimensions[0], dimensions[1]), Image.LANCZOS)
-            image = _binarize_for_eink(image)
 
     except Exception as e:
         logger.error(f"Failed to take screenshot: {str(e)}")
