@@ -42,40 +42,54 @@
                             "nodeRedUrl": "http://192.168.2.200:1880",
                             "endpointPath": "/inkypi/data",
                             "timeout": "10",
-                            "pageTitle": "",
+                            "pageTitle": "Temperaturen",
                             "division_0_type[]": [
                                 "dataoutput",
+                                "dataoutput",
+                                "divider",
                                 "dataoutput"
                             ],
                             "division_0_value[]": [
-                                "temperature",
+                                "insidetemp",
+                                "outsidetemp",
+                                "timestamp",
                                 "timestamp"
                             ],
                             "division_0_format[]": [
-                                "{value}C",
-                                "{value}"
+                                "Innen: {value}\u00b0C",
+                                "Au\u00dfen: {value}\u00b0C",
+                                "{value}",
+                                "Updated: {value}"
                             ],
                             "division_0_font[]": [
                                 "Jost",
-                                "Jost"
+                                "Jost",
+                                "Jost",
+                                "DS-Digital"
                             ],
                             "division_0_size[]": [
+                                "large",
+                                "large",
                                 "normal",
                                 "normal"
                             ],
                             "division_0_color[]": [
                                 "#000000",
+                                "#000000",
+                                "#000000",
                                 "#000000"
                             ],
                             "division_0_alignment[]": [
+                                "center",
+                                "center",
                                 "left",
-                                "left"
+                                "right"
                             ]
                         },
                         "refresh": {
                             "interval": 300
                         },
-                        "latest_refresh_time": "2026-02-07T12:02:31.823632+00:00"
+                        "latest_refresh_time": "2026-02-08T10:47:16.426875+00:00"
                     },
                     {
                         "plugin_id": "node-red",
@@ -98,8 +112,8 @@
         "active_playlist": "Default"
     },
     "refresh_info": {
-        "refresh_time": "2026-02-07T12:02:31.823632+00:00",
-        "image_hash": "d1cee200e72f8692afed35394d2d378b0e841b763e631237042870a074dbdbe9",
+        "refresh_time": "2026-02-08T10:47:16.426875+00:00",
+        "image_hash": "35b72bc2427626c50dba03d6b94c68a90d1a29bfe03157a4edec07c2e2e19697",
         "refresh_type": "Playlist",
         "plugin_id": "node-red",
         "playlist": "Default",
