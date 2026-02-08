@@ -4,6 +4,11 @@
         <link rel="stylesheet" href="{{style}}">
     {% endfor %}
     <style>
+        /* Crisp text for e-ink: disable anti-aliasing so B&W palette conversion stays sharp */
+        body {
+            -webkit-font-smoothing: none;
+            -moz-osx-font-smoothing: unset;
+        }
         {% for font in font_faces %}
         @font-face {
             font-family: "{{font.font_family}}";
