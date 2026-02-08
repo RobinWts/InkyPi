@@ -162,7 +162,11 @@ def take_screenshot(target, dimensions, timeout_ms=None):
             "--mute-audio",
             "--renderer-process-limit=1",
             "--no-zygote",
-            "--no-sandbox"
+            "--no-sandbox",
+            # Crisp text for e-ink: disable LCD/subpixel and subpixel positioning so
+            # B&W palette conversion stays sharp (Chromium content + gfx switches).
+            "--disable-lcd-text",
+            "--disable-font-subpixel-positioning",
         ]
         if timeout_ms:
             command.append(f"--timeout={timeout_ms}")
