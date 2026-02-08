@@ -4,18 +4,58 @@ from io import BytesIO
 import os
 import logging
 import hashlib
-import sys
 import tempfile
 import subprocess
 import shutil
 
 logger = logging.getLogger(__name__)
 
-# Default Chrome/Chromium locations on macOS (not typically on PATH).
-MACOS_BROWSER_PATHS = [
-    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-    "/Applications/Chromium.app/Contents/MacOS/Chromium",
-]
+# Check if Playwright is available
+_playwright_available = None
+_playwright_browser = None
+
+def _check_playwright_available():
+    """Check if Playwright is installed and available."""
+    global _playwright_available
+    if _playwright_available is None:
+        try:
+            from playwright.sync_api import sync_playwright
+            _playwright_available = True
+            logger.info("Playwright is available and will be used for rendering")
+        except ImportError:
+            _playwright_available = False
+            logger.info("Playwright not available, falling back to Chromium subprocess")
+    return _playwright_available
+
+def _get_playwright_browser():
+    """Get or create a Playwright browser instance (singleton pattern)."""
+    global _playwright_browser
+    if _playwright_browser is None:
+        try:
+            from playwright.sync_api import sync_playwright
+            playwright = sync_playwright().start()
+            # Use chromium for consistency with existing behavior
+            _playwright_browser = {
+                'playwright': playwright,
+                'browser': playwright.chromium.launch(headless=True)
+            }
+            logger.debug("Playwright browser instance created")
+        except Exception as e:
+            logger.error(f"Failed to create Playwright browser: {str(e)}")
+            return None
+    return _playwright_browser
+
+def _cleanup_playwright():
+    """Cleanup Playwright resources."""
+    global _playwright_browser
+    if _playwright_browser:
+        try:
+            _playwright_browser['browser'].close()
+            _playwright_browser['playwright'].stop()
+            _playwright_browser = None
+            logger.debug("Playwright browser cleaned up")
+        except Exception as e:
+            logger.error(f"Error cleaning up Playwright: {str(e)}")
 
 def get_image(image_url):
     response = requests.get(image_url, timeout=30)
@@ -95,9 +135,105 @@ def compute_image_hash(image):
     img_bytes = image.tobytes()
     return hashlib.sha256(img_bytes).hexdigest()
 
+def _take_screenshot_html_playwright(html_str, dimensions, timeout_ms=None):
+    """Take screenshot using Playwright.
+    Writes HTML to a temp file and loads it via file:// so that linked CSS and
+    font URLs (absolute file paths) resolve correctly; set_content(html) would
+    use about:blank and break resource loading.
+    """
+    image = None
+    html_file_path = None
+    try:
+        browser_instance = _get_playwright_browser()
+        if not browser_instance:
+            return None
+
+        # Write HTML to temp file so we can load it via file:// and allow
+        # stylesheets/fonts (absolute file paths) to load
+        with tempfile.NamedTemporaryFile(
+            suffix=".html", delete=False, mode="w", encoding="utf-8"
+        ) as html_file:
+            html_file.write(html_str)
+            html_file_path = html_file.name
+
+        file_url = f"file://{os.path.abspath(html_file_path)}"
+
+        browser = browser_instance["browser"]
+        context = browser.new_context(
+            viewport={"width": dimensions[0], "height": dimensions[1]},
+            device_scale_factor=1,
+        )
+        page = context.new_page()
+
+        if timeout_ms:
+            page.set_default_timeout(timeout_ms)
+
+        page.goto(file_url, wait_until="networkidle")
+
+        screenshot_bytes = page.screenshot(type="png")
+        image = Image.open(BytesIO(screenshot_bytes))
+
+        context.close()
+
+    except Exception as e:
+        logger.error(f"Failed to take screenshot with Playwright: {str(e)}")
+    finally:
+        if html_file_path and os.path.exists(html_file_path):
+            try:
+                os.remove(html_file_path)
+            except OSError as e:
+                logger.debug(f"Could not remove temp HTML file: {e}")
+
+    return image
+
+def _take_screenshot_playwright(target, dimensions, timeout_ms=None):
+    """Take screenshot of a file or URL using Playwright."""
+    image = None
+    try:
+        browser_instance = _get_playwright_browser()
+        if not browser_instance:
+            return None
+        
+        browser = browser_instance['browser']
+        context = browser.new_context(
+            viewport={'width': dimensions[0], 'height': dimensions[1]},
+            device_scale_factor=1
+        )
+        page = context.new_page()
+        
+        # Set timeout if provided
+        if timeout_ms:
+            page.set_default_timeout(timeout_ms)
+        
+        # Navigate to file:// URL or regular URL
+        if os.path.isfile(target):
+            target = f"file://{os.path.abspath(target)}"
+        
+        page.goto(target, wait_until='networkidle')
+        
+        # Take screenshot
+        screenshot_bytes = page.screenshot(type='png')
+        image = Image.open(BytesIO(screenshot_bytes))
+        
+        # Cleanup
+        context.close()
+        
+    except Exception as e:
+        logger.error(f"Failed to take screenshot with Playwright: {str(e)}")
+    
+    return image
+
 def take_screenshot_html(html_str, dimensions, timeout_ms=None):
     image = None
     try:
+        # Try Playwright first if available
+        if _check_playwright_available():
+            image = _take_screenshot_html_playwright(html_str, dimensions, timeout_ms)
+            if image:
+                return image
+            logger.warning("Playwright screenshot failed, falling back to Chromium subprocess")
+        
+        # Fallback to Chromium subprocess method
         # Create a temporary HTML file
         with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as html_file:
             html_file.write(html_str.encode("utf-8"))
@@ -114,24 +250,40 @@ def take_screenshot_html(html_str, dimensions, timeout_ms=None):
     return image
 
 def _find_chromium_binary():
-    """Find the first available Chromium-based binary (in PATH or known macOS locations)."""
-    path_candidates = ["chromium-headless-shell", "chromium", "chrome"]
+    """Find the first available Chromium-based binary in PATH or common install locations."""
+    # 1. Check PATH (works when binary name is on PATH)
+    path_candidates = ["chromium-headless-shell", "chromium", "chrome", "google-chrome"]
     for candidate in path_candidates:
         path = shutil.which(candidate)
         if path:
             logger.debug(f"Found browser binary: {candidate} at {path}")
             return path
-    if sys.platform == "darwin":
-        for path in MACOS_BROWSER_PATHS:
-            if os.path.isfile(path):
-                logger.debug(f"Using macOS browser at {path}")
-                return path
+
+    # 2. On macOS, check .app bundles (Chrome is not typically on PATH)
+    if os.name == "posix" and os.uname().sysname == "Darwin":
+        app_paths = [
+            "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+            "/Applications/Chromium.app/Contents/MacOS/Chromium",
+        ]
+        for app_path in app_paths:
+            if os.path.isfile(app_path) and os.access(app_path, os.X_OK):
+                logger.debug(f"Found browser at {app_path}")
+                return app_path
+
     return None
 
 
 def take_screenshot(target, dimensions, timeout_ms=None):
     image = None
     try:
+        # Try Playwright first if available
+        if _check_playwright_available():
+            image = _take_screenshot_playwright(target, dimensions, timeout_ms)
+            if image:
+                return image
+            logger.warning("Playwright screenshot failed, falling back to Chromium subprocess")
+        
+        # Fallback to Chromium subprocess method
         # Find available browser binary
         browser = _find_chromium_binary()
         if not browser:
@@ -161,7 +313,11 @@ def take_screenshot(target, dimensions, timeout_ms=None):
             "--mute-audio",
             "--renderer-process-limit=1",
             "--no-zygote",
-            "--no-sandbox"
+            "--no-sandbox",
+            # Crisp text for e-ink: disable LCD/subpixel and subpixel positioning so
+            # B&W palette conversion stays sharp (Chromium content + gfx switches).
+            "--disable-lcd-text",
+            "--disable-font-subpixel-positioning",
         ]
         if timeout_ms:
             command.append(f"--timeout={timeout_ms}")
