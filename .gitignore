@@ -178,3 +178,6 @@ src/config/device_dev.json
 src/static/images/current_image.png
 
 src/config/device_dev.json
+src/static/fonts/BethEllen-Regular.ttf
+.gitignore
+src/static/fonts/DearJoefour 400.otf
