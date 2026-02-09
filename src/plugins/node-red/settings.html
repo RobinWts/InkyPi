@@ -1,6 +1,7 @@
 <div class="form-group">
     <label for="nodeRedUrl" class="form-label">Node-RED URL:</label>
-    <input type="text" id="nodeRedUrl" name="nodeRedUrl" placeholder="http://localhost:1880" required class="form-input">
+    <input type="text" id="nodeRedUrl" name="nodeRedUrl" placeholder="http://localhost:1880" required
+        class="form-input">
     <span class="form-hint">Base URL of your Node-RED instance (e.g., http://localhost:1880)</span>
 </div>
 
@@ -23,7 +24,8 @@
             onclick="this.value = this.checked ? 'true' : 'false'; toggleModeDisplay();">
         <label for="htmlMode" class="toggle-label"></label>
     </div>
-    <span class="form-hint">When enabled, Node-RED should send complete HTML code. When disabled, Node-RED sends JSON which is parsed according to the layout configuration below.</span>
+    <span class="form-hint">When enabled, Node-RED should send complete HTML code. When disabled, Node-RED sends JSON
+        which is parsed according to the layout configuration below.</span>
 </div>
 
 <div class="form-group" id="pageTitleGroup">
@@ -39,14 +41,14 @@
         gap: 0.75rem;
         margin: 0.5rem 0;
     }
-    
+
     .division {
         border: 1px solid #ddd;
         border-radius: 4px;
         padding: 0.75rem;
         background: #fafafa;
     }
-    
+
     .division-header {
         display: flex;
         justify-content: space-between;
@@ -55,19 +57,19 @@
         padding-bottom: 0.5rem;
         border-bottom: 1px solid #e0e0e0;
     }
-    
+
     .division-title {
         font-weight: 600;
         font-size: 0.95rem;
         color: #333;
     }
-    
+
     .output-lines-container {
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
     }
-    
+
     .output-line {
         border: 1px solid #e5e5e5;
         border-radius: 3px;
@@ -75,11 +77,11 @@
         background: white;
         transition: border-color 0.2s;
     }
-    
+
     .output-line:hover {
         border-color: #ccc;
     }
-    
+
     .output-line-header {
         display: flex;
         justify-content: space-between;
@@ -88,39 +90,39 @@
         padding-bottom: 0.3rem;
         border-bottom: 1px solid #f0f0f0;
     }
-    
+
     .output-line-header .form-label {
         font-size: 0.85rem;
         font-weight: 500;
         color: #666;
         margin: 0;
     }
-    
+
     .output-line-controls {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
         gap: 0.4rem 0.6rem;
         align-items: start;
     }
-    
+
     @media (max-width: 1200px) {
         .output-line-controls {
             grid-template-columns: repeat(3, 1fr);
         }
     }
-    
+
     @media (max-width: 800px) {
         .output-line-controls {
             grid-template-columns: repeat(2, 1fr);
         }
     }
-    
-    .output-line-controls > div {
+
+    .output-line-controls>div {
         display: flex;
         flex-direction: column;
         gap: 0.2rem;
     }
-    
+
     .output-line-controls .form-label {
         font-size: 0.8rem;
         font-weight: 500;
@@ -128,7 +130,7 @@
         margin: 0;
         line-height: 1.2;
     }
-    
+
     .order-btn {
         background: #6c757d;
         color: white;
@@ -140,17 +142,17 @@
         transition: background 0.2s;
         min-width: 1.8rem;
     }
-    
+
     .order-btn:hover:not(:disabled) {
         background: #5a6268;
     }
-    
+
     .order-btn:disabled {
         background: #e9ecef;
         color: #adb5bd;
         cursor: not-allowed;
     }
-    
+
     .delete-btn {
         background: #dc3545;
         color: white;
@@ -161,17 +163,17 @@
         font-size: 0.85rem;
         transition: background 0.2s;
     }
-    
+
     .delete-btn:hover {
         background: #c82333;
     }
-    
+
     .output-line-actions {
         display: flex;
         gap: 0.3rem;
         align-items: center;
     }
-    
+
     .add-btn {
         background: #28a745;
         color: white;
@@ -183,31 +185,31 @@
         margin-top: 0.5rem;
         transition: background 0.2s;
     }
-    
+
     .add-btn:hover {
         background: #218838;
     }
-    
+
     .form-input-small {
         padding: 0.3rem 0.4rem;
         font-size: 0.85rem;
         border: 1px solid #ccc;
         border-radius: 3px;
     }
-    
+
     .form-input-small:focus {
         outline: none;
         border-color: #28a745;
         box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.1);
     }
-    
+
     /* Compact color input */
     .form-input-small[type="color"] {
         height: 2rem;
         padding: 0.1rem;
         cursor: pointer;
     }
-    
+
     /* Better spacing for divisions section */
     .form-group:has(.divisions-container) {
         margin-top: 1rem;
@@ -225,13 +227,13 @@
 <script>
     let divisionCount = 0;
     let outputLineCount = 0;
-    
+
     // Get available fonts from template (dynamically discovered)
-    const FONTS = {{ available_fonts | tojson if available_fonts else ['Jost', 'DS-Digital', 'Napoli', 'Dogica'] | tojson }};
+    const FONTS = {{ available_fonts | tojson if available_fonts else['Jost', 'DS-Digital', 'Napoli', 'Dogica'] | tojson }};
     const FONT_WEIGHTS = ['normal', 'bold'];
     const SIZES = ['x-small', 'small', 'normal', 'large', 'x-large'];
     const ALIGNMENTS = ['left', 'center', 'right'];
-    
+
     function createOutputLine(divisionId, lineData = null) {
         const lineId = `line_${outputLineCount++}`;
         const type = lineData?.type || 'dataoutput';
@@ -242,11 +244,11 @@
         const size = lineData?.size || 'normal';
         const color = lineData?.color || '#000000';
         const alignment = lineData?.alignment || 'left';
-        
+
         const lineDiv = document.createElement('div');
         lineDiv.className = 'output-line';
         lineDiv.id = lineId;
-        
+
         lineDiv.innerHTML = `
             <div class="output-line-header">
                 <span class="form-label">Output Line</span>
@@ -303,10 +305,10 @@
                 </div>
             </div>
         `;
-        
+
         return lineDiv;
     }
-    
+
     function updateOutputLineType(lineId, type) {
         const valueLabel = document.getElementById(`${lineId}_valueLabel`);
         const valueInput = document.querySelector(`#${lineId} input[name*="_value[]"]`);
@@ -316,9 +318,9 @@
         const sizeContainer = document.getElementById(`${lineId}_sizeContainer`);
         const colorContainer = document.getElementById(`${lineId}_colorContainer`);
         const alignmentContainer = document.getElementById(`${lineId}_alignmentContainer`);
-        
+
         const fontWeightContainer = document.getElementById(`${lineId}_fontWeightContainer`);
-        
+
         if (type === 'divider') {
             // Hide text, format, font, font weight, size, and alignment for divider, but keep color
             valueContainer.style.display = 'none';
@@ -351,7 +353,7 @@
             colorContainer.style.display = 'block';
         }
     }
-    
+
     function deleteOutputLine(lineId) {
         const lineElement = document.getElementById(lineId);
         const container = lineElement.parentElement;
@@ -359,31 +361,31 @@
         updateOutputLineNumbers(container);
         updateOrderButtons(container);
     }
-    
+
     function moveOutputLineUp(lineId) {
         const lineElement = document.getElementById(lineId);
         const container = lineElement.parentElement;
         const previousSibling = lineElement.previousElementSibling;
-        
+
         if (previousSibling) {
             container.insertBefore(lineElement, previousSibling);
             updateOutputLineNumbers(container);
             updateOrderButtons(container);
         }
     }
-    
+
     function moveOutputLineDown(lineId) {
         const lineElement = document.getElementById(lineId);
         const container = lineElement.parentElement;
         const nextSibling = lineElement.nextElementSibling;
-        
+
         if (nextSibling) {
             container.insertBefore(nextSibling, lineElement);
             updateOutputLineNumbers(container);
             updateOrderButtons(container);
         }
     }
-    
+
     function updateOutputLineNumbers(container) {
         const lines = container.querySelectorAll('.output-line');
         lines.forEach((line, index) => {
@@ -393,13 +395,13 @@
             }
         });
     }
-    
+
     function updateOrderButtons(container) {
         const lines = Array.from(container.querySelectorAll('.output-line'));
         lines.forEach((line, index) => {
             const upBtn = line.querySelector('button[onclick*="moveOutputLineUp"]');
             const downBtn = line.querySelector('button[onclick*="moveOutputLineDown"]');
-            
+
             if (upBtn) {
                 upBtn.disabled = index === 0;
             }
@@ -408,15 +410,15 @@
             }
         });
     }
-    
+
     function createDivision(divisionData = null) {
         const divisionId = divisionCount++;
         const outputLines = divisionData?.outputLines || [];
-        
+
         const divisionDiv = document.createElement('div');
         divisionDiv.className = 'division';
         divisionDiv.id = `division_${divisionId}`;
-        
+
         divisionDiv.innerHTML = `
             <div class="division-header">
                 <span class="division-title">Division ${divisionId + 1}</span>
@@ -427,10 +429,10 @@
             </div>
             <div class="output-lines-container" id="division_${divisionId}_lines"></div>
         `;
-        
+
         const container = document.getElementById('divisionsContainer');
         container.appendChild(divisionDiv);
-        
+
         const linesContainer = document.getElementById(`division_${divisionId}_lines`);
         if (outputLines.length > 0) {
             outputLines.forEach(line => {
@@ -440,12 +442,12 @@
             // Add one default line
             linesContainer.appendChild(createOutputLine(divisionId));
         }
-        
+
         // Update line numbers and order buttons after adding lines
         updateOutputLineNumbers(linesContainer);
         updateOrderButtons(linesContainer);
     }
-    
+
     function addOutputLine(divisionId) {
         const linesContainer = document.getElementById(`${divisionId}_lines`);
         const divId = divisionId.replace('division_', '');
@@ -453,14 +455,14 @@
         updateOutputLineNumbers(linesContainer);
         updateOrderButtons(linesContainer);
     }
-    
+
     function deleteDivision(divisionId) {
         document.getElementById(divisionId).remove();
     }
-    
+
     function parseDivisionsFromSettings(settings) {
         const divisions = [];
-        
+
         // Find all division indices from settings keys
         // Handle both "division_0_type[]" and "division_0_type[0]" formats
         const divisionIndices = new Set();
@@ -473,10 +475,10 @@
                 }
             }
         }
-        
+
         // Sort to maintain order
         const sortedIndices = Array.from(divisionIndices).sort((a, b) => a - b);
-        
+
         // Reconstruct each division
         for (const divIdx of sortedIndices) {
             // Get arrays for this division - try both [] and [0] formats
@@ -493,7 +495,7 @@
                     }
                     return [];
                 }
-                
+
                 // Try indexed notation (division_0_type[0], division_0_type[1], etc.)
                 const indexedValues = [];
                 let index = 0;
@@ -506,10 +508,10 @@
                         break;
                     }
                 }
-                
+
                 return indexedValues;
             };
-            
+
             const types = getArrayValue(`division_${divIdx}_type`);
             const values = getArrayValue(`division_${divIdx}_value`);
             const formats = getArrayValue(`division_${divIdx}_format`);
@@ -518,7 +520,7 @@
             const sizes = getArrayValue(`division_${divIdx}_size`);
             const colors = getArrayValue(`division_${divIdx}_color`);
             const alignments = getArrayValue(`division_${divIdx}_alignment`);
-            
+
             // Build output lines
             const outputLines = [];
             const maxLines = Math.max(
@@ -531,7 +533,7 @@
                 colors.length,
                 alignments.length
             );
-            
+
             for (let i = 0; i < maxLines; i++) {
                 outputLines.push({
                     type: types[i] || 'dataoutput',
@@ -544,21 +546,21 @@
                     alignment: alignments[i] || 'left'
                 });
             }
-            
+
             if (outputLines.length > 0) {
                 divisions.push({ outputLines: outputLines });
             }
         }
-        
+
         return divisions;
     }
-    
+
     function toggleModeDisplay() {
         const htmlMode = document.getElementById('htmlMode').checked;
         const pageTitleGroup = document.getElementById('pageTitleGroup');
         const divisionsContainer = document.getElementById('divisionsContainer');
         const divisionsGroup = divisionsContainer ? divisionsContainer.closest('.form-group') : null;
-        
+
         if (htmlMode) {
             // Hide JSON parsing configuration
             if (pageTitleGroup) pageTitleGroup.style.display = 'none';
@@ -569,7 +571,7 @@
             if (divisionsGroup) divisionsGroup.style.display = 'block';
         }
     }
-    
+
     document.addEventListener('DOMContentLoaded', () => {
         // Load basic settings
         if (loadPluginSettings) {
@@ -577,12 +579,12 @@
             document.getElementById('endpointPath').value = pluginSettings.endpointPath || '/inkypi/data';
             document.getElementById('timeout').value = pluginSettings.timeout || 10;
             document.getElementById('pageTitle').value = pluginSettings.pageTitle || '';
-            
+
             // Load HTML mode setting
             const htmlMode = pluginSettings.htmlMode === 'true';
             document.getElementById('htmlMode').checked = htmlMode;
             document.getElementById('htmlMode').value = htmlMode ? 'true' : 'false';
-            
+
             // Always restore divisions from saved settings so they are not lost when switching back from HTML mode
             const divisions = parseDivisionsFromSettings(pluginSettings);
             if (divisions.length > 0) {
@@ -590,7 +592,7 @@
             } else {
                 createDivision();
             }
-            
+
             // Show/hide JSON-only sections based on mode
             toggleModeDisplay();
         } else {
@@ -601,16 +603,16 @@
             document.getElementById('pageTitle').value = '';
             document.getElementById('htmlMode').checked = false;
             document.getElementById('htmlMode').value = 'false';
-            
+
             // Create one default division with one output line (only in JSON mode)
             if (!document.getElementById('htmlMode').checked) {
                 createDivision();
             }
-            
+
             // Update UI based on mode
             toggleModeDisplay();
         }
-        
+
         // Handle add division button
         document.getElementById('addDivisionBtn').onclick = () => createDivision();
     });
