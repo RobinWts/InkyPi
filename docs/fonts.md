@@ -4,11 +4,15 @@ InkyPi supports dynamic font discovery, allowing you to add custom fonts simply 
 
 ## Overview
 
-InkyPi automatically discovers fonts from the `src/static/fonts/` directory. Fonts are available for both:
+InkyPi automatically discovers fonts from multiple locations:
+- **Global fonts:** `src/static/fonts/` (user/system customizations)
+- **Plugin fonts:** `src/plugins/*/fonts/` (plugin-specific fonts)
+
+Fonts are available for both:
 - **PIL-based rendering** (plugins that draw directly with Pillow)
 - **HTML/CSS rendering** (plugins that use the `render_image()` method)
 
-All discovered fonts are automatically included in the base HTML template (`plugin.html`), making them available to all HTML-rendered plugins.
+All discovered fonts are automatically included in the base HTML template (`plugin.html`), making them available to all HTML-rendered plugins. Fonts are discovered in priority order: hardcoded (highest) → global → plugin (lowest).
 
 ## Supported Font Formats
 
@@ -19,9 +23,9 @@ Fonts can be placed directly in `src/static/fonts/` or in subdirectories (e.g., 
 
 ## Adding Fonts
 
-### Method 1: Automatic Discovery (Recommended)
+### Method 1: Global Fonts (User/System Level)
 
-Simply place your font files in the `src/static/fonts/` directory:
+Place your font files in the `src/static/fonts/` directory:
 
 ```bash
 src/static/fonts/
@@ -36,6 +40,27 @@ src/static/fonts/
 - Font metadata (family name, weight, style) is extracted from the font files using `fonttools`
 - If `fonttools` is not available, metadata is inferred from filenames using naming conventions
 - Fonts are automatically merged with built-in fonts
+- Global fonts have higher priority than plugin fonts
+
+### Method 2: Plugin Fonts (Plugin-Specific)
+
+Plugins can bundle their own fonts by creating a `fonts/` subdirectory:
+
+```bash
+src/plugins/myplugin/
+├── fonts/
+│   ├── PluginFont.ttf
+│   └── PluginFont-Bold.ttf
+├── myplugin.py
+└── ...
+```
+
+**How it works:**
+- InkyPi automatically scans all plugin directories for `fonts/` subdirectories
+- Plugin fonts are discovered and made available system-wide
+- When a plugin is removed, its fonts are automatically removed
+- Plugin fonts have lower priority than global fonts (can be overridden)
+- Perfect for third-party plugins that bundle fonts
 
 **Naming Conventions (fallback when fonttools unavailable):**
 - `FontName-Regular.ttf` → family="FontName", weight="normal"
@@ -172,18 +197,25 @@ FONTS.forEach(font => {
 
 ## Font Discovery Process
 
-1. **On first access:** InkyPi scans `src/static/fonts/` recursively
+Fonts are discovered in priority order:
+
+1. **Hardcoded fonts** (`FONT_FAMILIES`) - Highest priority (system fonts)
+2. **Global fonts** (`src/static/fonts/`) - Medium priority (user/system customizations)
+3. **Plugin fonts** (`src/plugins/*/fonts/`) - Lowest priority (plugin-specific fonts)
+
+**Discovery steps:**
+1. **On first access:** InkyPi scans all font directories recursively
 2. **Metadata extraction:** Uses `fonttools` to read font file metadata (family name, weight, style)
 3. **Fallback:** If `fonttools` unavailable, infers from filename
 4. **Override check:** Looks for `.json` metadata files
-5. **Merging:** Combines discovered fonts with built-in fonts (built-in takes precedence)
+5. **Merging:** Combines fonts in priority order (higher priority fonts override lower priority)
 6. **Caching:** Results are cached for performance
 
 ## Troubleshooting
 
 ### Font not appearing in plugin
 
-1. **Check font file:** Ensure `.ttf` or `.otf` file exists in `src/static/fonts/`
+1. **Check font file:** Ensure `.ttf` or `.otf` file exists in `src/static/fonts/` or `src/plugins/{plugin_id}/fonts/`
 2. **Restart service:** Font discovery happens on first access; restart InkyPi to refresh
 3. **Check logs:** Look for font discovery messages in logs
 4. **Verify metadata:** Use a metadata JSON file if font name extraction fails
@@ -217,10 +249,16 @@ Or restart the InkyPi service.
 3. **Include variants:** Add bold, italic variants for complete font families
 4. **Test both rendering methods:** Verify fonts work in both PIL and HTML rendering
 5. **Use metadata files:** For fonts with non-standard naming, use JSON metadata files
+6. **Bundle fonts with plugins:** Use `fonts/` subdirectory in plugins for plugin-specific fonts
+7. **Consider priority:** Global fonts override plugin fonts, so use global fonts for user customizations
 
 ## Technical Details
 
 - **Font discovery:** Lazy-loaded on first access, cached thereafter
+- **Discovery locations:**
+  - Global fonts: `src/static/fonts/`
+  - Plugin fonts: `src/plugins/*/fonts/`
+- **Priority order:** Hardcoded → Global → Plugin (higher priority overrides lower)
 - **Metadata source:** `fonttools` library (if available) or filename parsing
 - **Storage:** Font metadata cached in memory (`_DISCOVERED_FONTS`)
 - **Template integration:** All fonts automatically included in `plugin.html` via `font_faces` template variable
