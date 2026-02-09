@@ -226,7 +226,8 @@
     let divisionCount = 0;
     let outputLineCount = 0;
     
-    const FONTS = ['Jost', 'DS-Digital', 'Napoli', 'Dogica'];
+    // Get available fonts from template (dynamically discovered)
+    const FONTS = {{ available_fonts | tojson if available_fonts else ['Jost', 'DS-Digital', 'Napoli', 'Dogica'] | tojson }};
     const SIZES = ['x-small', 'small', 'normal', 'large', 'x-large'];
     const ALIGNMENTS = ['left', 'center', 'right'];
     
@@ -235,7 +236,7 @@
         const type = lineData?.type || 'dataoutput';
         const value = lineData?.value || '';
         const format = lineData?.format || '{value}';
-        const font = lineData?.font || 'Jost';
+        const font = lineData?.font || (FONTS.length > 0 ? FONTS[0] : 'Jost');
         const size = lineData?.size || 'normal';
         const color = lineData?.color || '#000000';
         const alignment = lineData?.alignment || 'left';
@@ -521,7 +522,7 @@
                     type: types[i] || 'dataoutput',
                     value: values[i] || '',
                     format: formats[i] || '{value}',
-                    font: fonts[i] || 'Jost',
+                    font: fonts[i] || (FONTS.length > 0 ? FONTS[0] : 'Jost'),
                     size: sizes[i] || 'normal',
                     color: colors[i] || '#000000',
                     alignment: alignments[i] || 'left'

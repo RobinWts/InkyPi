@@ -10,12 +10,24 @@ import requests
 import json
 import os
 from utils.image_utils import take_screenshot_html
+from utils.app_utils import get_fonts
 
 logger = logging.getLogger(__name__)
 
 
 class NodeRed(BasePlugin):
     """Plugin for displaying Node-RED data on InkyPi."""
+    
+    def generate_settings_template(self):
+        """Override to pass available fonts to the settings template."""
+        template_params = super().generate_settings_template()
+        
+        # Get unique font family names from all available fonts
+        fonts = get_fonts()
+        font_families = sorted(set(f["font_family"] for f in fonts))
+        template_params["available_fonts"] = font_families
+        
+        return template_params
     
     def generate_image(self, settings, device_config):
         """
@@ -277,7 +289,7 @@ class NodeRed(BasePlugin):
                     'type': types[i] if i < len(types) else 'dataoutput',
                     'value': values[i] if i < len(values) else '',
                     'format': formats[i] if i < len(formats) else '{value}',
-                    'font': fonts[i] if i < len(fonts) else 'Jost',
+                    'font': fonts[i] if i < len(fonts) else 'Jost',  # Jost is built-in, always available
                     'size': sizes[i] if i < len(sizes) else 'normal',
                     'color': colors[i] if i < len(colors) else '#000000',
                     'alignment': alignments[i] if i < len(alignments) else 'left'
