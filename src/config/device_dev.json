@@ -95,7 +95,7 @@
                         "refresh": {
                             "interval": 300
                         },
-                        "latest_refresh_time": "2026-02-09T12:02:41.688710+00:00"
+                        "latest_refresh_time": "2026-02-09T12:42:18.150671+00:00"
                     },
                     {
                         "plugin_id": "node-red",
@@ -118,8 +118,8 @@
         "active_playlist": "Default"
     },
     "refresh_info": {
-        "refresh_time": "2026-02-09T12:02:41.688710+00:00",
-        "image_hash": "598b17eb65f98b78e0663f853c54e2d0c988857a053718ef83e80dc94cb41a1f",
+        "refresh_time": "2026-02-09T12:42:18.150671+00:00",
+        "image_hash": "fba0c91707c497ede10eb94055733407c8558a7e55a19ba2dc7cd57fff43ac9e",
         "refresh_type": "Playlist",
         "plugin_id": "node-red",
         "playlist": "Default",

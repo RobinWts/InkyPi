@@ -56,11 +56,36 @@ def resolve_path(file_path):
     return str(src_path / file_path)
 
 def _get_fonts_directory():
-    """Get the fonts directory path."""
+    """Get the global fonts directory path."""
     global _FONTS_DIR
     if _FONTS_DIR is None:
         _FONTS_DIR = resolve_path(os.path.join("static", "fonts"))
     return _FONTS_DIR
+
+def _get_plugin_fonts_directories():
+    """Get list of plugin fonts directories.
+    
+    Scans all plugin directories for fonts/ subdirectories.
+    
+    Returns:
+        list: List of absolute paths to plugin fonts directories
+    """
+    plugins_dir = resolve_path("plugins")
+    plugin_font_dirs = []
+    
+    if not os.path.exists(plugins_dir):
+        return plugin_font_dirs
+    
+    plugins_base_path = Path(plugins_dir)
+    
+    # Scan each plugin directory for fonts/ subdirectory
+    for plugin_dir in plugins_base_path.iterdir():
+        if plugin_dir.is_dir():
+            fonts_dir = plugin_dir / "fonts"
+            if fonts_dir.is_dir():
+                plugin_font_dirs.append(str(fonts_dir))
+    
+    return plugin_font_dirs
 
 def _extract_font_metadata(font_path):
     """
@@ -198,51 +223,43 @@ def _load_metadata_override(font_path):
             logger.warning(f"Failed to load metadata override from {metadata_path}: {e}")
     return None
 
-def _discover_fonts():
+def _scan_fonts_in_directory(fonts_dir, base_path_for_relative=None):
     """
-    Discover fonts dynamically from the fonts directory.
+    Scan a single directory for font files and extract metadata.
     
-    Scans the fonts directory recursively for .ttf and .otf files,
-    extracts metadata from each font file, and merges with hardcoded
-    FONT_FAMILIES (hardcoded takes precedence for overrides).
-    
+    Args:
+        fonts_dir: Absolute path to directory to scan
+        base_path_for_relative: Base path for calculating relative paths (defaults to fonts_dir)
+        
     Returns:
-        dict: Font families dictionary in the same format as FONT_FAMILIES
+        dict: Dictionary mapping font family names to lists of variants
     """
-    global _DISCOVERED_FONTS
-    
-    if _DISCOVERED_FONTS is not None:
-        logger.debug(f"Using cached font discovery results ({len(_DISCOVERED_FONTS)} families)")
-        return _DISCOVERED_FONTS
-    
-    fonts_dir = _get_fonts_directory()
-    logger.debug(f"Scanning fonts directory: {fonts_dir}")
     discovered = {}
+    font_extensions = {'.ttf', '.otf', '.TTF', '.OTF'}
     
     if not os.path.exists(fonts_dir):
-        logger.warning(f"Fonts directory not found: {fonts_dir}")
-        _DISCOVERED_FONTS = {}
-        return {}
+        return discovered
     
-    # Scan for font files recursively
-    font_extensions = {'.ttf', '.otf', '.TTF', '.OTF'}
+    if base_path_for_relative is None:
+        base_path_for_relative = fonts_dir
+    
     fonts_base_path = Path(fonts_dir)
-    
     font_files_found = 0
+    
     for font_file in fonts_base_path.rglob('*'):
         if font_file.suffix in font_extensions:
             font_files_found += 1
             try:
                 font_path = str(font_file)
-                relative_path = os.path.relpath(font_path, fonts_dir)
+                relative_path = os.path.relpath(font_path, base_path_for_relative)
                 
                 # Check for metadata override first
                 metadata_override = _load_metadata_override(font_path)
                 
                 if metadata_override:
                     metadata = metadata_override
-                    # Ensure file path is set correctly
-                    metadata['file'] = relative_path.replace('\\', '/')  # Normalize path separators
+                    # Ensure file path is set correctly (relative to static/fonts for global, or plugin path for plugin fonts)
+                    metadata['file'] = relative_path.replace('\\', '/')
                 else:
                     # Extract metadata from font file
                     metadata = _extract_font_metadata(font_path)
@@ -278,13 +295,87 @@ def _discover_fonts():
                 continue
     
     logger.debug(f"Found {font_files_found} font file(s) in {fonts_dir}")
+    return discovered
+
+def _discover_fonts():
+    """
+    Discover fonts dynamically from multiple sources.
+    
+    Scans fonts in priority order:
+    1. Global fonts directory (src/static/fonts/)
+    2. Plugin fonts directories (src/plugins/*/fonts/)
+    
+    Fonts are merged with hardcoded FONT_FAMILIES (hardcoded takes precedence).
+    
+    Returns:
+        dict: Font families dictionary in the same format as FONT_FAMILIES
+    """
+    global _DISCOVERED_FONTS
+    
+    if _DISCOVERED_FONTS is not None:
+        logger.debug(f"Using cached font discovery results ({len(_DISCOVERED_FONTS)} families)")
+        return _DISCOVERED_FONTS
+    
+    discovered = {}
+    total_font_files = 0
+    
+    # 1. Scan global fonts directory (src/static/fonts/)
+    global_fonts_dir = _get_fonts_directory()
+    logger.debug(f"Scanning global fonts directory: {global_fonts_dir}")
+    global_fonts = _scan_fonts_in_directory(global_fonts_dir, global_fonts_dir)
+    total_font_files += sum(len(variants) for variants in global_fonts.values())
+    
+    # Merge global fonts (higher priority than plugin fonts)
+    for family, variants in global_fonts.items():
+        if family not in discovered:
+            discovered[family] = []
+        # Add variants, avoiding duplicates
+        existing_weights_styles = {
+            (v.get("font-weight", "normal"), v.get("font-style", "normal"))
+            for v in discovered[family]
+        }
+        for variant in variants:
+            key = (variant.get("font-weight", "normal"), variant.get("font-style", "normal"))
+            if key not in existing_weights_styles:
+                discovered[family].append(variant)
+    
+    # 2. Scan plugin fonts directories (src/plugins/*/fonts/)
+    plugin_font_dirs = _get_plugin_fonts_directories()
+    logger.debug(f"Scanning {len(plugin_font_dirs)} plugin fonts directory(ies)")
+    
+    plugins_dir = resolve_path("plugins")
+    
+    for plugin_fonts_dir in plugin_font_dirs:
+        plugin_fonts = _scan_fonts_in_directory(plugin_fonts_dir, plugin_fonts_dir)
+        total_font_files += sum(len(variants) for variants in plugin_fonts.values())
+        
+        # Merge plugin fonts (lower priority - can be overridden by global fonts)
+        for family, variants in plugin_fonts.items():
+            if family not in discovered:
+                discovered[family] = []
+            # Add variants, avoiding duplicates
+            existing_weights_styles = {
+                (v.get("font-weight", "normal"), v.get("font-style", "normal"))
+                for v in discovered[family]
+            }
+            for variant in plugin_fonts[family]:
+                key = (variant.get("font-weight", "normal"), variant.get("font-style", "normal"))
+                if key not in existing_weights_styles:
+                    # Calculate relative path from plugins directory for plugin fonts
+                    # variant['file'] is currently relative to plugin_fonts_dir, need to make it relative to plugins_dir
+                    font_file_path = os.path.join(plugin_fonts_dir, variant['file'])
+                    relative_to_plugins = os.path.relpath(font_file_path, plugins_dir).replace('\\', '/')
+                    # Create a copy to avoid modifying the original variant dict
+                    variant_copy = variant.copy()
+                    variant_copy['file'] = relative_to_plugins
+                    discovered[family].append(variant_copy)
     
     # Sort variants within each family for consistency
     for family in discovered:
         discovered[family].sort(key=lambda v: (v.get("font-weight", "normal"), v.get("font-style", "normal")))
     
     _DISCOVERED_FONTS = discovered
-    logger.info(f"Font discovery complete: {len(discovered)} font families discovered from {font_files_found} font file(s)")
+    logger.info(f"Font discovery complete: {len(discovered)} font families discovered from {total_font_files} font file(s) (global + {len(plugin_font_dirs)} plugin dir(s))")
     
     return discovered
 
@@ -378,7 +469,15 @@ def get_font(font_name, font_size=50, font_weight="normal"):
             font_entry = font_variants[0]  # Default to first available variant
 
         if font_entry:
-            font_path = resolve_path(os.path.join("static", "fonts", font_entry["file"]))
+            # Handle both global fonts (relative to static/fonts) and plugin fonts (relative to plugins/)
+            font_file = font_entry["file"]
+            if font_file.startswith("plugins/"):
+                # Plugin font - path is already relative to plugins directory
+                font_path = resolve_path(font_file)
+            else:
+                # Global font - relative to static/fonts
+                font_path = resolve_path(os.path.join("static", "fonts", font_file))
+            
             try:
                 return ImageFont.truetype(font_path, font_size)
             except Exception as e:
@@ -407,9 +506,18 @@ def get_fonts():
         
         for font_family, variants in font_families.items():
             for variant in variants:
+                # Handle both global fonts (relative to static/fonts) and plugin fonts (relative to plugins/)
+                font_file = variant["file"]
+                if font_file.startswith("plugins/"):
+                    # Plugin font - path is already relative to plugins directory
+                    font_url = resolve_path(font_file)
+                else:
+                    # Global font - relative to static/fonts
+                    font_url = resolve_path(os.path.join("static", "fonts", font_file))
+                
                 fonts_list.append({
                     "font_family": font_family,
-                    "url": resolve_path(os.path.join("static", "fonts", variant["file"])),
+                    "url": font_url,
                     "font_weight": variant.get("font-weight", "normal"),
                     "font_style": variant.get("font-style", "normal"),
                 })
