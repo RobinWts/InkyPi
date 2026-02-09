@@ -62,10 +62,16 @@
                                 "Updated: {value}"
                             ],
                             "division_0_font[]": [
-                                "dearJoe4",
+                                "Beth Ellen",
                                 "Jost",
                                 "Jost",
                                 "DS-Digital"
+                            ],
+                            "division_0_fontWeight[]": [
+                                "bold",
+                                "normal",
+                                "normal",
+                                "normal"
                             ],
                             "division_0_size[]": [
                                 "large",
@@ -89,7 +95,7 @@
                         "refresh": {
                             "interval": 300
                         },
-                        "latest_refresh_time": "2026-02-09T11:55:36.487923+00:00"
+                        "latest_refresh_time": "2026-02-09T12:02:41.688710+00:00"
                     },
                     {
                         "plugin_id": "node-red",
@@ -112,8 +118,8 @@
         "active_playlist": "Default"
     },
     "refresh_info": {
-        "refresh_time": "2026-02-09T11:55:36.487923+00:00",
-        "image_hash": "0645e94ddbd826a90da43e4e787cdd69dc594338e2acf69a1f5ab04247bce95d",
+        "refresh_time": "2026-02-09T12:02:41.688710+00:00",
+        "image_hash": "598b17eb65f98b78e0663f853c54e2d0c988857a053718ef83e80dc94cb41a1f",
         "refresh_type": "Playlist",
         "plugin_id": "node-red",
         "playlist": "Default",

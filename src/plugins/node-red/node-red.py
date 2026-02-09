@@ -255,6 +255,7 @@ class NodeRed(BasePlugin):
             value_keys = [k for k in settings.keys() if k == f'division_{div_idx}_value[]' or k.startswith(f'division_{div_idx}_value[')]
             format_keys = [k for k in settings.keys() if k == f'division_{div_idx}_format[]' or k.startswith(f'division_{div_idx}_format[')]
             font_keys = [k for k in settings.keys() if k == f'division_{div_idx}_font[]' or k.startswith(f'division_{div_idx}_font[')]
+            fontweight_keys = [k for k in settings.keys() if k == f'division_{div_idx}_fontWeight[]' or k.startswith(f'division_{div_idx}_fontWeight[')]
             size_keys = [k for k in settings.keys() if k == f'division_{div_idx}_size[]' or k.startswith(f'division_{div_idx}_size[')]
             color_keys = [k for k in settings.keys() if k == f'division_{div_idx}_color[]' or k.startswith(f'division_{div_idx}_color[')]
             alignment_keys = [k for k in settings.keys() if k == f'division_{div_idx}_alignment[]' or k.startswith(f'division_{div_idx}_alignment[')]
@@ -276,13 +277,14 @@ class NodeRed(BasePlugin):
             values = get_array_value(value_keys)
             formats = get_array_value(format_keys)
             fonts = get_array_value(font_keys)
+            fontweights = get_array_value(fontweight_keys)
             sizes = get_array_value(size_keys)
             colors = get_array_value(color_keys)
             alignments = get_array_value(alignment_keys)
             
             # Build output lines
             output_lines = []
-            max_lines = max(len(types), len(values), len(formats), len(fonts), len(sizes), len(colors), len(alignments))
+            max_lines = max(len(types), len(values), len(formats), len(fonts), len(fontweights), len(sizes), len(colors), len(alignments))
             
             for i in range(max_lines):
                 output_line = {
@@ -290,6 +292,7 @@ class NodeRed(BasePlugin):
                     'value': values[i] if i < len(values) else '',
                     'format': formats[i] if i < len(formats) else '{value}',
                     'font': fonts[i] if i < len(fonts) else 'Jost',  # Jost is built-in, always available
+                    'fontWeight': fontweights[i] if i < len(fontweights) else 'normal',
                     'size': sizes[i] if i < len(sizes) else 'normal',
                     'color': colors[i] if i < len(colors) else '#000000',
                     'alignment': alignments[i] if i < len(alignments) else 'left'
@@ -310,6 +313,7 @@ class NodeRed(BasePlugin):
         processed_line = {
             'type': line_type,
             'font': line.get('font', 'Jost'),
+            'fontWeight': line.get('fontWeight', 'normal'),
             'size': line.get('size', 'normal'),
             'color': line.get('color', '#000000'),
             'alignment': line.get('alignment', 'left'),

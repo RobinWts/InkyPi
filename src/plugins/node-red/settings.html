@@ -228,6 +228,7 @@
     
     // Get available fonts from template (dynamically discovered)
     const FONTS = {{ available_fonts | tojson if available_fonts else ['Jost', 'DS-Digital', 'Napoli', 'Dogica'] | tojson }};
+    const FONT_WEIGHTS = ['normal', 'bold'];
     const SIZES = ['x-small', 'small', 'normal', 'large', 'x-large'];
     const ALIGNMENTS = ['left', 'center', 'right'];
     
@@ -237,6 +238,7 @@
         const value = lineData?.value || '';
         const format = lineData?.format || '{value}';
         const font = lineData?.font || (FONTS.length > 0 ? FONTS[0] : 'Jost');
+        const fontWeight = lineData?.fontWeight || 'normal';
         const size = lineData?.size || 'normal';
         const color = lineData?.color || '#000000';
         const alignment = lineData?.alignment || 'left';
@@ -277,6 +279,12 @@
                         ${FONTS.map(f => `<option value="${f}" ${font === f ? 'selected' : ''}>${f}</option>`).join('')}
                     </select>
                 </div>
+                <div id="${lineId}_fontWeightContainer" style="display: ${type === 'divider' ? 'none' : 'block'}">
+                    <label class="form-label">Weight:</label>
+                    <select name="division_${divisionId}_fontWeight[]" class="form-input form-input-small">
+                        ${FONT_WEIGHTS.map(w => `<option value="${w}" ${fontWeight === w ? 'selected' : ''}>${w}</option>`).join('')}
+                    </select>
+                </div>
                 <div id="${lineId}_sizeContainer" style="display: ${type === 'divider' ? 'none' : 'block'}">
                     <label class="form-label">Size:</label>
                     <select name="division_${divisionId}_size[]" class="form-input form-input-small">
@@ -309,11 +317,14 @@
         const colorContainer = document.getElementById(`${lineId}_colorContainer`);
         const alignmentContainer = document.getElementById(`${lineId}_alignmentContainer`);
         
+        const fontWeightContainer = document.getElementById(`${lineId}_fontWeightContainer`);
+        
         if (type === 'divider') {
-            // Hide text, format, font, size, and alignment for divider, but keep color
+            // Hide text, format, font, font weight, size, and alignment for divider, but keep color
             valueContainer.style.display = 'none';
             formatContainer.style.display = 'none';
             fontContainer.style.display = 'none';
+            if (fontWeightContainer) fontWeightContainer.style.display = 'none';
             sizeContainer.style.display = 'none';
             alignmentContainer.style.display = 'none';
             colorContainer.style.display = 'block';
@@ -323,6 +334,7 @@
             valueInput.placeholder = 'e.g., temperature or sensor.temp';
             formatContainer.style.display = 'block';
             fontContainer.style.display = 'block';
+            if (fontWeightContainer) fontWeightContainer.style.display = 'block';
             sizeContainer.style.display = 'block';
             alignmentContainer.style.display = 'block';
             colorContainer.style.display = 'block';
@@ -333,6 +345,7 @@
             valueInput.placeholder = 'Enter text';
             formatContainer.style.display = 'none';
             fontContainer.style.display = 'block';
+            if (fontWeightContainer) fontWeightContainer.style.display = 'block';
             sizeContainer.style.display = 'block';
             alignmentContainer.style.display = 'block';
             colorContainer.style.display = 'block';
@@ -501,6 +514,7 @@
             const values = getArrayValue(`division_${divIdx}_value`);
             const formats = getArrayValue(`division_${divIdx}_format`);
             const fonts = getArrayValue(`division_${divIdx}_font`);
+            const fontWeights = getArrayValue(`division_${divIdx}_fontWeight`);
             const sizes = getArrayValue(`division_${divIdx}_size`);
             const colors = getArrayValue(`division_${divIdx}_color`);
             const alignments = getArrayValue(`division_${divIdx}_alignment`);
@@ -512,6 +526,7 @@
                 values.length,
                 formats.length,
                 fonts.length,
+                fontWeights.length,
                 sizes.length,
                 colors.length,
                 alignments.length
@@ -523,6 +538,7 @@
                     value: values[i] || '',
                     format: formats[i] || '{value}',
                     font: fonts[i] || (FONTS.length > 0 ? FONTS[0] : 'Jost'),
+                    fontWeight: fontWeights[i] || 'normal',
                     size: sizes[i] || 'normal',
                     color: colors[i] || '#000000',
                     alignment: alignments[i] || 'left'
