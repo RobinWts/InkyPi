@@ -4,17 +4,10 @@
 
 **For users who just want to use the Plugin Manager:**
 
-1. Open a terminal/SSH session on your Raspberry Pi
-2. Navigate to your InkyPi directory (usually `/home/pi/InkyPi`)
-3. Run the patch script:
-   ```bash
-   cd /home/pi/InkyPi
-   bash src/plugins/pluginmanager/patch-core.sh
-   ```
-4. The script will automatically:
-   - Apply the necessary core changes
-   - Restart the InkyPi service
-5. Reload the Plugin Manager page in your web browser
+1. Install the pluginmanager plugin via the CLI.
+2. Open the InkyPi WebUI and click on PluginManager. 
+3. Patch will be applied automatically.
+4. Wait 30 seconds and press reload button
 
 **That's it!** After patching, the Plugin Manager will work fully from the web interface.
 
@@ -46,10 +39,10 @@ If you need to undo the patch, you can restore the original core files:
    (Replace `inkypi` with your service name if different)
 
 **What happens after undoing:**
-- The Plugin Manager will stop working and will show the patch warning message instead
-- **All installed third-party plugins will continue to work normally** - they don't depend on the Plugin Manager to function
+- The Plugin Manager will stop auto patch your system next time it is opened, so better uninstall the PluginManager before undoing the patch.
+- **All installed third-party plugins will continue to work normally** - they don't depend on the Plugin Manager to function or be installed
 - You can still manage plugins manually using the CLI script (`install/cli/inkypi-plugin`)
-- To use the Plugin Manager UI again, simply re-run the patch script
+- To use the Plugin Manager UI again, simply let it auto patch again.
 
 **Note**: The patch changes are minimal and safe. Undoing them only affects the Plugin Manager's ability to register its API routes. All other InkyPi functionality remains unchanged.
 
