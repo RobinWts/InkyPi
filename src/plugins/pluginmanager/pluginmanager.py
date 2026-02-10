@@ -4,6 +4,7 @@ from plugins.base_plugin.base_plugin import BasePlugin
 from PIL import Image
 import logging
 import os
+import subprocess
 
 logger = logging.getLogger(__name__)
 
@@ -38,29 +39,41 @@ class PluginManager(BasePlugin):
             template_params['core_needs_patch'] = core_needs_patch
             template_params['core_patch_missing'] = core_patch_missing
             
-            # Only load plugins if core is patched (skip unnecessary work)
-            if not core_needs_patch:
+            # If core is not patched, trigger patch script in the background
+            if core_needs_patch:
+                patch_script = os.path.join(os.path.dirname(__file__), "patch-core.sh")
+                if os.path.isfile(patch_script):
+                    try:
+                        # Fire-and-forget: do not wait, service will restart during/after this call
+                        subprocess.Popen(
+                            ["bash", patch_script],
+                            stdout=subprocess.DEVNULL,
+                            stderr=subprocess.DEVNULL,
+                        )
+                        template_params['auto_patch_started'] = True
+                    except Exception as e:  # pragma: no cover - best-effort logging
+                        logger.warning(f"Could not start auto core patch: {e}")
+                        template_params['auto_patch_started'] = False
+                else:
+                    logger.warning("patch-core.sh not found for pluginmanager")
+                    template_params['auto_patch_started'] = False
+                
+                # Skip loading plugins when unpatched
+                template_params['third_party_plugins'] = []
+            else:
+                # Core is patched, normal behaviour: load third-party plugins list
                 device_config = current_app.config.get('DEVICE_CONFIG')
                 if device_config:
                     third_party = [p for p in device_config.get_plugins() if p.get("repository")]
                     template_params['third_party_plugins'] = third_party
                 else:
                     template_params['third_party_plugins'] = []
-            else:
-                # Skip loading plugins when unpatched
-                template_params['third_party_plugins'] = []
-                # Add project root path for patch command display
-                try:
-                    from config import Config
-                    project_root = os.path.dirname(Config.BASE_DIR)
-                    template_params['project_root'] = project_root
-                except:
-                    template_params['project_root'] = None
         except (RuntimeError, ImportError):
             # Not in Flask context or Flask not available
             template_params['third_party_plugins'] = []
             template_params['core_needs_patch'] = False
             template_params['core_patch_missing'] = []
+            template_params['auto_patch_started'] = False
         return template_params
     
     def generate_image(self, settings, device_config):

@@ -170,29 +170,20 @@
         <p style="margin: 0 0 16px 0; color: var(--text-primary, #333); font-weight: bold; font-size: 20px;">
             Core files need to be patched
         </p>
-        <p style="margin: 0 0 24px 0; color: var(--text-secondary, #666); font-size: 15px; line-height: 1.6;">
+        <p style="margin: 0 0 16px 0; color: var(--text-secondary, #666); font-size: 15px; line-height: 1.6;">
             The pluginmanager plugin requires core changes to work properly.<br>
-            Run the patch script manually from the command line:
+            The patch is being applied automatically now.
         </p>
-        <div
-            style="margin: 0 0 24px 0; padding: 16px; background: rgba(0, 0, 0, 0.1); border-radius: 6px; font-family: monospace; font-size: 13px; text-align: left; overflow-x: auto;">
-            <code style="color: var(--text-primary, #333);">
-                {% if project_root %}
-                cd {{ project_root }}<br>
-                {% else %}
-                cd /path/to/InkyPi<br>
-                {% endif %}
-                bash src/plugins/pluginmanager/patch-core.sh
-            </code>
-        </div>
         <p style="margin: 0 0 24px 0; color: var(--text-secondary, #666); font-size: 13px; line-height: 1.6;">
-            After patching, the service will restart automatically. Then reload this page.
+            The InkyPi service will restart during this process. Please wait about 30 seconds, then use the button
+            below to reload this page.
         </p>
         {% if core_patch_missing %}
         <div
             style="margin: 0 0 24px 0; padding: 16px; background: rgba(0, 0, 0, 0.05); border-radius: 6px; text-align: left;">
-            <p style="margin: 0 0 10px 0; font-weight: bold; font-size: 13px; color: var(--text-primary, #333);">Missing
-                components:</p>
+            <p style="margin: 0 0 10px 0; font-weight: bold; font-size: 13px; color: var(--text-primary, #333);">
+                Missing components before patch:
+            </p>
             <ul
                 style="margin: 0; padding-left: 24px; color: var(--text-secondary, #666); font-size: 13px; line-height: 1.8;">
                 {% for missing in core_patch_missing %}
@@ -206,6 +197,9 @@
                 target="_blank" class="action-button" style="text-decoration: none; display: inline-block;">
                 View Documentation
             </a>
+            <button type="button" id="reload-btn" class="action-button" onclick="forceReload()" disabled>
+                Reload (30s)
+            </button>
         </div>
     </div>
     {% else %}
@@ -252,6 +246,11 @@
 </div>
 
 <script>
+    function forceReload() {
+        // Browser-level reload so we don't depend on any specific route
+        window.location.reload();
+    }
+
     function showMessage(success, text) {
         if (typeof showResponseModal === 'function') {
             showResponseModal(success ? 'success' : 'failure', text);
@@ -392,4 +391,27 @@
             installBtn.textContent = 'Install';
         }
     }
+
+    // Enable reload button after a 30s countdown when core patch is pending
+    document.addEventListener('DOMContentLoaded', () => {
+        const reloadBtn = document.getElementById('reload-btn');
+        if (!reloadBtn) {
+            return;
+        }
+        let remaining = 30;
+        const updateLabel = () => {
+            reloadBtn.textContent = `Reload (${remaining}s)`;
+        };
+        updateLabel();
+        const intervalId = setInterval(() => {
+            remaining -= 1;
+            if (remaining <= 0) {
+                clearInterval(intervalId);
+                reloadBtn.disabled = false;
+                reloadBtn.textContent = 'Reload now';
+            } else {
+                updateLabel();
+            }
+        }, 1000);
+    });
 </script>
