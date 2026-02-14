@@ -1,6 +1,6 @@
 # Building InkyPi Plugins
 
-This guide walks you through the process of creating a new plugin for InkyPi. 
+This guide walks you through the process of creating a new plugin for InkyPi. For plugins that expose API routes and interact with core (trigger refresh, push images, read status), see [Advanced Plugin Development](advanced_plugin_development.md). 
 
 ### 1. Create a Directory for Your Plugin
 
