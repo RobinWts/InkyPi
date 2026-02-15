@@ -89,12 +89,12 @@
             {
                 "id": "btn_0",
                 "gpio_pin": 17,
-                "short_action": "core_force_refresh",
+                "short_action": "core_trigger_refresh",
                 "double_action": "core_trigger_refresh",
                 "long_action": "system_restart_inkypi",
-                "script_path_short": null,
-                "script_path_double": null,
-                "script_path_long": null
+                "script_path_short": "None",
+                "script_path_double": "None",
+                "script_path_long": "None"
             }
         ]
     }
