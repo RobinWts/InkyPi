@@ -1,0 +1,12 @@
+<div class="form-group pisugarbutton-settings">
+    <p class="form-label" style="margin-top: 1em; color: var(--text-secondary, #666);">Nothing to set (yet)</p>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var form = document.getElementById('settingsForm');
+        if (form) {
+            var buttonsContainer = form.querySelector('.buttons-container');
+            if (buttonsContainer) buttonsContainer.style.display = 'none';
+        }
+    });
+</script>
