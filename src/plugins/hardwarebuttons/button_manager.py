@@ -116,7 +116,7 @@ def _setup_button(btn, bindings, refs, short_ms, double_ms, long_ms):
             pending_short_timer[0] = None
         action = bindings.get("long_action")
         if action:
-            run_action(action, bindings.get("script_path"))
+            run_action(action, bindings.get("script_path_long"))
 
     def on_released():
         if long_fired[0]:
@@ -129,7 +129,7 @@ def _setup_button(btn, bindings, refs, short_ms, double_ms, long_ms):
             # Second release within double window -> double click
             action = bindings.get("double_action")
             if action:
-                run_action(action, bindings.get("script_path"))
+                run_action(action, bindings.get("script_path_double"))
             double_window_remaining[0] = 0
             return
         # First release: start double-click window
@@ -137,7 +137,7 @@ def _setup_button(btn, bindings, refs, short_ms, double_ms, long_ms):
             pending_short_timer[0] = None
             action = bindings.get("short_action")
             if action:
-                run_action(action, bindings.get("script_path"))
+                run_action(action, bindings.get("script_path_short"))
 
         t = threading.Timer(double_ms / 1000.0, fire_short)
         pending_short_timer[0] = t

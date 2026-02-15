@@ -72,6 +72,18 @@
         border-color: #555;
     }
 
+    .button-row .field-group {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .button-row .field-group label {
+        font-size: 12px;
+        color: var(--text-secondary, #666);
+        white-space: nowrap;
+    }
+
     .button-row .pin-input {
         width: 70px;
         padding: 8px 10px;
@@ -88,14 +100,24 @@
         font-size: 13px;
     }
 
-    .button-row .script-path {
+    .button-row .script-path-input {
         width: 100%;
-        max-width: 320px;
+        min-width: 180px;
+        max-width: 280px;
         padding: 6px 10px;
         border: 1px solid var(--border-color, #ddd);
         border-radius: 6px;
         font-size: 12px;
-        margin-top: 6px;
+    }
+
+    .button-row .script-path-wrap {
+        display: none;
+    }
+
+    .button-row .script-path-wrap.visible {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
     }
 
     .btn-remove {
@@ -201,23 +223,46 @@
             {% for btn in buttons %}
             <div class="button-row" data-button-id="{{ btn.id }}">
                 <input type="hidden" class="btn-id" value="{{ btn.id }}">
-                <input type="number" class="pin-input" placeholder="GPIO" min="2" max="27" value="{{ btn.gpio_pin }}" title="GPIO pin (2–27)">
-                <select class="short-action" title="Short press">
-                    {% for a in available_actions %}
-                    <option value="{{ a.id }}" {% if btn.short_action == a.id %}selected{% endif %}>{{ a.label }}</option>
-                    {% endfor %}
-                </select>
-                <select class="double-action" title="Double-click">
-                    {% for a in available_actions %}
-                    <option value="{{ a.id }}" {% if btn.double_action == a.id %}selected{% endif %}>{{ a.label }}</option>
-                    {% endfor %}
-                </select>
-                <select class="long-action" title="Long press">
-                    {% for a in available_actions %}
-                    <option value="{{ a.id }}" {% if btn.long_action == a.id %}selected{% endif %}>{{ a.label }}</option>
-                    {% endfor %}
-                </select>
-                <input type="text" class="script-path" placeholder="Script path (for external script)" value="{{ btn.script_path | default('') }}" title="Absolute path to bash script when using Run external bash script">
+                <div class="field-group">
+                    <label>GPIO pin</label>
+                    <input type="number" class="pin-input" placeholder="e.g. 17" min="2" max="27" value="{{ btn.gpio_pin }}" title="BCM GPIO (2–27)">
+                </div>
+                <div class="field-group">
+                    <label>Short press</label>
+                    <select class="short-action">
+                        {% for a in available_actions %}
+                        <option value="{{ a.id }}" {% if btn.short_action == a.id %}selected{% endif %}>{{ a.label }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="script-path-wrap short-script-wrap" data-action="short">
+                        <label>Script path</label>
+                        <input type="text" class="script-path-input short-script" placeholder="/path/to/script.sh" value="{{ btn.script_path_short | default(btn.script_path) | default('') }}">
+                    </div>
+                </div>
+                <div class="field-group">
+                    <label>Double-click</label>
+                    <select class="double-action">
+                        {% for a in available_actions %}
+                        <option value="{{ a.id }}" {% if btn.double_action == a.id %}selected{% endif %}>{{ a.label }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="script-path-wrap double-script-wrap" data-action="double">
+                        <label>Script path</label>
+                        <input type="text" class="script-path-input double-script" placeholder="/path/to/script.sh" value="{{ btn.script_path_double | default('') }}">
+                    </div>
+                </div>
+                <div class="field-group">
+                    <label>Long press</label>
+                    <select class="long-action">
+                        {% for a in available_actions %}
+                        <option value="{{ a.id }}" {% if btn.long_action == a.id %}selected{% endif %}>{{ a.label }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="script-path-wrap long-script-wrap" data-action="long">
+                        <label>Script path</label>
+                        <input type="text" class="script-path-input long-script" placeholder="/path/to/script.sh" value="{{ btn.script_path_long | default(btn.script_path) | default('') }}">
+                    </div>
+                </div>
                 <button type="button" class="btn-remove" title="Remove button">×</button>
             </div>
             {% endfor %}
@@ -238,6 +283,17 @@
     }
 
     const availableActions = {{ available_actions | tojson | safe }};
+    const EXTERNAL_SCRIPT_ID = 'external_script';
+
+    function toggleScriptPathVisibility(row) {
+        if (!row) return;
+        const shortVal = row.querySelector('.short-action').value;
+        const doubleVal = row.querySelector('.double-action').value;
+        const longVal = row.querySelector('.long-action').value;
+        row.querySelector('.short-script-wrap').classList.toggle('visible', shortVal === EXTERNAL_SCRIPT_ID);
+        row.querySelector('.double-script-wrap').classList.toggle('visible', doubleVal === EXTERNAL_SCRIPT_ID);
+        row.querySelector('.long-script-wrap').classList.toggle('visible', longVal === EXTERNAL_SCRIPT_ID);
+    }
 
     function buildActionOptions(selectedId) {
         let html = '';
@@ -266,15 +322,42 @@
         row.setAttribute('data-button-id', btn.id);
         row.innerHTML = `
             <input type="hidden" class="btn-id" value="${escapeHtml(btn.id)}">
-            <input type="number" class="pin-input" placeholder="GPIO" min="2" max="27" value="${btn.gpio_pin || ''}" title="GPIO pin (2–27)">
-            <select class="short-action" title="Short press">${buildActionOptions(btn.short_action)}</select>
-            <select class="double-action" title="Double-click">${buildActionOptions(btn.double_action)}</select>
-            <select class="long-action" title="Long press">${buildActionOptions(btn.long_action)}</select>
-            <input type="text" class="script-path" placeholder="Script path (for external script)" value="${escapeHtml(btn.script_path || '')}" title="Absolute path to bash script">
+            <div class="field-group">
+                <label>GPIO pin</label>
+                <input type="number" class="pin-input" placeholder="e.g. 17" min="2" max="27" value="${btn.gpio_pin || ''}" title="BCM GPIO (2–27)">
+            </div>
+            <div class="field-group">
+                <label>Short press</label>
+                <select class="short-action">${buildActionOptions(btn.short_action)}</select>
+                <div class="script-path-wrap short-script-wrap" data-action="short">
+                    <label>Script path</label>
+                    <input type="text" class="script-path-input short-script" placeholder="/path/to/script.sh" value="${escapeHtml(btn.script_path_short || '')}">
+                </div>
+            </div>
+            <div class="field-group">
+                <label>Double-click</label>
+                <select class="double-action">${buildActionOptions(btn.double_action)}</select>
+                <div class="script-path-wrap double-script-wrap" data-action="double">
+                    <label>Script path</label>
+                    <input type="text" class="script-path-input double-script" placeholder="/path/to/script.sh" value="${escapeHtml(btn.script_path_double || '')}">
+                </div>
+            </div>
+            <div class="field-group">
+                <label>Long press</label>
+                <select class="long-action">${buildActionOptions(btn.long_action)}</select>
+                <div class="script-path-wrap long-script-wrap" data-action="long">
+                    <label>Script path</label>
+                    <input type="text" class="script-path-input long-script" placeholder="/path/to/script.sh" value="${escapeHtml(btn.script_path_long || '')}">
+                </div>
+            </div>
             <button type="button" class="btn-remove" title="Remove button">×</button>
         `;
         document.getElementById('buttons-list').appendChild(row);
+        toggleScriptPathVisibility(row);
         row.querySelector('.btn-remove').addEventListener('click', () => row.remove());
+        row.querySelectorAll('.short-action, .double-action, .long-action').forEach(el => {
+            el.addEventListener('change', () => toggleScriptPathVisibility(row));
+        });
     }
 
     function collectPayload() {
@@ -295,7 +378,9 @@
                 short_action: (row.querySelector('.short-action').value || '').trim() || null,
                 double_action: (row.querySelector('.double-action').value || '').trim() || null,
                 long_action: (row.querySelector('.long-action').value || '').trim() || null,
-                script_path: (row.querySelector('.script-path').value || '').trim() || null
+                script_path_short: (row.querySelector('.short-script').value || '').trim() || null,
+                script_path_double: (row.querySelector('.double-script').value || '').trim() || null,
+                script_path_long: (row.querySelector('.long-script').value || '').trim() || null
             });
         });
         return { timings, buttons };
@@ -319,6 +404,13 @@
             }, 1000);
         }
 
+        document.querySelectorAll('.button-row').forEach(row => {
+            toggleScriptPathVisibility(row);
+            row.querySelectorAll('.short-action, .double-action, .long-action').forEach(el => {
+                el.addEventListener('change', () => toggleScriptPathVisibility(row));
+            });
+        });
+
         const addBtn = document.getElementById('add-button-btn');
         if (addBtn) {
             addBtn.addEventListener('click', () => {
@@ -328,7 +420,9 @@
                     short_action: null,
                     double_action: null,
                     long_action: null,
-                    script_path: null
+                    script_path_short: null,
+                    script_path_double: null,
+                    script_path_long: null
                 });
             });
         }

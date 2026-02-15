@@ -100,17 +100,18 @@ def save():
         for aid in (short_a, double_a, long_a):
             if aid and aid != "external_script" and aid not in available:
                 logger.warning("Unknown action_id %s for button %s", aid, bid)
-            if aid == "external_script":
-                script_path = (btn.get("script_path") or "").strip()
-                if not script_path or not os.path.isabs(script_path) or not os.path.isfile(script_path):
-                    pass  # Will be ignored at runtime
+        script_short = (btn.get("script_path_short") or "").strip() or None
+        script_double = (btn.get("script_path_double") or "").strip() or None
+        script_long = (btn.get("script_path_long") or "").strip() or None
         validated_buttons.append({
             "id": bid,
             "gpio_pin": pin,
             "short_action": short_a,
             "double_action": double_a,
             "long_action": long_a,
-            "script_path": (btn.get("script_path") or "").strip() or None,
+            "script_path_short": script_short,
+            "script_path_double": script_double,
+            "script_path_long": script_long,
         })
 
     payload = {"timings": timings, "buttons": validated_buttons}
