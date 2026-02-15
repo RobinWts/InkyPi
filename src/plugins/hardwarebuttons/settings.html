@@ -1,0 +1,120 @@
+<style>
+    /* Hide core "Update Now" and "Add to Playlist" buttons for this plugin (UI-only, no display/playlist use) */
+    #settingsForm > .buttons-container {
+        display: none !important;
+    }
+
+    .hardwarebuttons-container {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .core-patch-warning {
+        background: rgba(255, 152, 0, 0.15) !important;
+        border: 1px solid rgba(255, 152, 0, 0.4) !important;
+    }
+
+    [data-theme="dark"] .core-patch-warning {
+        background: rgba(255, 152, 0, 0.2) !important;
+        border-color: rgba(255, 152, 0, 0.5) !important;
+    }
+
+    [data-theme="dark"] .core-patch-warning p {
+        color: #eee !important;
+    }
+
+    [data-theme="dark"] .core-patch-warning ul {
+        color: #aaa !important;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--text-secondary, #666);
+    }
+
+    .empty-state-icon {
+        font-size: 48px;
+        margin-bottom: 15px;
+    }
+</style>
+
+<div class="hardwarebuttons-container">
+    {% if core_needs_patch %}
+    <div class="core-patch-warning"
+        style="padding: 32px 24px; border-radius: 8px; text-align: center; max-width: 600px; margin: 40px auto;">
+        <div style="font-size: 64px; margin-bottom: 20px;">⚠️</div>
+        <p style="margin: 0 0 16px 0; color: var(--text-primary, #333); font-weight: bold; font-size: 20px;">
+            Core files need to be patched
+        </p>
+        <p style="margin: 0 0 16px 0; color: var(--text-secondary, #666); font-size: 15px; line-height: 1.6;">
+            The Hardware Buttons plugin requires core changes to work properly.<br>
+            The patch is being applied automatically now.
+        </p>
+        <p style="margin: 0 0 24px 0; color: var(--text-secondary, #666); font-size: 13px; line-height: 1.6;">
+            The InkyPi service will restart during this process. Please wait about 30 seconds, then use the button
+            below to reload this page.
+        </p>
+        {% if core_patch_missing %}
+        <div
+            style="margin: 0 0 24px 0; padding: 16px; background: rgba(0, 0, 0, 0.05); border-radius: 6px; text-align: left;">
+            <p style="margin: 0 0 10px 0; font-weight: bold; font-size: 13px; color: var(--text-primary, #333);">
+                Missing components before patch:
+            </p>
+            <ul
+                style="margin: 0; padding-left: 24px; color: var(--text-secondary, #666); font-size: 13px; line-height: 1.8;">
+                {% for missing in core_patch_missing %}
+                <li>{{ missing }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+            <a href="https://github.com/fatihak/InkyPi/blob/main/docs/building_plugins.md"
+                target="_blank" class="action-button" style="text-decoration: none; display: inline-block;">
+                View Documentation
+            </a>
+            <button type="button" id="reload-btn" class="action-button" onclick="forceReload()" disabled>
+                Reload (30s)
+            </button>
+        </div>
+    </div>
+    {% else %}
+
+    <h2 class="form-label" style="margin-bottom: 12px;">Hardware Buttons</h2>
+    <div class="empty-state">
+        <div class="empty-state-icon">🔘</div>
+        <p>Configure hardware button bindings here.</p>
+        <p style="font-size: 13px; margin-top: 8px;">Settings and button actions will be available in a future update.</p>
+    </div>
+
+    {% endif %}
+</div>
+
+<script>
+    function forceReload() {
+        window.location.reload();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const reloadBtn = document.getElementById('reload-btn');
+        if (!reloadBtn) {
+            return;
+        }
+        let remaining = 30;
+        const updateLabel = () => {
+            reloadBtn.textContent = `Reload (${remaining}s)`;
+        };
+        updateLabel();
+        const intervalId = setInterval(() => {
+            remaining -= 1;
+            if (remaining <= 0) {
+                clearInterval(intervalId);
+                reloadBtn.disabled = false;
+                reloadBtn.textContent = 'Reload now';
+            } else {
+                updateLabel();
+            }
+        }, 1000);
+    });
+</script>
