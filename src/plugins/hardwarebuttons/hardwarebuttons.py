@@ -8,12 +8,24 @@ import subprocess
 
 logger = logging.getLogger(__name__)
 
+DEFAULT_TIMINGS = {
+    "short_press_ms": 500,
+    "double_click_interval_ms": 500,
+    "long_press_ms": 1000,
+}
+
 
 class HardwareButtons(BasePlugin):
     """Plugin for configuring hardware button actions (UI/settings only)."""
 
+    @classmethod
+    def get_blueprint(cls):
+        """Return the Flask blueprint for this plugin's API routes."""
+        from . import api
+        return api.hardwarebuttons_bp
+
     def generate_settings_template(self):
-        """Add patch-check and autopatch template parameters."""
+        """Add patch-check, autopatch, timings, buttons, and available_actions."""
         template_params = super().generate_settings_template()
         try:
             from flask import current_app
@@ -48,12 +60,29 @@ class HardwareButtons(BasePlugin):
                 else:
                     logger.warning("patch-core.sh not found for hardwarebuttons")
                     template_params['auto_patch_started'] = False
+                template_params['timings'] = DEFAULT_TIMINGS
+                template_params['buttons'] = []
+                template_params['available_actions'] = []
             else:
                 template_params['auto_patch_started'] = False
+                device_config = current_app.config.get("DEVICE_CONFIG")
+                if device_config:
+                    hw_cfg = device_config.get_config("hardwarebuttons", default={}) or {}
+                    template_params['timings'] = {**DEFAULT_TIMINGS, **(hw_cfg.get("timings") or {})}
+                    template_params['buttons'] = hw_cfg.get("buttons") or []
+                    from .discovery import get_available_actions
+                    template_params['available_actions'] = get_available_actions(device_config)
+                else:
+                    template_params['timings'] = DEFAULT_TIMINGS
+                    template_params['buttons'] = []
+                    template_params['available_actions'] = []
         except (RuntimeError, ImportError):
-            template_params['core_needs_patch'] = False
-            template_params['core_patch_missing'] = []
+            template_params['core_needs_patch'] = template_params.get('core_needs_patch', False)
+            template_params['core_patch_missing'] = template_params.get('core_patch_missing', [])
             template_params['auto_patch_started'] = False
+            template_params['timings'] = DEFAULT_TIMINGS
+            template_params['buttons'] = []
+            template_params['available_actions'] = []
         return template_params
 
     def generate_image(self, settings, device_config):
