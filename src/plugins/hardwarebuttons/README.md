@@ -31,7 +31,7 @@ You can add several buttons (each with its own GPIO pin) and remove any with the
 - **System:** Shutdown, Reboot, Restart InkyPi service, Run external bash script, Call URL.
 
 Other plugins can register extra actions that appear under “Current plugin” or “Other plugins” in the dropdowns.
-(This fuction is still under development and will probably subject to change)
+(This fuction is still under development and will probably be subject to change)
 
 ## Wiring buttons on a Raspberry Pi Zero 2 W
 
