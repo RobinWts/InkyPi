@@ -35,8 +35,6 @@ Other plugins can register extra actions that appear under “Current plugin” 
 
 ## Wiring buttons on a Raspberry Pi Zero 2 W
 
-The **Raspberry Pi Zero 2 W** has a **40-pin GPIO header** (0.1 in / 2.54 mm pitch). On the base Zero 2 W the header is **unpopulated**; you can solder a 40-pin header or use pogo pins. The Zero 2 **WH** variant comes with the header pre-soldered.
-
 Use **BCM GPIO numbers** in the plugin (the same numbers used by gpiozero and most Python GPIO docs). Do **not** use “physical pin” numbers.
 
 ### Simple two-wire button (recommended)
