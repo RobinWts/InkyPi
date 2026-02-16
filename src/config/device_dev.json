@@ -88,13 +88,13 @@
         "buttons": [
             {
                 "id": "btn_0",
-                "gpio_pin": 17,
+                "gpio_pin": 27,
                 "short_action": "core_trigger_refresh",
-                "double_action": "core_trigger_refresh",
-                "long_action": "system_restart_inkypi",
-                "script_path_short": "None",
-                "script_path_double": "None",
-                "script_path_long": "None"
+                "double_action": null,
+                "long_action": null,
+                "script_path_short": null,
+                "script_path_double": null,
+                "script_path_long": null
             }
         ]
     }
