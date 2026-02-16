@@ -89,12 +89,15 @@
             {
                 "id": "btn_0",
                 "gpio_pin": 27,
-                "short_action": "core_trigger_refresh",
+                "short_action": "call_url",
                 "double_action": null,
                 "long_action": null,
                 "script_path_short": null,
                 "script_path_double": null,
-                "script_path_long": null
+                "script_path_long": null,
+                "url_short": "http://192.168.2.200:1880/inkypi/dataglobals",
+                "url_double": null,
+                "url_long": null
             }
         ]
     }
