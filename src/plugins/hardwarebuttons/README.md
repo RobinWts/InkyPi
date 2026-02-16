@@ -44,17 +44,17 @@ A typical momentary pushbutton is wired between a **GPIO** pin and **GND**. The 
 
 | Button leg | Pi connection |
 |------------|----------------|
-| Leg 1      | **GPIO** (e.g. BCM 17) |
+| Leg 1      | **GPIO** (e.g. BCM 27) |
 | Leg 2      | **GND** (e.g. physical pin 6, 9, 14, 20, 25, 30, 34, or 39) |
 
 When the button is **released**, the GPIO is pulled high (3.3 V). When **pressed**, the pin is shorted to GND and reads low. The plugin uses this “active low” behaviour.
 
-### Example: one button on GPIO 17 (Raspberry Pi Zero 2 W)
+### Example: one button on GPIO 27 (Raspberry Pi Zero 2 W)
 
-- **GPIO 17** = **physical pin 11** (see diagram below).
-- **GND** = e.g. **physical pin 9** (next to GPIO 17) or **physical pin 6**.
+- **GPIO 27** = **physical pin 13** (see diagram below).
+- **GND** = e.g. **physical pin 14** (next to GPIO 27) or **physical pin 6**.
 
-So you need two wires: one from one button leg to **pin 11**, one from the other leg to **pin 9** (or another GND).
+So you need two wires: one from one button leg to **pin 13**, one from the other leg to **pin 14** (or another GND).
 
 ### 40-pin header (BCM GPIO, top view)
 
@@ -78,18 +78,18 @@ Use this to pick a GPIO and a GND near it:
         GND (39)(40) GND
 ```
 
-**Safe GPIOs for buttons** (avoid pins used by your display or HAT): **2**, **3**, **4**, **17**, **27**, **22**, **23**, **24**, **25**.  
+**Safe GPIOs for buttons** (avoid pins used by your display or HAT): **2**, **3**, **4**, **27**, **22**, **23**, **24**, **25**.  
 Avoid **8, 9, 10, 11** if you use SPI for the e-ink display; avoid **2, 3** if you use I2C.
 
 ### Multiple buttons
 
 Repeat the same wiring for each button: each button uses one GPIO and one GND. You can use the same GND for all buttons (e.g. pin 6 or 9). Example for three buttons:
 
-- Button A: GPIO 17 (pin 11) ↔ GND (pin 9)
-- Button B: GPIO 27 (pin 13) ↔ GND (pin 9)
-- Button C: GPIO 22 (pin 15) ↔ GND (pin 9)
+- Button A: GPIO 27 (pin 13) ↔ GND (pin 14)
+- Button B: GPIO 22 (pin 15) ↔ GND (pin 14)
+- Button C: GPIO 23 (pin 16) ↔ GND (pin 14)
 
-In the plugin, add three buttons with GPIO pins **17**, **27**, and **22**.
+In the plugin, add three buttons with GPIO pins **27**, **22**, and **23**.
 
 ## Requirements
 
