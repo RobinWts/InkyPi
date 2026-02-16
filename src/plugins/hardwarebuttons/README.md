@@ -98,6 +98,6 @@ In the plugin, add three buttons with GPIO pins **17**, **27**, and **22**.
 
 ## Notes
 
-- Only **one action** runs at a time; further button presses or API calls are ignored until the current action finishes or times out (about 2 minutes).
-- **External script**: use an absolute path to a script; the plugin runs it with `bash` and a 30 s timeout. Restrict paths to avoid running arbitrary commands.
+- Only **one action** runs at a time; further button presses or API calls are ignored until the current action finishes.
+- **External script**: use an absolute path to a script under the InkyPi service user's home directory (for example `/home/pi/scripts/my_action.sh`). The plugin runs it with `bash` and a 30 s timeout.
 - After changing settings, click **Save**; the button manager reloads config without restarting InkyPi.
