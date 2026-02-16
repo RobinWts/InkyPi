@@ -7,12 +7,13 @@ This guide covers how to build plugins that go beyond the basics: plugins that e
 **Contents:**
 
 1. [Prerequisites: Plugin with a Blueprint](#1-prerequisites-plugin-with-a-blueprint)
-2. [Core Services in Request Context](#2-core-services-in-request-context)
-3. [Triggering a Display Refresh from Your Plugin](#3-triggering-a-display-refresh-from-your-plugin)
-4. [Pushing an Image to the Display](#4-pushing-an-image-to-the-display)
-5. [Reading Playlist and Refresh Status](#5-reading-playlist-and-refresh-status)
-6. [Storing Persistent Plugin Data](#6-storing-persistent-plugin-data)
-7. [Complete Example: Remote Control Plugin](#7-complete-example-remote-control-plugin)
+2. [Running Code at Blueprint Registration](#2-running-code-at-blueprint-registration)
+3. [Core Services in Request Context](#3-core-services-in-request-context)
+4. [Triggering a Display Refresh from Your Plugin](#4-triggering-a-display-refresh-from-your-plugin)
+5. [Pushing an Image to the Display](#5-pushing-an-image-to-the-display)
+6. [Reading Playlist and Refresh Status](#6-reading-playlist-and-refresh-status)
+7. [Storing Persistent Plugin Data](#7-storing-persistent-plugin-data)
+8. [Complete Example: Remote Control Plugin](#8-complete-example-remote-control-plugin)
 
 ---
 
@@ -33,7 +34,59 @@ See [Adding API routes (optional)](building_plugins.md#adding-api-routes-optiona
 
 ---
 
-## 2. Core Services in Request Context
+## 2. Running Code at Blueprint Registration
+
+Core services (`DEVICE_CONFIG`, `REFRESH_TASK`, etc.) are only available **during an HTTP request** when you use `current_app.config`. If your plugin needs to run logic **as soon as InkyPi starts**—for example, starting a background thread that listens to GPIO or that must react before any user opens the settings page—you cannot rely on “first request” alone. You need code to run when the blueprint is registered.
+
+Flask provides **`Blueprint.record_once()`** for this. When core calls `app.register_blueprint(bp)`, Flask invokes any functions registered with `record_once` and passes a **state** object; **`state.app`** is the Flask application. At that moment, `app.config` already contains `DEVICE_CONFIG` and `REFRESH_TASK` (they are set in `inkypi.py` before `register_plugin_blueprints(app)`). So you can read core refs and start background workers or store them for use outside request context—**without any core changes**.
+
+### How to use it
+
+In the module where you define your Blueprint (e.g. `api.py`), register a callback with `@your_bp.record_once`:
+
+```python
+@your_bp.record_once
+def _on_blueprint_registered(state):
+    app = state.app
+    device_config = app.config.get("DEVICE_CONFIG")
+    refresh_task = app.config.get("REFRESH_TASK")
+    if device_config is None or refresh_task is None:
+        return  # not ready, skip
+    # Store refs for use from a background thread or other non-request context
+    refs = {
+        "device_config": device_config,
+        "refresh_task": refresh_task,
+        "app": app,
+    }
+    # Start your background worker, GPIO listener, etc.
+    your_background_module.start_if_needed(refs)
+```
+
+The callback runs **once** when the blueprint is registered (even if the blueprint is registered on multiple apps, Flask’s `record_once` runs once per registration). There is **no request context** (no `request` object), so you cannot read request-specific data; you only have the app and its config.
+
+### Why this is useful
+
+- **Startup behaviour:** Plugins that need to “wake up” with the app (e.g. hardware buttons, GPIO listeners, or workers that depend on `device_config`) can capture refs and start their logic at registration time. Without this, the same logic would only run on the first HTTP request to the plugin (e.g. when the user opens the plugin’s settings), so the feature would not work until that first request.
+- **No core changes:** Everything stays inside the plugin; core’s `register_plugin_blueprints(app)` and app setup order remain unchanged.
+- **Single place for refs:** You can store `device_config`, `refresh_task`, and `app` in module-level variables or pass them into a background module once, and reuse them in threads or callbacks that do not run inside a request.
+
+### When to use it
+
+Use **`record_once`** when:
+
+- Your plugin starts **background threads** or **listeners** (e.g. GPIO, webhooks) that must run as soon as InkyPi is ready, not only after a user visits a route.
+- Your plugin needs **core refs** (`device_config`, `refresh_task`, `app`) in code that runs **outside** request context (e.g. in a `threading.Thread` or a gpiozero callback).
+
+Do **not** rely on it for:
+
+- **Request-scoped** behaviour (use normal route handlers and `current_app` there).
+- **Port or host** from the current request (no request exists at registration time; use a default such as `80` and optionally update from the first request if needed).
+
+The **Hardware Buttons** plugin uses this pattern: it registers a `record_once` callback that captures refs and starts the button manager thread when the blueprint is registered, so physical buttons work from startup without the user having to open the plugin’s settings page first.
+
+---
+
+## 3. Core Services in Request Context
 
 Inside any Flask request—including your plugin’s API routes—InkyPi stores three core objects in the app config. You can use them to drive the display and refresh behaviour from your plugin.
 
@@ -81,7 +134,7 @@ Use these in both `generate_image` and in your API routes (via `current_app.conf
 
 ---
 
-## 3. Triggering a Display Refresh from Your Plugin
+## 4. Triggering a Display Refresh from Your Plugin
 
 You can request “refresh now” from your own API (e.g. a “Next slide” button, a webhook, or an automation tool). Core provides two refresh actions; both are triggered via `RefreshTask.manual_update(...)`.
 
@@ -216,7 +269,7 @@ def refresh_plugin():
 
 ---
 
-## 4. Pushing an Image to the Display
+## 5. Pushing an Image to the Display
 
 Sometimes you want to show a one-off image without going through the playlist or a plugin instance (e.g. a notification, or content from a webhook). You can generate a PIL image in your route and send it to the display manager.
 
@@ -290,7 +343,7 @@ def show_custom():
 
 ---
 
-## 5. Reading Playlist and Refresh Status
+## 6. Reading Playlist and Refresh Status
 
 Plugins can build status APIs or adapt behaviour based on “what is on display now” and “when did we last refresh.” All of this is read-only and comes from `device_config`.
 
@@ -389,7 +442,7 @@ def next_preview():
 
 ---
 
-## 6. Storing Persistent Plugin Data
+## 7. Storing Persistent Plugin Data
 
 Plugins sometimes need to store small state (e.g. OAuth tokens, feature flags, or counters) that survives restarts. Core does not yet provide a dedicated `get_plugin_data` / `set_plugin_data` API; the recommended approach for now is to store data in your plugin directory.
 
@@ -442,7 +495,7 @@ Use these only from within a request (where `current_app` is available), or pass
 
 ---
 
-## 7. Complete Example: Remote Control Plugin
+## 8. Complete Example: Remote Control Plugin
 
 The following is a minimal but complete plugin that exposes:
 
