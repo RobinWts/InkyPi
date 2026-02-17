@@ -2,5 +2,5 @@
     "display_name": "Hardware Buttons Reg Test",
     "id": "hardwarebuttonsregtest",
     "class": "HardwareButtonsRegTest",
-    "repository": ""
+    "repository": "https://github.com/RobinWts/InkyPi-Plugin-HWButtonRegTest"
 }

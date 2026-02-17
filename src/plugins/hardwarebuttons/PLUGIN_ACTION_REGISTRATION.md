@@ -11,6 +11,7 @@ The Hardware Buttons plugin provides a registration system that allows any InkyP
 - **Image folder plugin**: "Next Image", "Previous Image", "Random Image"
 - **Todo list plugin**: "Add Task", "Complete Current Task", "Next Task"
 
+
 ## Two Types of Actions
 
 ### 1. Anytime Actions
@@ -49,6 +50,8 @@ The Hardware Buttons plugin provides a registration system that allows any InkyP
 
 ## How to Register Actions
 
+For a simple example for registering both types of actions see [Plugin-HWButtonRegTest](https://github.com/RobinWts/InkyPi-Plugin-HWButtonRegTest).
+
 ### Step 1: Create a Blueprint (if you don't have one)
 
 Your plugin needs a Flask Blueprint to register actions. If you don't have one yet:
@@ -73,7 +76,7 @@ class MyPlugin(BasePlugin):
         pass
 ```
 
-See [Advanced Plugin Development](../../../docs/advanced_plugin_development.md) for more details on blueprints.
+This needs the Core files to be patched, this is done automatically when you install the hardwarebuttons-plugin.
 
 ### Step 2: Register Actions in Blueprint Initialization
 
