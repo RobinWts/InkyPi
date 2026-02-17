@@ -177,3 +177,7 @@ src/plugins/seniorDashboard_allDay
 src/plugins/sensor_quote
 src/plugins/plugin_template
 .cursorrules
+
+# Core files that are patched by the pluginmanager plugin
+src/inkypi.py
+src/plugins/plugin_registry.py
