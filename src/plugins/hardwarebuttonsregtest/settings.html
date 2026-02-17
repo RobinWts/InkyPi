@@ -1,0 +1,12 @@
+<div class="form-group">
+    <label for="headline" class="form-label">Headline:</label>
+    <input type="text" id="headline" name="headline" class="form-input" placeholder="Instance Display" />
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        if (loadPluginSettings) {
+            document.getElementById('headline').value = pluginSettings.headline || 'Instance Display';
+        }
+    });
+</script>

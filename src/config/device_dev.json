@@ -72,12 +72,10 @@
         "active_playlist": "Default"
     },
     "refresh_info": {
-        "refresh_time": "2026-02-16T12:31:35.106270+00:00",
-        "image_hash": "864bbc8770b1f6e44f022ee52f0a493a73f402b3aff1ead2f6c351e57b949f10",
-        "refresh_type": "Playlist",
-        "plugin_id": "calendar",
-        "playlist": "Default",
-        "plugin_instance": "gfds"
+        "refresh_time": "2026-02-17T12:57:51.886820+00:00",
+        "image_hash": "32c9b8ecfcaca9f57131887c905542d4f27412ce7dd14a977e7d2193c406888e",
+        "refresh_type": "Manual Update",
+        "plugin_id": "hardwarebuttonsregtest"
     },
     "hardwarebuttons": {
         "timings": {

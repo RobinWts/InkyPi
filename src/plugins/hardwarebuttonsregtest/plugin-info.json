@@ -1,0 +1,6 @@
+{
+    "display_name": "Hardware Buttons Reg Test",
+    "id": "hardwarebuttonsregtest",
+    "class": "HardwareButtonsRegTest",
+    "repository": ""
+}

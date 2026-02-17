@@ -1,0 +1,22 @@
+.regtest-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    gap: 2vh;
+}
+
+.regtest-headline {
+    font-size: 5vh;
+    font-weight: bold;
+    margin: 0;
+}
+
+.regtest-subtitle {
+    font-size: 2.5vh;
+    margin: 0;
+    opacity: 0.9;
+}
