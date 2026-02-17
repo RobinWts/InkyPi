@@ -34,16 +34,73 @@
                 "name": "Default",
                 "start_time": "00:00",
                 "end_time": "24:00",
-                "plugins": [],
-                "current_plugin_index": null
+                "plugins": [
+                    {
+                        "plugin_id": "hardwarebuttonsregtest",
+                        "name": "fds",
+                        "plugin_settings": {
+                            "headline": "Instance Display",
+                            "selectedFrame": "None",
+                            "topMargin": "",
+                            "bottomMargin": "",
+                            "leftMargin": "",
+                            "rightMargin": "",
+                            "backgroundOption": "color",
+                            "backgroundColor": "#ffffff",
+                            "textColor": "#000000"
+                        },
+                        "refresh": {
+                            "interval": 180
+                        },
+                        "latest_refresh_time": null
+                    },
+                    {
+                        "plugin_id": "clock",
+                        "name": "gfds",
+                        "plugin_settings": {
+                            "selectedClockFace": "Gradient Clock",
+                            "primaryColor": "#db3246",
+                            "secondaryColor": "#000000"
+                        },
+                        "refresh": {
+                            "interval": 120
+                        },
+                        "latest_refresh_time": "2026-02-17T14:39:44.200508+00:00"
+                    }
+                ],
+                "current_plugin_index": 1
             }
         ],
         "active_playlist": null
     },
     "refresh_info": {
-        "refresh_time": "2026-02-06T10:48:38.538067+00:00",
-        "image_hash": "cf2fc989b2e2f2060013960928812ab0985c6bc55e298166d52477b43452faa8",
-        "refresh_type": "Manual Update",
-        "plugin_id": "pluginmanager"
+        "refresh_time": "2026-02-17T14:39:44.200508+00:00",
+        "image_hash": "c56147fc409710639530914e693f13e4454657ee26bdfe338c2644f3968cf38a",
+        "refresh_type": "Playlist",
+        "plugin_id": "clock",
+        "playlist": "Default",
+        "plugin_instance": "gfds"
+    },
+    "hardwarebuttons": {
+        "timings": {
+            "short_press_ms": 500,
+            "double_click_interval_ms": 500,
+            "long_press_ms": 1000
+        },
+        "buttons": [
+            {
+                "id": "btn_0",
+                "gpio_pin": 27,
+                "short_action": "core_trigger_refresh",
+                "double_action": "core_next_playlist",
+                "long_action": "hardwarebuttonsregtest_force_display",
+                "script_path_short": null,
+                "script_path_double": null,
+                "script_path_long": null,
+                "url_short": null,
+                "url_double": null,
+                "url_long": null
+            }
+        ]
     }
 }

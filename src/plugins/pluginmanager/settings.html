@@ -1,12 +1,13 @@
 <style>
     /* Hide core "Update Now" and "Add to Playlist" buttons for this plugin (UI-only, no display/playlist use) */
-    #settingsForm > .buttons-container {
+    #settingsForm>.buttons-container {
         display: none !important;
     }
 
     .plugin-manage-container {
-        max-width: 700px;
-        margin: 0 auto;
+        width: 100%;
+        padding: 0 24px;
+        box-sizing: border-box;
     }
 
     .plugin-row {
@@ -26,14 +27,23 @@
         color: var(--text-primary, #333);
     }
 
-    .plugin-repo {
+    .plugin-version-date {
         flex: 1;
         padding: 10px 12px;
         font-size: 12px;
         color: var(--text-secondary, #666);
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .plugin-version-date-label {
+        font-weight: 500;
+    }
+
+    .plugin-version-date-value {
+        font-size: 11px;
+        color: var(--text-secondary, #888);
     }
 
     .btn-delete {
@@ -62,19 +72,20 @@
     }
 
     .btn-update {
-        width: 36px;
+        padding: 8px 16px;
         height: 36px;
         border: none;
         background: #2196F3;
         color: white;
         border-radius: 6px;
         cursor: pointer;
-        font-size: 14px;
+        font-size: 13px;
         display: flex;
         align-items: center;
         justify-content: center;
         transition: background 0.2s;
         flex-shrink: 0;
+        white-space: nowrap;
     }
 
     .btn-update:hover {
@@ -121,7 +132,11 @@
         color: #eee;
     }
 
-    [data-theme="dark"] .plugin-repo {
+    [data-theme="dark"] .plugin-version-date-label {
+        color: #eee;
+    }
+
+    [data-theme="dark"] .plugin-version-date-value {
         color: #aaa;
     }
 
@@ -210,9 +225,12 @@
         {% for plugin in third_party_plugins %}
         <div class="plugin-row" data-plugin-id="{{ plugin.id }}">
             <span class="plugin-name">{{ plugin.display_name or plugin.id }}</span>
-            <span class="plugin-repo" title="{{ plugin.repository }}">{{ plugin.repository }}</span>
-            <button type="button" class="btn-update" onclick="updatePlugin('{{ plugin.id }}', this)"
-                title="Update">↻</button>
+            <span class="plugin-version-date">
+                <span class="plugin-version-date-label">Version timestamp:</span>
+                <span class="plugin-version-date-value">{{ plugin.version_date or 'Unknown' }}</span>
+            </span>
+            <button type="button" class="btn-update" onclick="checkUpdates('{{ plugin.id }}', this)"
+                title="Check for updates">check updates</button>
             <button type="button" class="btn-delete" onclick="uninstallPlugin('{{ plugin.id }}', this)"
                 title="Uninstall">×</button>
         </div>
@@ -276,11 +294,54 @@
     }
 
 
-    async function updatePlugin(pluginId, btn) {
-        if (!confirm('Update this plugin? It will be reinstalled from the repository.')) {
-            return;
-        }
+    async function checkUpdates(pluginId, btn) {
         btn.disabled = true;
+        const originalText = btn.textContent;
+        btn.textContent = 'Checking...';
+
+        try {
+            // Check for updates
+            const checkResponse = await fetch('/pluginmanager-api/check-updates', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ plugin_id: pluginId })
+            });
+            const checkData = await checkResponse.json().catch(() => ({}));
+
+            if (!checkResponse.ok) {
+                showMessage(false, checkData.error || 'Failed to check for updates');
+                btn.disabled = false;
+                btn.textContent = originalText;
+                return;
+            }
+
+            if (checkData.has_updates) {
+                // Show requester with update/cancel options
+                const updateConfirmed = confirm('Updates available! Do you want to update this plugin?');
+                if (updateConfirmed) {
+                    await updatePlugin(pluginId, btn);
+                } else {
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                }
+            } else {
+                // Show "No updates available" message
+                alert('No updates available!');
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        } catch (e) {
+            showMessage(false, 'Request failed: ' + e.message);
+            btn.disabled = false;
+            btn.textContent = originalText;
+        }
+    }
+
+    async function updatePlugin(pluginId, btn) {
+        btn.disabled = true;
+        const originalText = btn.textContent;
+        btn.textContent = 'Updating...';
+
         try {
             // Use direct URL since blueprint might not be registered yet
             const response = await fetch('/pluginmanager-api/update', {
@@ -294,10 +355,12 @@
             } else {
                 showMessage(false, data.error || 'Update failed');
                 btn.disabled = false;
+                btn.textContent = originalText;
             }
         } catch (e) {
             showMessage(false, 'Request failed: ' + e.message);
             btn.disabled = false;
+            btn.textContent = originalText;
         }
     }
 

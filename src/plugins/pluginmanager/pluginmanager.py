@@ -5,6 +5,7 @@ from PIL import Image
 import logging
 import os
 import subprocess
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +18,37 @@ class PluginManager(BasePlugin):
         """Return the Flask blueprint for this plugin's API routes."""
         from . import api
         return api.plugin_manage_bp
+    
+    @staticmethod
+    def _get_plugin_last_commit_date(plugin_id):
+        """Get the last commit date for a plugin from its local git repository."""
+        try:
+            from flask import current_app
+            from config import Config
+            
+            plugins_dir = os.path.join(Config.BASE_DIR, "plugins")
+            plugin_dir = os.path.join(plugins_dir, plugin_id)
+            git_dir = os.path.join(plugin_dir, ".git")
+            
+            if not os.path.isdir(git_dir):
+                return None
+            
+            # Get the last commit date
+            result = subprocess.run(
+                ["git", "-C", plugin_dir, "log", "-1", "--format=%ci", "HEAD"],
+                capture_output=True,
+                text=True,
+                timeout=5,
+            )
+            
+            if result.returncode == 0 and result.stdout.strip():
+                # Return the complete timestamp as-is (format: "2024-01-15 10:30:45 +0100")
+                return result.stdout.strip()
+            
+            return None
+        except Exception as e:
+            logger.debug(f"Could not get commit date for plugin {plugin_id}: {e}")
+            return None
     
     def generate_settings_template(self):
         """Add third-party plugins list to template parameters."""
@@ -65,6 +97,12 @@ class PluginManager(BasePlugin):
                 device_config = current_app.config.get('DEVICE_CONFIG')
                 if device_config:
                     third_party = [p for p in device_config.get_plugins() if p.get("repository")]
+                    # Add version date (last commit date) to each plugin
+                    for plugin in third_party:
+                        plugin_id = plugin.get("id")
+                        if plugin_id:
+                            version_date = self._get_plugin_last_commit_date(plugin_id)
+                            plugin['version_date'] = version_date or "Unknown"
                     template_params['third_party_plugins'] = third_party
                 else:
                     template_params['third_party_plugins'] = []

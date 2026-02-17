@@ -159,6 +159,124 @@ def uninstall_plugin():
     return jsonify({"success": True})
 
 
+@plugin_manage_bp.route("/pluginmanager-api/check-updates", methods=["POST"])
+def check_updates():
+    """Check if a plugin has updates available by comparing local and remote commits."""
+    data = request.get_json() or {}
+    plugin_id = (data.get("plugin_id") or "").strip()
+
+    if not plugin_id:
+        return jsonify({"success": False, "error": "plugin_id is required"}), 400
+
+    third_party = _third_party_plugins()
+    plugin_info = next((p for p in third_party if p["id"] == plugin_id), None)
+    if not plugin_info:
+        return jsonify({"success": False, "error": "Plugin not found"}), 400
+
+    repo_url = plugin_info.get("repository", "").strip()
+    if not repo_url:
+        return jsonify({"success": False, "error": "Plugin repository URL not found"}), 400
+
+    try:
+        from config import Config
+        plugins_dir = os.path.join(Config.BASE_DIR, "plugins")
+        plugin_dir = os.path.join(plugins_dir, plugin_id)
+        git_dir = os.path.join(plugin_dir, ".git")
+        
+        if not os.path.isdir(git_dir):
+            return jsonify({"success": False, "error": "Plugin is not a git repository"}), 400
+        
+        # Get current local commit hash
+        local_commit_result = subprocess.run(
+            ["git", "-C", plugin_dir, "rev-parse", "HEAD"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+        
+        if local_commit_result.returncode != 0:
+            logger.warning(f"Could not get local commit for {plugin_id}")
+            return jsonify({"success": False, "error": "Could not determine current version"}), 500
+        
+        local_commit = local_commit_result.stdout.strip()
+        
+        # Get remote URL to query directly
+        remote_url_result = subprocess.run(
+            ["git", "-C", plugin_dir, "config", "--get", "remote.origin.url"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+        
+        if remote_url_result.returncode != 0:
+            logger.warning(f"Could not get remote URL for {plugin_id}")
+            return jsonify({"success": False, "error": "Could not determine remote repository"}), 500
+        
+        remote_url = remote_url_result.stdout.strip()
+        
+        # Use ls-remote to get the remote HEAD commit without needing to fetch
+        # This works even with shallow clones
+        ls_remote_result = subprocess.run(
+            ["git", "ls-remote", "--heads", remote_url],
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        
+        if ls_remote_result.returncode != 0:
+            logger.warning(f"Could not query remote for {plugin_id}: {ls_remote_result.stderr}")
+            return jsonify({"success": False, "error": "Failed to check remote repository"}), 500
+        
+        # Parse ls-remote output to find the default branch
+        # Format: <commit_hash>    refs/heads/<branch_name>
+        remote_refs = ls_remote_result.stdout.strip().split("\n")
+        remote_commit = None
+        default_branch = None
+        
+        # Try common branch names first
+        for branch_name in ["main", "master", "develop"]:
+            for ref_line in remote_refs:
+                if f"refs/heads/{branch_name}" in ref_line:
+                    parts = ref_line.split()
+                    if len(parts) >= 1:
+                        remote_commit = parts[0]
+                        default_branch = branch_name
+                        break
+            if remote_commit:
+                break
+        
+        # If no common branch found, use the first ref
+        if not remote_commit and remote_refs:
+            first_ref = remote_refs[0]
+            parts = first_ref.split()
+            if len(parts) >= 2:
+                remote_commit = parts[0]
+                # Extract branch name from refs/heads/branch_name
+                ref_path = parts[1]
+                if "refs/heads/" in ref_path:
+                    default_branch = ref_path.replace("refs/heads/", "")
+        
+        if not remote_commit:
+            logger.warning(f"Could not determine remote commit for {plugin_id}")
+            return jsonify({"success": True, "has_updates": False, "commits_behind": 0})
+        
+        # Compare commits directly
+        # With shallow clones, we can't reliably count commits behind, so we just check if they differ
+        if local_commit == remote_commit:
+            return jsonify({"success": True, "has_updates": False, "commits_behind": 0})
+        else:
+            # Commits differ - there are updates available
+            # Note: With shallow clones, we can't reliably count commits behind,
+            # but we know there's a difference, so updates are available
+            return jsonify({"success": True, "has_updates": True, "commits_behind": 1})
+            
+    except subprocess.TimeoutExpired:
+        return jsonify({"success": False, "error": "Check updates timed out"}), 500
+    except Exception as e:
+        logger.exception("Failed to check for plugin updates")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
 @plugin_manage_bp.route("/pluginmanager-api/update", methods=["POST"])
 def update_plugin():
     """Update a third-party plugin by reinstalling from its repository. Only allows plugins with repository set."""
