@@ -63,7 +63,7 @@
                         "refresh": {
                             "interval": 120
                         },
-                        "latest_refresh_time": "2026-02-16T12:31:35.106270+00:00"
+                        "latest_refresh_time": "2026-02-17T13:31:16.632850+00:00"
                     }
                 ],
                 "current_plugin_index": 0
@@ -72,10 +72,12 @@
         "active_playlist": "Default"
     },
     "refresh_info": {
-        "refresh_time": "2026-02-17T12:57:51.886820+00:00",
-        "image_hash": "32c9b8ecfcaca9f57131887c905542d4f27412ce7dd14a977e7d2193c406888e",
-        "refresh_type": "Manual Update",
-        "plugin_id": "hardwarebuttonsregtest"
+        "refresh_time": "2026-02-17T13:31:16.632850+00:00",
+        "image_hash": "b8270f2afdabb55acc06e7bdbaf8d190a1c8d35748b60a7fb5c7354eded753dc",
+        "refresh_type": "Playlist",
+        "plugin_id": "calendar",
+        "playlist": "Default",
+        "plugin_instance": "gfds"
     },
     "hardwarebuttons": {
         "timings": {
@@ -89,7 +91,7 @@
                 "gpio_pin": 27,
                 "short_action": "call_url",
                 "double_action": null,
-                "long_action": null,
+                "long_action": "core_next_playlist",
                 "script_path_short": null,
                 "script_path_double": null,
                 "script_path_long": null,
