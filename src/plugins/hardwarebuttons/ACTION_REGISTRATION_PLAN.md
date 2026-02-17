@@ -461,13 +461,122 @@ This design provides a flexible, extensible action registration system that:
 7. ✅ Provides clear API for plugin developers
 8. ✅ Follows InkyPi plugin patterns (blueprint registration, no core changes)
 
+## Implementation Status
+
+### ✅ Phase 1: Core Registry - COMPLETE
+
+**Files Created:**
+- `src/plugins/hardwarebuttons/action_registry.py` - Central action registry with thread-safe registration and execution
+
+**Files Modified:**
+- `src/plugins/hardwarebuttons/discovery.py` - Updated to include plugin actions in dropdown
+- `src/plugins/hardwarebuttons/actions.py` - Added handlers for plugin anytime and display actions
+
+**Key Functions Implemented:**
+- `register_actions(plugin_id, anytime_actions, display_actions)` - Main registration API
+- `get_all_anytime_actions()` - Returns all anytime actions for dropdowns
+- `get_max_display_action_count()` - Returns max display actions for dropdown sizing
+- `execute_plugin_action(action_id, refs)` - Executes anytime actions
+- `execute_display_action(action_index, refs)` - Resolves and executes display actions
+
+### ✅ Phase 2: Display Action Resolution - COMPLETE
+
+**Implemented:**
+- Display action resolution based on currently displayed plugin
+- Current plugin detection via `device_config.get_refresh_info().plugin_id`
+- Plugin instance resolution for display actions (passed in refs)
+- Edge case handling:
+  - No plugin currently displayed → log warning, no-op
+  - Current plugin has no display actions → log debug, return false
+  - Action index out of bounds → log debug, return false
+- Comprehensive logging for debugging
+
+### ✅ Phase 3: Documentation and Polish - COMPLETE
+
+**Files Created:**
+- `src/plugins/hardwarebuttons/PLUGIN_ACTION_REGISTRATION.md` - Complete guide for plugin developers
+  - Two types of actions explained with use cases
+  - Callback signature documentation
+  - Three complete working examples (image folder, weather, calendar)
+  - Best practices and troubleshooting
+  - Advanced topics
+
+**Files Modified:**
+- `src/plugins/hardwarebuttons/README.md` - Added plugin action registration section
+- `src/plugins/hardwarebuttons/api.py` - Added module documentation
+- `src/plugins/hardwarebuttons/action_registry.py` - Enhanced inline documentation
+- `src/plugins/hardwarebuttons/actions.py` - Added explanatory comments
+- `src/plugins/hardwarebuttons/discovery.py` - Added action group documentation
+
+**No Linter Errors:** All modified files pass linting checks
+
+## Testing the Implementation
+
+To test the action registration system:
+
+1. **Verify Registry Module:**
+   ```python
+   from plugins.hardwarebuttons import action_registry
+   stats = action_registry.get_registry_stats()
+   # Should return {"anytime_count": 0, "plugins_with_display": 0, "max_display": 0}
+   ```
+
+2. **Test Registration (in another plugin's blueprint):**
+   ```python
+   @my_bp.record_once
+   def _register_test_actions(state):
+       from plugins.hardwarebuttons import action_registry
+       
+       def test_action(refs):
+           print("Test action executed!")
+       
+       action_registry.register_actions(
+           plugin_id="test_plugin",
+           anytime_actions={
+               "test": {
+                   "label": "Test Action",
+                   "callback": test_action
+               }
+           }
+       )
+   ```
+
+3. **Verify in UI:**
+   - Open Hardware Buttons settings
+   - Add a button
+   - Check that "Test Action" appears in the dropdown under "Other Plugins"
+
+4. **Test Execution:**
+   - Bind a button to the test action
+   - Press the button
+   - Check logs: `journalctl -u inkypi.service -f | grep "test_action"`
+
 ## Next Steps
 
-Please review this plan and provide feedback on:
+### Phase 4: Example Implementation (Optional)
 
-1. ✅ Overall approach and architecture
-2. ❓ Open questions that need decisions (see section above)
-3. ❓ Any additional requirements or edge cases I should consider
-4. ✅ Priority of implementation phases (should we skip Phase 4-5 for now?)
+Create a reference implementation in an existing plugin (e.g., `image_folder`) to demonstrate:
+- Anytime action (reload images)
+- Display actions (next/prev/random image)
 
-Once approved, I will proceed with implementation starting with Phase 1.
+This would serve as a working example for other plugin developers.
+
+### Phase 5: Settings UI Enhancement (Future)
+
+Potential improvements:
+- Show which plugins have registered actions
+- Visual indicators for display vs anytime actions
+- Help tooltips in the dropdown
+- "Test Action" button to manually trigger an action
+
+## Summary
+
+✅ **All core functionality is implemented and documented:**
+1. Action registry with thread-safe registration and execution
+2. Integration with discovery and action executor
+3. Display action resolution with current plugin detection
+4. Comprehensive documentation for plugin developers
+5. Best practices and examples
+6. Clean, well-commented code with no linter errors
+
+The system is ready for use by plugin developers. Any plugin can now register custom actions that users can bind to hardware buttons by following the guide in `PLUGIN_ACTION_REGISTRATION.md`.

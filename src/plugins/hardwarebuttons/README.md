@@ -84,8 +84,10 @@ You can add several buttons (each with its own GPIO pin) and remove any with the
 
 - **Core:** Trigger refresh (next in playlist), Force refresh (re-show current), Next playlist item, Previous playlist item.
 - **System:** Shutdown, Reboot, Restart InkyPi service, Run external bash script (with optional script path), Call URL (with optional URL).
+- **Current Plugin:** Display Action 1-N (context-dependent actions for the currently displayed plugin)
+- **Other Plugins:** Custom anytime actions registered by other plugins (e.g., "Reload Weather Data", "Sync Calendar")
 
-Other plugins can register extra actions that appear under "Current plugin" or "Other plugins" in the dropdowns.
+Other plugins can register custom actions that appear in the dropdown. See [Plugin Action Registration Guide](./PLUGIN_ACTION_REGISTRATION.md) for details on how to add custom actions to your plugin.
 
 ## Wiring Buttons on a Raspberry Pi Zero 2 W
 
@@ -145,6 +147,50 @@ Repeat the same wiring for each button: each button uses one GPIO and one GND. Y
 - Button C: GPIO 23 (pin 16) ↔ GND (pin 14)
 
 In the plugin, add three buttons with GPIO pins **27**, **22**, and **23**.
+
+## Plugin Action Registration
+
+Plugin developers can register custom actions that users can bind to buttons. The system supports two types of actions:
+
+1. **Anytime Actions**: Can be triggered at any time (e.g., "Reload Weather Data", "Sync Calendar")
+2. **Display Actions**: Only work when the plugin is currently displayed (e.g., "Next Image", "Previous Slide")
+
+For complete documentation on registering actions in your plugin, see [Plugin Action Registration Guide](./PLUGIN_ACTION_REGISTRATION.md).
+
+### Quick Example
+
+```python
+# In your plugin's api.py
+from flask import Blueprint
+
+my_bp = Blueprint("my_plugin_api", __name__)
+
+@my_bp.record_once
+def _register_actions(state):
+    try:
+        from plugins.hardwarebuttons import action_registry
+    except ImportError:
+        return
+    
+    def reload_data(refs):
+        # Your reload logic
+        pass
+    
+    def next_item(refs):
+        # Navigate to next item
+        pass
+    
+    action_registry.register_actions(
+        plugin_id="my_plugin",
+        anytime_actions={
+            "reload": {
+                "label": "Reload My Plugin Data",
+                "callback": reload_data
+            }
+        },
+        display_actions=[next_item]
+    )
+```
 
 ## Notes
 

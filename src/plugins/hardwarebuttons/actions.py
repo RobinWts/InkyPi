@@ -4,6 +4,7 @@ import os
 import logging
 import subprocess
 import threading
+from . import action_registry
 
 logger = logging.getLogger(__name__)
 
@@ -53,6 +54,7 @@ def _run_action_impl(refs, action_id, context):
     refresh_task = refs.get("refresh_task")
     app = refs.get("app")
 
+    # Handle actions with special context requirements first
     if action_id == "external_script":
         logger.debug("_run_action_impl: running external_script")
         _run_external_script(context)
@@ -61,6 +63,8 @@ def _run_action_impl(refs, action_id, context):
         logger.debug("_run_action_impl: running call_url")
         _call_url(context)
         return
+    
+    # Handle system actions
     if action_id == "system_shutdown":
         logger.debug("_run_action_impl: running system_shutdown")
         _system_shutdown(app, reboot=False)
@@ -73,7 +77,41 @@ def _run_action_impl(refs, action_id, context):
         logger.debug("_run_action_impl: running system_restart_inkypi")
         _restart_inkypi_service()
         return
+    
+    # ===== Plugin-Registered Actions =====
+    # Plugins can register two types of actions via action_registry:
+    # 1. Display actions: context-dependent, only work when that plugin is displayed
+    # 2. Anytime actions: can be triggered anytime (e.g., "Reload Weather Data")
+    
+    # Check for display actions (display_action_0, display_action_1, etc.)
+    # These are resolved to the currently displayed plugin's action array
+    if action_id.startswith("display_action_"):
+        try:
+            action_index = int(action_id.split("_")[-1])
+            logger.debug("_run_action_impl: display action index %d", action_index)
+            action_registry.execute_display_action(action_index, refs)
+            return
+        except (ValueError, IndexError) as e:
+            logger.warning("_run_action_impl: invalid display_action format: %s (%s)", action_id, e)
+            return
+        except Exception as e:
+            logger.exception("_run_action_impl: display action %s failed: %s", action_id, e)
+            return
+    
+    # Check for plugin-registered anytime actions (e.g., "weather_reload", "calendar_sync")
+    if action_id not in BUILTIN_ACTION_IDS:
+        # Could be a plugin action; try to execute it
+        try:
+            action_registry.execute_plugin_action(action_id, refs)
+            return
+        except ValueError:
+            # Not a registered plugin action; fall through to core actions or unknown
+            pass
+        except Exception as e:
+            logger.exception("_run_action_impl: plugin action %s failed: %s", action_id, e)
+            return
 
+    # Core playlist actions require refresh_task and device_config
     if not refresh_task or not device_config:
         logger.warning("Cannot run core action %s: missing refresh_task or device_config", action_id)
         return
