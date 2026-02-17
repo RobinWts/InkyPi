@@ -4,7 +4,6 @@ import os
 import logging
 import subprocess
 import threading
-import urllib.request
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +27,7 @@ BUILTIN_ACTION_IDS = {
 def execute_action(refs, action_id, context=None):
     """Execute a button action. Only one action runs at a time; other triggers are ignored until it returns.
 
-    refs = dict with device_config, refresh_task, app (optional), port (optional).
+    refs = dict with device_config, refresh_task, app (optional).
     context: optional dict with script_path for external_script, url for call_url, etc.
     """
     logger.debug("execute_action called: action_id=%s", action_id)
@@ -53,7 +52,6 @@ def _run_action_impl(refs, action_id, context):
     device_config = refs.get("device_config")
     refresh_task = refs.get("refresh_task")
     app = refs.get("app")
-    port = refs.get("port", 80)
 
     if action_id == "external_script":
         logger.debug("_run_action_impl: running external_script")
@@ -140,12 +138,6 @@ def _run_action_impl(refs, action_id, context):
         instance = playlist.plugins[prev_idx]
         refresh_task.manual_update(PlaylistRefresh(playlist, instance, force=True))
         device_config.write_config()
-        return
-
-    # Plugin-registered action: execute via HTTP
-    if action_id.startswith("plugin_"):
-        logger.debug("_run_action_impl: plugin action -> HTTP to plugin URL")
-        _execute_plugin_action(action_id, device_config, port)
         return
 
     logger.warning("Unknown action_id: %s", action_id)
@@ -249,22 +241,5 @@ def _restart_inkypi_service():
         logger.warning("Restart InkyPi service failed: %s", e)
 
 
-def _execute_plugin_action(action_id, device_config, port):
-    """Resolve plugin action to URL and POST to it."""
-    from .discovery import get_available_actions
-    actions_list = get_available_actions(device_config)
-    act = next((a for a in actions_list if a.get("id") == action_id), None)
-    if not act or not act.get("url"):
-        logger.warning("Plugin action %s not found or has no url", action_id)
-        return
-    url = act["url"]
-    if not url.startswith("http"):
-        url = f"http://127.0.0.1:{port}{url}" if url.startswith("/") else f"http://127.0.0.1:{port}/{url}"
-    method = act.get("method", "POST").upper()
-    logger.debug("_execute_plugin_action: %s %s", method, url)
-    try:
-        req = urllib.request.Request(url, data=b"", method=method, headers={"Content-Type": "application/json"})
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            resp.read()
-    except Exception as e:
-        logger.warning("Plugin action HTTP %s %s failed: %s", method, url, e)
+    # Note: intentionally no "plugin_*" action execution. This plugin only supports the
+    # built-in Core/System actions plus its own external_script and call_url actions.
