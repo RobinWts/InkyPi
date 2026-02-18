@@ -1,0 +1,46 @@
+{% extends "plugin.html" %}
+
+{% block content %}
+<div class="pihole-container">
+    <div class="pihole-header">
+        <div class="title">Pi-hole Statistics</div>
+        {% if stats.status %}
+        <div class="status status-{{ stats.status }}">
+            {{ stats.status|upper }}
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Queries Today</div>
+            <div class="stat-value">{{ stats.dns_queries_today or 0 }}</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">Blocked Today</div>
+            <div class="stat-value blocked">{{ stats.ads_blocked_today or 0 }}</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">Block Percentage</div>
+            <div class="stat-value">{{ "%.1f"|format((stats.ads_percentage_today or 0)) }}%</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">Domains Blocked</div>
+            <div class="stat-value">{{ stats.domains_being_blocked or 0 }}</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">Queries Forwarded</div>
+            <div class="stat-value">{{ stats.queries_forwarded or 0 }}</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">Queries Cached</div>
+            <div class="stat-value">{{ stats.queries_cached or 0 }}</div>
+        </div>
+    </div>
+</div>
+{% endblock %}

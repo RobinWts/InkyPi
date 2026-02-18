@@ -1,0 +1,72 @@
+.pihole-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    font-family: "Jost";
+    container-type: size;
+    gap: 2cqh;
+}
+
+.pihole-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1cqh;
+}
+
+.title {
+    font-weight: bold;
+    font-size: min(8cqh, 6cqi);
+}
+
+.status {
+    padding: 0.5cqh 1cqi;
+    border-radius: 4px;
+    font-size: min(4cqh, 3cqi);
+    font-weight: bold;
+}
+
+.status-enabled {
+    background-color: rgba(76, 175, 80, 0.2);
+    color: rgba(76, 175, 80, 1);
+}
+
+.status-disabled {
+    background-color: rgba(244, 67, 54, 0.2);
+    color: rgba(244, 67, 54, 1);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2cqh;
+    flex: 1;
+}
+
+.stat-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2cqh;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    text-align: center;
+}
+
+.stat-label {
+    font-size: min(3.5cqh, 2.5cqi);
+    font-weight: 300;
+    margin-bottom: 1cqh;
+    opacity: 0.8;
+}
+
+.stat-value {
+    font-size: min(6cqh, 5cqi);
+    font-weight: bold;
+}
+
+.stat-value.blocked {
+    color: rgba(244, 67, 54, 1);
+}
