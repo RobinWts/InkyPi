@@ -22,7 +22,11 @@
 
     {% if show_status %}
     <div class="pihole-status status-{{ stats.status|default('enabled') }}">
-        {{ (stats.status|default('enabled'))|upper }}
+        {% if (stats.status|default('enabled'))|lower == 'enabled' %}
+        BLOCKING ENABLED
+        {% else %}
+        BLOCKING DISABLED
+        {% endif %}
     </div>
     {% endif %}
 
@@ -46,7 +50,8 @@
         {% if show_queries_graph %}
         <div class="queries-bar-container">
             <div class="queries-bar-track">
-                <div class="queries-bar-fill" style="width: {{ [ (stats.ads_percentage_today or 0)|float, 100 ]|min }}%"></div>
+                <div class="queries-bar-fill"
+                    style="width: {{ [ (stats.ads_percentage_today or 0)|float, 100 ]|min }}%"></div>
             </div>
             <div class="queries-bar-legend">
                 <span>Blocked</span>

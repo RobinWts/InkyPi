@@ -92,7 +92,7 @@
                         "refresh": {
                             "interval": 60
                         },
-                        "latest_refresh_time": "2026-02-18T13:20:38.806234+00:00"
+                        "latest_refresh_time": "2026-02-18T13:24:10.882557+00:00"
                     }
                 ],
                 "current_plugin_index": null
@@ -101,8 +101,8 @@
         "active_playlist": null
     },
     "refresh_info": {
-        "refresh_time": "2026-02-18T13:20:38.806234+00:00",
-        "image_hash": "9c520952ea6c7e851e896e8bae08bcd3c233e5fbbda72221353ed854bb47c676",
+        "refresh_time": "2026-02-18T13:24:10.882557+00:00",
+        "image_hash": "3a286c918d3ac0a7549ee9c761b7c29f2248af0890567913165ad4ca1375f6f5",
         "refresh_type": "Playlist",
         "plugin_id": "pihole",
         "playlist": "Default",
