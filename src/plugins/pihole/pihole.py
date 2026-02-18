@@ -63,14 +63,14 @@ class Pihole(BasePlugin):
 
         # Font settings from app_utils.FONT_FAMILIES
         font_family = settings.get("fontFamily", "Jost")
-        font_weight = settings.get("fontWeight", "normal")
+        font_weight = settings.get("fontWeight", "bold")
 
         # Display toggles and optional title
         custom_title = (settings.get("customTitle") or "").strip()
         show_title = settings.get("showTitle", "true").lower() == "true" and bool(custom_title)
         show_status = settings.get("showStatus", "true").lower() == "true"
         show_queries = settings.get("showQueries", "true").lower() == "true"
-        show_queries_graph = settings.get("showQueriesGraph", "false").lower() == "true"
+        show_queries_graph = settings.get("showQueriesGraph", "true").lower() == "true"
         show_clients = settings.get("showClients", "true").lower() == "true"
         show_blocklist = settings.get("showBlocklist", "true").lower() == "true"
 

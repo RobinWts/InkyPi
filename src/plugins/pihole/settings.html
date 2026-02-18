@@ -106,7 +106,7 @@
             <label for="showQueries" class="form-label" style="margin-left: 8px;">Show queries (total, blocked, %)</label>
         </div>
         <div class="form-group nowrap">
-            <input type="checkbox" id="showQueriesGraph" name="showQueriesGraph" value="true" class="form-checkbox">
+            <input type="checkbox" id="showQueriesGraph" name="showQueriesGraph" value="true" class="form-checkbox" checked>
             <input type="hidden" name="showQueriesGraph" value="false">
             <label for="showQueriesGraph" class="form-label" style="margin-left: 8px;">Show queries bar graph</label>
         </div>
@@ -127,7 +127,7 @@
     <label for="fontFamily" class="form-label">Font Family:</label>
     <select id="fontFamily" name="fontFamily" class="form-input">
         {% for font in font_families %}
-        <option value="{{ font }}">{{ font }}</option>
+        <option value="{{ font }}" {% if font == 'Jost' %}selected{% endif %}>{{ font }}</option>
         {% endfor %}
     </select>
 </div>
@@ -136,7 +136,7 @@
     <label for="fontWeight" class="form-label">Font Weight:</label>
     <select id="fontWeight" name="fontWeight" class="form-input">
         {% for w in font_weights %}
-        <option value="{{ w }}">{{ w | capitalize }}</option>
+        <option value="{{ w }}" {% if w == 'bold' %}selected{% endif %}>{{ w | capitalize }}</option>
         {% endfor %}
     </select>
 </div>
@@ -187,12 +187,12 @@
             document.getElementById('showTitle').checked = pluginSettings.showTitle !== 'false';
             document.getElementById('showStatus').checked = pluginSettings.showStatus !== 'false';
             document.getElementById('showQueries').checked = pluginSettings.showQueries !== 'false';
-            document.getElementById('showQueriesGraph').checked = pluginSettings.showQueriesGraph === 'true';
+            document.getElementById('showQueriesGraph').checked = pluginSettings.showQueriesGraph !== 'false';
             document.getElementById('showClients').checked = pluginSettings.showClients !== 'false';
             document.getElementById('showBlocklist').checked = pluginSettings.showBlocklist !== 'false';
 
             document.getElementById('fontFamily').value = pluginSettings.fontFamily || 'Jost';
-            document.getElementById('fontWeight').value = pluginSettings.fontWeight || 'normal';
+            document.getElementById('fontWeight').value = pluginSettings.fontWeight || 'bold';
             document.getElementById('fontSize').value = pluginSettings.fontSize || 'normal';
         }
     });

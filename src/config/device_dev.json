@@ -67,20 +67,19 @@
                     },
                     {
                         "plugin_id": "pihole",
-                        "name": "pi",
+                        "name": "ph",
                         "plugin_settings": {
                             "piholeUrl": "http://192.168.2.200",
-                            "allowInsecureSSL": "true",
-                            "customTitle": "Pi-Hole stats",
+                            "customTitle": "",
                             "showTitle": "true",
                             "showStatus": "true",
                             "showQueries": "true",
-                            "showQueriesGraph": "false",
+                            "showQueriesGraph": "true",
                             "showClients": "true",
                             "showBlocklist": "true",
-                            "fontFamily": "DS-Digital",
+                            "fontFamily": "Jost",
                             "fontWeight": "bold",
-                            "fontSize": "x-large",
+                            "fontSize": "normal",
                             "selectedFrame": "None",
                             "topMargin": "",
                             "bottomMargin": "",
@@ -93,7 +92,7 @@
                         "refresh": {
                             "interval": 60
                         },
-                        "latest_refresh_time": "2026-02-18T12:57:44.649979+00:00"
+                        "latest_refresh_time": "2026-02-18T13:20:38.806234+00:00"
                     }
                 ],
                 "current_plugin_index": null
@@ -102,12 +101,12 @@
         "active_playlist": null
     },
     "refresh_info": {
-        "refresh_time": "2026-02-18T12:57:44.649979+00:00",
-        "image_hash": "6d1965b54c70b4e4786d98660e0952eae850d5049325edce690241d6b6b2556e",
+        "refresh_time": "2026-02-18T13:20:38.806234+00:00",
+        "image_hash": "9c520952ea6c7e851e896e8bae08bcd3c233e5fbbda72221353ed854bb47c676",
         "refresh_type": "Playlist",
         "plugin_id": "pihole",
         "playlist": "Default",
-        "plugin_instance": "pi"
+        "plugin_instance": "ph"
     },
     "hardwarebuttons": {
         "timings": {
