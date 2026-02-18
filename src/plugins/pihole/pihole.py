@@ -1,13 +1,17 @@
 from plugins.base_plugin.base_plugin import BasePlugin
+from utils.app_utils import FONT_FAMILIES
 import logging
 import requests
 
 logger = logging.getLogger(__name__)
 
+
 class Pihole(BasePlugin):
     def generate_settings_template(self):
         template_params = super().generate_settings_template()
-        template_params['style_settings'] = True
+        template_params["style_settings"] = True
+        template_params["font_families"] = list(FONT_FAMILIES.keys())
+        template_params["font_weights"] = ["normal", "bold"]
         return template_params
 
     def generate_image(self, settings, device_config):
@@ -29,9 +33,49 @@ class Pihole(BasePlugin):
         if device_config.get_config("orientation") == "vertical":
             dimensions = dimensions[::-1]
 
+        # Font settings from app_utils.FONT_FAMILIES
+        font_family = settings.get("fontFamily", "Jost")
+        font_weight = settings.get("fontWeight", "normal")
+
+        # Display toggles and optional title
+        custom_title = (settings.get("customTitle") or "").strip()
+        show_title = settings.get("showTitle", "true").lower() == "true" and bool(custom_title)
+        show_status = settings.get("showStatus", "true").lower() == "true"
+        show_queries = settings.get("showQueries", "true").lower() == "true"
+        show_queries_graph = settings.get("showQueriesGraph", "false").lower() == "true"
+        show_clients = settings.get("showClients", "true").lower() == "true"
+        show_blocklist = settings.get("showBlocklist", "true").lower() == "true"
+
+        # Fallback: never render an empty page - if all content toggles are off, show all
+        if not any((show_status, show_queries, show_clients, show_blocklist)):
+            show_status = show_queries = show_clients = show_blocklist = True
+
+        font_scale = {"x-small": 0.75, "small": 0.9, "normal": 1.0, "large": 1.15, "x-large": 1.3}.get(
+            settings.get("fontSize", "normal"), 1.0
+        )
+
+        # Ensure style defaults for base template - prevents blank white when style section not saved
+        plugin_settings = dict(settings)
+        if not plugin_settings.get("backgroundColor"):
+            plugin_settings["backgroundColor"] = "#ffffff"
+        if not plugin_settings.get("textColor"):
+            plugin_settings["textColor"] = "#000000"
+        if not plugin_settings.get("backgroundOption"):
+            plugin_settings["backgroundOption"] = "color"
+
         template_params = {
             "stats": stats_data,
-            "plugin_settings": settings
+            "plugin_settings": plugin_settings,
+            "show_title": show_title,
+            "custom_title": custom_title,
+            "show_status": show_status,
+            "show_queries": show_queries,
+            "show_queries_graph": show_queries_graph,
+            "show_clients": show_clients,
+            "show_blocklist": show_blocklist,
+            "font_family": font_family,
+            "font_weight": font_weight,
+            "font_scale": font_scale,
         }
 
         image = self.render_image(dimensions, "pihole.html", "pihole.css", template_params)
@@ -105,9 +149,17 @@ class Pihole(BasePlugin):
         if not isinstance(data, dict):
             return {}
 
-        # If the API already returns data in the expected format, use it directly.
+        # If the API already returns data in the expected format, pass through with active_clients
         if all(k in data for k in ("dns_queries_today", "ads_blocked_today", "ads_percentage_today")):
-            return data
+            out = dict(data)
+            if "active_clients" not in out:
+                out["active_clients"] = (
+                    (data.get("clients") or {}).get("active")
+                    or (data.get("clients") or {}).get("count")
+                    or data.get("unique_clients")
+                    or 0
+                )
+            return out
 
         # Map modern API response fields to expected template format.
         # Field names may differ between Pi-hole v6 versions; keep this defensive.
@@ -146,12 +198,22 @@ class Pihole(BasePlugin):
         if isinstance(status, bool):
             status = "enabled" if status else "disabled"
 
+        # Active/unique clients - field name varies across Pi-hole API versions
+        active_clients = (
+            (data.get("clients") or {}).get("active")
+            or (data.get("clients") or {}).get("count")
+            or data.get("unique_clients")
+            or data.get("active_clients")
+            or 0
+        )
+
         return {
             "status": status,
             "dns_queries_today": queries_total,
             "ads_blocked_today": blocked_total,
             "ads_percentage_today": pct_blocked,
             "domains_being_blocked": domains_blocked,
+            "active_clients": active_clients,
             "queries_forwarded": (data.get("queries") or {}).get("forwarded") or data.get("queries_forwarded") or 0,
             "queries_cached": (data.get("queries") or {}).get("cached") or data.get("queries_cached") or 0,
         }

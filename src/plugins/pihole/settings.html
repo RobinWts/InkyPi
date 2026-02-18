@@ -7,15 +7,18 @@
                 Pi-hole Version & Configuration Notes
             </p>
             <p style="margin: 0 0 8px 0; color: var(--text-secondary, #666); font-size: 13px; line-height: 1.5;">
-                <strong>Version Requirement:</strong> This plugin requires <strong>Pi-hole v6 or later</strong>. It uses the modern REST API (<code>/api/*</code>) and does not support older token-based APIs.
+                <strong>Version Requirement:</strong> This plugin requires <strong>Pi-hole v6 or later</strong>. It uses
+                the modern REST API (<code>/api/*</code>) and does not support older token-based APIs.
             </p>
             <p style="margin: 0 0 8px 0; color: var(--text-secondary, #666); font-size: 13px; line-height: 1.5;">
-                <strong>Authentication:</strong> If your Pi-hole has <strong>no password</strong> set, this plugin can query the API without authentication.
-                If your Pi-hole is password protected, set <code>PIHOLE_PASSWORD=your_password_or_app_password</code> via the
-                <strong>API Keys</strong> page in the web UI or in your <code>.env</code> file.
+                <strong>Authentication:</strong> If your Pi-hole has <strong>no password</strong> set, this plugin can
+                query the API without authentication.
+                If your Pi-hole is password protected, set <code>PIHOLE_PASSWORD=your_password_or_app_password</code>
+                via the <strong>API Keys</strong> page in the web UI or in your <code>.env</code> file.
             </p>
             <p style="margin: 0; color: var(--text-secondary, #666); font-size: 13px; line-height: 1.5;">
-                <strong>Self-Signed Certificates:</strong> Pi-hole v6+ automatically creates self-signed SSL certificates. If you're using HTTPS and getting SSL errors, enable "Allow insecure HTTPS" below. This only affects certificate verification, not encryption.
+                <strong>Self-Signed Certificates:</strong> Pi-hole v6+ automatically creates self-signed SSL
+                certificates. If you're using HTTPS and getting SSL errors, enable "Allow insecure HTTPS" below.
             </p>
         </div>
     </div>
@@ -24,8 +27,7 @@
 <div class="form-group">
     <div class="form-group nowrap">
         <label for="piholeUrl" class="form-label">Pi-hole URL:</label>
-        <input type="text" id="piholeUrl" name="piholeUrl" placeholder="http://192.168.1.100" required
-            class="form-input">
+        <input type="text" id="piholeUrl" name="piholeUrl" placeholder="http://192.168.1.100" required class="form-input">
     </div>
 </div>
 
@@ -36,21 +38,94 @@
             Allow insecure HTTPS (self-signed certificate)
         </label>
     </div>
-    <p style="margin: 4px 0 0 0; color: var(--text-secondary, #666); font-size: 12px; padding-left: 24px;">
-        Enable this if your Pi-hole uses HTTPS with a self-signed certificate. This disables SSL certificate verification but keeps encryption enabled.
-    </p>
+</div>
+
+<div class="form-group">
+    <label class="form-label">Display Options:</label>
+    <div class="form-group" style="display: flex; flex-direction: column; gap: 8px;">
+        <div class="form-group nowrap">
+            <label for="customTitle" class="form-label">Custom Title (optional):</label>
+            <input type="text" id="customTitle" name="customTitle" class="form-input" placeholder="e.g. Pi-hole Statistics">
+        </div>
+        <div class="form-group nowrap">
+            <input type="checkbox" id="showTitle" name="showTitle" value="true" class="form-checkbox" checked>
+            <input type="hidden" name="showTitle" value="false">
+            <label for="showTitle" class="form-label" style="margin-left: 8px;">Show title row</label>
+        </div>
+        <div class="form-group nowrap">
+            <input type="checkbox" id="showStatus" name="showStatus" value="true" class="form-checkbox" checked>
+            <input type="hidden" name="showStatus" value="false">
+            <label for="showStatus" class="form-label" style="margin-left: 8px;">Show status (Enabled/Disabled)</label>
+        </div>
+        <div class="form-group nowrap">
+            <input type="checkbox" id="showQueries" name="showQueries" value="true" class="form-checkbox" checked>
+            <input type="hidden" name="showQueries" value="false">
+            <label for="showQueries" class="form-label" style="margin-left: 8px;">Show queries (total, blocked, %)</label>
+        </div>
+        <div class="form-group nowrap">
+            <input type="checkbox" id="showQueriesGraph" name="showQueriesGraph" value="true" class="form-checkbox">
+            <input type="hidden" name="showQueriesGraph" value="false">
+            <label for="showQueriesGraph" class="form-label" style="margin-left: 8px;">Show queries bar graph</label>
+        </div>
+        <div class="form-group nowrap">
+            <input type="checkbox" id="showClients" name="showClients" value="true" class="form-checkbox" checked>
+            <input type="hidden" name="showClients" value="false">
+            <label for="showClients" class="form-label" style="margin-left: 8px;">Show active clients</label>
+        </div>
+        <div class="form-group nowrap">
+            <input type="checkbox" id="showBlocklist" name="showBlocklist" value="true" class="form-checkbox" checked>
+            <input type="hidden" name="showBlocklist" value="false">
+            <label for="showBlocklist" class="form-label" style="margin-left: 8px;">Show blocklist domains</label>
+        </div>
+    </div>
+</div>
+
+<div class="form-group">
+    <label for="fontFamily" class="form-label">Font Family:</label>
+    <select id="fontFamily" name="fontFamily" class="form-input">
+        {% for font in font_families %}
+        <option value="{{ font }}">{{ font }}</option>
+        {% endfor %}
+    </select>
+</div>
+
+<div class="form-group">
+    <label for="fontWeight" class="form-label">Font Weight:</label>
+    <select id="fontWeight" name="fontWeight" class="form-input">
+        {% for w in font_weights %}
+        <option value="{{ w }}">{{ w | capitalize }}</option>
+        {% endfor %}
+    </select>
+</div>
+
+<div class="form-group">
+    <label for="fontSize" class="form-label">Font Size:</label>
+    <select id="fontSize" name="fontSize" class="form-input">
+        <option value="x-small">Extra Small</option>
+        <option value="small">Small</option>
+        <option value="normal" selected>Normal</option>
+        <option value="large">Large</option>
+        <option value="x-large">Extra Large</option>
+    </select>
 </div>
 
 <script>
-    // Populate form values from plugin settings
     document.addEventListener('DOMContentLoaded', () => {
         if (loadPluginSettings) {
-            // Populate text inputs
             document.getElementById('piholeUrl').value = pluginSettings.piholeUrl || '';
-            
-            // Populate checkbox
-            const allowInsecureSSL = pluginSettings.allowInsecureSSL === 'true' || pluginSettings.allowInsecureSSL === true;
-            document.getElementById('allowInsecureSSL').checked = allowInsecureSSL;
+            document.getElementById('allowInsecureSSL').checked = pluginSettings.allowInsecureSSL === 'true' || pluginSettings.allowInsecureSSL === true;
+            document.getElementById('customTitle').value = pluginSettings.customTitle || '';
+
+            document.getElementById('showTitle').checked = pluginSettings.showTitle !== 'false';
+            document.getElementById('showStatus').checked = pluginSettings.showStatus !== 'false';
+            document.getElementById('showQueries').checked = pluginSettings.showQueries !== 'false';
+            document.getElementById('showQueriesGraph').checked = pluginSettings.showQueriesGraph === 'true';
+            document.getElementById('showClients').checked = pluginSettings.showClients !== 'false';
+            document.getElementById('showBlocklist').checked = pluginSettings.showBlocklist !== 'false';
+
+            document.getElementById('fontFamily').value = pluginSettings.fontFamily || 'Jost';
+            document.getElementById('fontWeight').value = pluginSettings.fontWeight || 'normal';
+            document.getElementById('fontSize').value = pluginSettings.fontSize || 'normal';
         }
     });
 </script>

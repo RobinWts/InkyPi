@@ -176,5 +176,6 @@ mock_display_output/
 .cursorrules
 src/config/device_dev.json
 src/static/images/current_image.png
+src/static/html/
 
 src/config/device_dev.json

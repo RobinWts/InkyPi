@@ -101,4 +101,16 @@ class BasePlugin:
         template = self.env.get_template(html_file)
         rendered_html = template.render(template_params)
 
+        # Debug: save rendered HTML to src/static/html for inspection
+        html_dir = os.path.join(STATIC_DIR, "html")
+        try:
+            os.makedirs(html_dir, exist_ok=True)
+            plugin_id = self.get_plugin_id()
+            out_path = os.path.join(html_dir, f"{plugin_id}.html")
+            with open(out_path, "w", encoding="utf-8") as f:
+                f.write(rendered_html)
+            logger.debug("Saved rendered HTML to %s", out_path)
+        except OSError as e:
+            logger.warning("Could not save debug HTML to %s: %s", html_dir, e)
+
         return take_screenshot_html(rendered_html, dimensions)

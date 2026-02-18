@@ -63,7 +63,36 @@
                         "refresh": {
                             "interval": 120
                         },
-                        "latest_refresh_time": "2026-02-08T17:06:25.025375+00:00"
+                        "latest_refresh_time": "2026-02-18T11:41:47.443961+00:00"
+                    },
+                    {
+                        "plugin_id": "pihole",
+                        "name": "pi",
+                        "plugin_settings": {
+                            "piholeUrl": "http://192.168.2.200",
+                            "customTitle": "Title!!",
+                            "showTitle": "true",
+                            "showStatus": "true",
+                            "showQueries": "true",
+                            "showQueriesGraph": "true",
+                            "showClients": "true",
+                            "showBlocklist": "true",
+                            "fontFamily": "Jost",
+                            "fontWeight": "normal",
+                            "fontSize": "x-large",
+                            "selectedFrame": "None",
+                            "topMargin": "",
+                            "bottomMargin": "",
+                            "leftMargin": "",
+                            "rightMargin": "",
+                            "backgroundOption": "color",
+                            "backgroundColor": "#ffffff",
+                            "textColor": "#000000"
+                        },
+                        "refresh": {
+                            "interval": 60
+                        },
+                        "latest_refresh_time": "2026-02-18T11:51:23.520341+00:00"
                     }
                 ],
                 "current_plugin_index": null
@@ -72,11 +101,11 @@
         "active_playlist": null
     },
     "refresh_info": {
-        "refresh_time": "2026-02-08T17:06:25.025375+00:00",
-        "image_hash": "5a03f721af246e24db3623832bdfbc569fd8dc50b3a9935f4521b0f038fcd7ef",
+        "refresh_time": "2026-02-18T11:51:23.520341+00:00",
+        "image_hash": "bed03de66cbf73779778585de9b80533d6c38a9c77b76b72dd43124e092c87f2",
         "refresh_type": "Playlist",
-        "plugin_id": "calendar",
+        "plugin_id": "pihole",
         "playlist": "Default",
-        "plugin_instance": "gfds"
+        "plugin_instance": "pi"
     }
 }
