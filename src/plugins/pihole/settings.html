@@ -4,12 +4,18 @@
         <span style="font-size: 20px;">ℹ️</span>
         <div style="flex: 1;">
             <p style="margin: 0 0 8px 0; font-weight: bold; color: var(--text-primary, #333); font-size: 14px;">
-                API Token Required
+                Pi-hole Version & Configuration Notes
+            </p>
+            <p style="margin: 0 0 8px 0; color: var(--text-secondary, #666); font-size: 13px; line-height: 1.5;">
+                <strong>Version Requirement:</strong> This plugin requires <strong>Pi-hole v6 or later</strong>. It uses the modern REST API (<code>/api/*</code>) and does not support older token-based APIs.
+            </p>
+            <p style="margin: 0 0 8px 0; color: var(--text-secondary, #666); font-size: 13px; line-height: 1.5;">
+                <strong>Authentication:</strong> If your Pi-hole has <strong>no password</strong> set, this plugin can query the API without authentication.
+                If your Pi-hole is password protected, set <code>PIHOLE_PASSWORD=your_password_or_app_password</code> via the
+                <strong>API Keys</strong> page in the web UI or in your <code>.env</code> file.
             </p>
             <p style="margin: 0; color: var(--text-secondary, #666); font-size: 13px; line-height: 1.5;">
-                This plugin requires a Pi-hole API token from your Pi-hole server. Set it via the <strong>API
-                    Keys</strong> page in the web UI or add <code>PIHOLE_API_TOKEN=your_token_here</code> to your
-                <code>.env</code> file manually.
+                <strong>Self-Signed Certificates:</strong> Pi-hole v6+ automatically creates self-signed SSL certificates. If you're using HTTPS and getting SSL errors, enable "Allow insecure HTTPS" below. This only affects certificate verification, not encryption.
             </p>
         </div>
     </div>
@@ -23,12 +29,28 @@
     </div>
 </div>
 
+<div class="form-group">
+    <div class="form-group nowrap">
+        <input type="checkbox" id="allowInsecureSSL" name="allowInsecureSSL" value="true" class="form-checkbox">
+        <label for="allowInsecureSSL" class="form-label" style="margin-left: 8px;">
+            Allow insecure HTTPS (self-signed certificate)
+        </label>
+    </div>
+    <p style="margin: 4px 0 0 0; color: var(--text-secondary, #666); font-size: 12px; padding-left: 24px;">
+        Enable this if your Pi-hole uses HTTPS with a self-signed certificate. This disables SSL certificate verification but keeps encryption enabled.
+    </p>
+</div>
+
 <script>
     // Populate form values from plugin settings
     document.addEventListener('DOMContentLoaded', () => {
         if (loadPluginSettings) {
             // Populate text inputs
             document.getElementById('piholeUrl').value = pluginSettings.piholeUrl || '';
+            
+            // Populate checkbox
+            const allowInsecureSSL = pluginSettings.allowInsecureSSL === 'true' || pluginSettings.allowInsecureSSL === true;
+            document.getElementById('allowInsecureSSL').checked = allowInsecureSSL;
         }
     });
 </script>
