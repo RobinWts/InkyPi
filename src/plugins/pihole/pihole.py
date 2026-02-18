@@ -12,6 +12,12 @@ class PiholeRateLimitError(RuntimeError):
 
 
 class Pihole(BasePlugin):
+    @classmethod
+    def get_blueprint(cls):
+        """Return the Flask blueprint for this plugin's API routes."""
+        from . import api
+        return api.pihole_bp
+
     def generate_settings_template(self):
         template_params = super().generate_settings_template()
         template_params["style_settings"] = True

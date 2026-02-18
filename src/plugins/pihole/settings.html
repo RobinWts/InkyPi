@@ -1,28 +1,71 @@
-<div class="form-group"
-    style="padding: 16px; background: rgba(33, 150, 243, 0.1); border: 1px solid rgba(33, 150, 243, 0.3); border-radius: 8px; margin-bottom: 20px;">
-    <div style="display: flex; align-items: flex-start; gap: 12px;">
-        <span style="font-size: 20px;">ℹ️</span>
-        <div style="flex: 1;">
-            <p style="margin: 0 0 8px 0; font-weight: bold; color: var(--text-primary, #333); font-size: 14px;">
-                Pi-hole Version & Configuration Notes
-            </p>
-            <p style="margin: 0 0 8px 0; color: var(--text-secondary, #666); font-size: 13px; line-height: 1.5;">
-                <strong>Version Requirement:</strong> This plugin requires <strong>Pi-hole v6 or later</strong>. It uses
-                the modern REST API (<code>/api/*</code>) and does not support older token-based APIs.
-            </p>
-            <p style="margin: 0 0 8px 0; color: var(--text-secondary, #666); font-size: 13px; line-height: 1.5;">
-                <strong>Authentication:</strong> If your Pi-hole has <strong>no password</strong> set, this plugin can
-                query the API without authentication.
-                If your Pi-hole is password protected, set <code>PIHOLE_PASSWORD=your_password_or_app_password</code>
-                via the <strong>API Keys</strong> page in the web UI or in your <code>.env</code> file.
-            </p>
-            <p style="margin: 0; color: var(--text-secondary, #666); font-size: 13px; line-height: 1.5;">
-                <strong>Self-Signed Certificates:</strong> Pi-hole v6+ automatically creates self-signed SSL
-                certificates. If you're using HTTPS and getting SSL errors, enable "Allow insecure HTTPS" below.
-            </p>
-        </div>
+<details class="pihole-info-box">
+    <summary class="pihole-info-box-header">
+        <span class="pihole-info-box-icon" aria-hidden="true">ℹ️</span>
+        <span class="pihole-info-box-title">Pi-hole Version & Configuration Notes (click to expand)</span>
+    </summary>
+    <div class="pihole-info-box-body">
+        <p><strong>Version Requirement:</strong> This plugin requires <strong>Pi-hole v6 or later</strong>. It uses
+            the modern REST API (<code>/api/*</code>) and does not support older token-based APIs.</p>
+        <p><strong>Authentication:</strong> If your Pi-hole has <strong>no password</strong> set, this plugin can
+            query the API without authentication.
+            If your Pi-hole is password protected, set <code>PIHOLE_PASSWORD=your_password_or_app_password</code>
+            via the <strong>API Keys</strong> page in the web UI or in your <code>.env</code> file.</p>
+        <p><strong>Self-Signed Certificates:</strong> Pi-hole v6+ automatically creates self-signed SSL
+            certificates. If you're using HTTPS and getting SSL errors, enable "Allow insecure HTTPS" below.</p>
     </div>
-</div>
+</details>
+<style>
+.pihole-info-box {
+    padding: 16px;
+    background: rgba(33, 150, 243, 0.1);
+    border: 1px solid rgba(33, 150, 243, 0.3);
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+.pihole-info-box-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: bold;
+    color: var(--text-primary, #333);
+    font-size: 14px;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+}
+.pihole-info-box-header::-webkit-details-marker { display: none; }
+.pihole-info-box-header::marker { display: none; }
+.pihole-info-box-icon { font-size: 20px; flex-shrink: 0; }
+.pihole-info-box-title { flex: 1; }
+.pihole-info-box-body {
+    margin-top: 12px;
+    padding-left: 32px;
+}
+.pihole-info-box-body p {
+    margin: 0 0 8px 0;
+    color: var(--text-secondary, #666);
+    font-size: 13px;
+    line-height: 1.5;
+}
+.pihole-info-box-body p:last-child { margin-bottom: 0; }
+.pihole-info-box-body ul {
+    margin: 4px 0 8px 0;
+    padding-left: 20px;
+    color: var(--text-secondary, #666);
+    font-size: 13px;
+    line-height: 1.5;
+}
+.pihole-info-box-body li {
+    margin-bottom: 4px;
+}
+.pihole-info-box-body a {
+    color: rgba(33, 150, 243, 0.9);
+    text-decoration: underline;
+}
+.pihole-info-box-body a:hover {
+    color: rgba(33, 150, 243, 1);
+}
+</style>
 
 <div class="form-group">
     <div class="form-group nowrap">
@@ -108,6 +151,31 @@
         <option value="x-large">Extra Large</option>
     </select>
 </div>
+
+<details class="pihole-info-box">
+    <summary class="pihole-info-box-header">
+        <span class="pihole-info-box-icon" aria-hidden="true">🔘</span>
+        <span class="pihole-info-box-title">Hardware buttons registration (click to expand)</span>
+    </summary>
+    <div class="pihole-info-box-body">
+        <p><strong>Hardware Button Actions:</strong> This plugin registers actions that can be bound to physical buttons using the Hardware Buttons plugin.</p>
+        <p><strong>Anytime Action:</strong></p>
+        <ul>
+            <li><strong>Show Pihole:</strong> Forces the Pi-hole plugin to display immediately, regardless of what is currently shown.</li>
+        </ul>
+        <p><strong>Display Actions</strong> (only work when Pi-hole is currently displayed):</p>
+        <ul>
+            <li><strong>Display Action 1:</strong> Toggle blocking — Switches blocking on or off based on current status.</li>
+            <li><strong>Display Action 2:</strong> Blocking off — Disables blocking permanently.</li>
+            <li><strong>Display Action 3:</strong> Blocking on — Enables blocking.</li>
+            <li><strong>Display Action 4:</strong> Blocking off 5 minutes — Temporarily disables blocking for 5 minutes.</li>
+            <li><strong>Display Action 5:</strong> Blocking off 30 minutes — Temporarily disables blocking for 30 minutes.</li>
+            <li><strong>Display Action 6:</strong> Blocking off 1 hour — Temporarily disables blocking for 1 hour.</li>
+        </ul>
+        <p><strong>Plugin Required:</strong> To use these actions, you need to install the <strong>Hardware Buttons</strong> plugin. After installation, configure buttons in the Hardware Buttons plugin settings and bind them to these actions.</p>
+        <p><strong>Installation:</strong> The Hardware Buttons plugin can be found at <a href="https://github.com/RobinWts/InkyPi-Plugin-hardwarebuttons" target="_blank" rel="noopener noreferrer">https://github.com/RobinWts/InkyPi-Plugin-hardwarebuttons</a></p>
+    </div>
+</details>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {

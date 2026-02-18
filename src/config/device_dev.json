@@ -70,7 +70,8 @@
                         "name": "pi",
                         "plugin_settings": {
                             "piholeUrl": "http://192.168.2.200",
-                            "customTitle": "Title!!",
+                            "allowInsecureSSL": "true",
+                            "customTitle": "Pi-Hole stats",
                             "showTitle": "true",
                             "showStatus": "true",
                             "showQueries": "true",
@@ -78,7 +79,7 @@
                             "showClients": "true",
                             "showBlocklist": "true",
                             "fontFamily": "Jost",
-                            "fontWeight": "normal",
+                            "fontWeight": "bold",
                             "fontSize": "x-large",
                             "selectedFrame": "None",
                             "topMargin": "",
@@ -92,7 +93,7 @@
                         "refresh": {
                             "interval": 60
                         },
-                        "latest_refresh_time": "2026-02-18T12:09:58.375946+00:00"
+                        "latest_refresh_time": "2026-02-18T12:28:10.232664+00:00"
                     }
                 ],
                 "current_plugin_index": null
@@ -101,8 +102,8 @@
         "active_playlist": null
     },
     "refresh_info": {
-        "refresh_time": "2026-02-18T12:09:58.375946+00:00",
-        "image_hash": "15eca9b139fbca71891cbfce5fc423654d8973e714df292a62d3c3edff60fd0b",
+        "refresh_time": "2026-02-18T12:28:10.232664+00:00",
+        "image_hash": "2fd9647b7860c389f126f4fdcb8b0ddf447619852693c76342f3a233ccbfb920",
         "refresh_type": "Playlist",
         "plugin_id": "pihole",
         "playlist": "Default",
