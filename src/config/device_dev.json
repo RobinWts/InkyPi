@@ -75,10 +75,10 @@
                             "showTitle": "true",
                             "showStatus": "true",
                             "showQueries": "true",
-                            "showQueriesGraph": "true",
+                            "showQueriesGraph": "false",
                             "showClients": "true",
                             "showBlocklist": "true",
-                            "fontFamily": "Jost",
+                            "fontFamily": "DS-Digital",
                             "fontWeight": "bold",
                             "fontSize": "x-large",
                             "selectedFrame": "None",
@@ -93,7 +93,7 @@
                         "refresh": {
                             "interval": 60
                         },
-                        "latest_refresh_time": "2026-02-18T12:28:10.232664+00:00"
+                        "latest_refresh_time": "2026-02-18T12:57:44.649979+00:00"
                     }
                 ],
                 "current_plugin_index": null
@@ -102,11 +102,33 @@
         "active_playlist": null
     },
     "refresh_info": {
-        "refresh_time": "2026-02-18T12:28:10.232664+00:00",
-        "image_hash": "2fd9647b7860c389f126f4fdcb8b0ddf447619852693c76342f3a233ccbfb920",
+        "refresh_time": "2026-02-18T12:57:44.649979+00:00",
+        "image_hash": "6d1965b54c70b4e4786d98660e0952eae850d5049325edce690241d6b6b2556e",
         "refresh_type": "Playlist",
         "plugin_id": "pihole",
         "playlist": "Default",
         "plugin_instance": "pi"
+    },
+    "hardwarebuttons": {
+        "timings": {
+            "short_press_ms": 500,
+            "double_click_interval_ms": 500,
+            "long_press_ms": 1000
+        },
+        "buttons": [
+            {
+                "id": "btn_0",
+                "gpio_pin": 27,
+                "short_action": "hardwarebuttonsregtest_force_display",
+                "double_action": "pihole_show_pihole",
+                "long_action": "display_action_1",
+                "script_path_short": null,
+                "script_path_double": null,
+                "script_path_long": null,
+                "url_short": null,
+                "url_double": null,
+                "url_long": null
+            }
+        ]
     }
 }

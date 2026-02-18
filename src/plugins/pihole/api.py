@@ -68,6 +68,62 @@ def _register_actions(state):
                         return pl
         return None
 
+    def _get_displayed_pihole_instance(refs):
+        """Resolve the Pi-hole instance that is currently displayed (for display actions).
+
+        Uses refresh_info so we use the same instance that is on screen, not a random one.
+        Falls back to current_plugin_instance from refs, then to refresh_info lookup.
+        """
+        device_config = refs.get("device_config")
+        if not device_config:
+            return None, None
+
+        # Prefer instance already resolved by action_registry
+        current_instance = refs.get("current_plugin_instance")
+        if current_instance and getattr(current_instance, "plugin_id", None) == "pihole":
+            playlist = _find_playlist_for_instance(refs, current_instance)
+            return playlist, current_instance
+
+        # Resolve from refresh_info: this is the instance that is actually displayed
+        refresh_info = device_config.get_refresh_info()
+        if not refresh_info:
+            return None, None
+
+        plugin_id = getattr(refresh_info, "plugin_id", None)
+        if plugin_id != "pihole":
+            return None, None
+
+        playlist_name = getattr(refresh_info, "playlist", None)
+        instance_name = getattr(refresh_info, "plugin_instance", None)
+
+        if playlist_name and instance_name and getattr(refresh_info, "refresh_type", None) == "Playlist":
+            playlist_manager = device_config.get_playlist_manager()
+            playlist = playlist_manager.get_playlist(playlist_name)
+            if playlist:
+                instance = playlist.find_plugin("pihole", instance_name)
+                if instance:
+                    return playlist, instance
+
+        # Manual Update or missing playlist context: use active playlist's pihole instance
+        playlist_manager = device_config.get_playlist_manager()
+        active_name = playlist_manager.active_playlist
+        if active_name:
+            playlist = playlist_manager.get_playlist(active_name)
+            if playlist:
+                for pi in playlist.plugins:
+                    if pi.plugin_id == "pihole":
+                        return playlist, pi
+
+        # Last resort: any pihole instance in any playlist
+        for name in playlist_manager.get_playlist_names():
+            pl = playlist_manager.get_playlist(name)
+            if pl:
+                for pi in pl.plugins:
+                    if pi.plugin_id == "pihole":
+                        return pl, pi
+
+        return None, None
+
     def anytime_show_pihole(refs):
         """Anytime action: force display of pihole plugin."""
         playlist, instance = _find_pihole_instance(refs)
@@ -78,10 +134,10 @@ def _register_actions(state):
             logger.warning("pihole: no instance found for 'show Pihole' action")
 
     def _set_blocking(refs, blocking, timer_seconds=None):
-        """Set Pi-hole blocking status via API."""
-        current_instance = refs.get("current_plugin_instance")
+        """Set Pi-hole blocking status via API. Uses the instance that is currently displayed."""
+        _playlist, current_instance = _get_displayed_pihole_instance(refs)
         if not current_instance:
-            logger.warning("pihole: no current instance for blocking action")
+            logger.warning("pihole: no displayed pihole instance for blocking action")
             return False
 
         settings = current_instance.settings
@@ -94,8 +150,12 @@ def _register_actions(state):
         device_config = refs.get("device_config")
 
         try:
-            # Create plugin instance for helper methods
-            pihole_instance = plugin_module.Pihole()
+            # Get plugin config to create plugin instance for helper methods
+            plugin_config = device_config.get_plugin("pihole")
+            if not plugin_config:
+                logger.error("pihole: plugin config not found")
+                return False
+            pihole_instance = plugin_module.Pihole(plugin_config)
 
             # Authenticate if needed
             password = (device_config.load_env_key("PIHOLE_PASSWORD") or "").strip()
@@ -133,8 +193,8 @@ def _register_actions(state):
             return False
 
     def _get_blocking_status(refs):
-        """Get current blocking status from Pi-hole API."""
-        current_instance = refs.get("current_plugin_instance")
+        """Get current blocking status from Pi-hole API. Uses the instance that is currently displayed."""
+        _playlist, current_instance = _get_displayed_pihole_instance(refs)
         if not current_instance:
             return None
 
@@ -147,7 +207,11 @@ def _register_actions(state):
         device_config = refs.get("device_config")
 
         try:
-            pihole_instance = plugin_module.Pihole()
+            # Get plugin config to create plugin instance for helper methods
+            plugin_config = device_config.get_plugin("pihole")
+            if not plugin_config:
+                return None
+            pihole_instance = plugin_module.Pihole(plugin_config)
             password = (device_config.load_env_key("PIHOLE_PASSWORD") or "").strip()
             headers = {}
             if password:
@@ -167,7 +231,7 @@ def _register_actions(state):
 
     def display_toggle_blocking(refs):
         """Display action 1: toggle blocking status."""
-        current_instance = refs.get("current_plugin_instance")
+        playlist, current_instance = _get_displayed_pihole_instance(refs)
         if not current_instance:
             return
 
@@ -178,52 +242,46 @@ def _register_actions(state):
 
         new_status = not current_status
         if _set_blocking(refs, new_status):
-            playlist = _find_playlist_for_instance(refs, current_instance)
             _force_refresh(refs, playlist, current_instance)
 
     def display_blocking_off(refs):
         """Display action 2: set blocking to off (permanent)."""
-        current_instance = refs.get("current_plugin_instance")
+        playlist, current_instance = _get_displayed_pihole_instance(refs)
         if not current_instance:
             return
         if _set_blocking(refs, False):
-            playlist = _find_playlist_for_instance(refs, current_instance)
             _force_refresh(refs, playlist, current_instance)
 
     def display_blocking_on(refs):
         """Display action 3: set blocking to on."""
-        current_instance = refs.get("current_plugin_instance")
+        playlist, current_instance = _get_displayed_pihole_instance(refs)
         if not current_instance:
             return
         if _set_blocking(refs, True):
-            playlist = _find_playlist_for_instance(refs, current_instance)
             _force_refresh(refs, playlist, current_instance)
 
     def display_blocking_off_5min(refs):
         """Display action 4: disable blocking for 5 minutes."""
-        current_instance = refs.get("current_plugin_instance")
+        playlist, current_instance = _get_displayed_pihole_instance(refs)
         if not current_instance:
             return
         if _set_blocking(refs, False, timer_seconds=300):
-            playlist = _find_playlist_for_instance(refs, current_instance)
             _force_refresh(refs, playlist, current_instance)
 
     def display_blocking_off_30min(refs):
         """Display action 5: disable blocking for 30 minutes."""
-        current_instance = refs.get("current_plugin_instance")
+        playlist, current_instance = _get_displayed_pihole_instance(refs)
         if not current_instance:
             return
         if _set_blocking(refs, False, timer_seconds=1800):
-            playlist = _find_playlist_for_instance(refs, current_instance)
             _force_refresh(refs, playlist, current_instance)
 
     def display_blocking_off_1hour(refs):
         """Display action 6: disable blocking for 1 hour."""
-        current_instance = refs.get("current_plugin_instance")
+        playlist, current_instance = _get_displayed_pihole_instance(refs)
         if not current_instance:
             return
         if _set_blocking(refs, False, timer_seconds=3600):
-            playlist = _find_playlist_for_instance(refs, current_instance)
             _force_refresh(refs, playlist, current_instance)
 
     action_registry.register_actions(
