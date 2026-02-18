@@ -1,6 +1,14 @@
 {% extends "plugin.html" %}
 
 {% block content %}
+{% if rate_limited %}
+<div class="pihole-rate-limit" style="
+    font-family: {{ plugin_settings.fontFamily|default('Jost') }};
+    color: {{ plugin_settings.textColor|default('#000000') }};
+">
+    <span class="pihole-rate-limit-message">Rate limit exceeded, try again later.</span>
+</div>
+{% else %}
 <div class="pihole-dashboard" style="
     --font-family: {{ font_family }};
     --font-weight: {{ font_weight }};
@@ -63,4 +71,5 @@
     </div>
     {% endif %}
 </div>
+{% endif %}
 {% endblock %}
