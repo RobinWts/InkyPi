@@ -125,13 +125,25 @@ def _register_actions(state):
         return None, None
 
     def anytime_show_pihole(refs):
-        """Anytime action: force display of pihole plugin."""
-        playlist, instance = _find_pihole_instance(refs)
+        """Anytime action: force display of pihole plugin.
+        
+        Prefers the currently displayed pihole instance if one exists, otherwise
+        finds any pihole instance. Gracefully does nothing if no instance exists.
+        """
+        # First try to use the currently displayed instance (if pihole is on screen)
+        playlist, instance = _get_displayed_pihole_instance(refs)
+        
+        # If nothing is displayed or it's not pihole, find any pihole instance
+        if not instance:
+            playlist, instance = _find_pihole_instance(refs)
+        
+        # If we found an instance, force refresh it
         if playlist and instance:
             _force_refresh(refs, playlist, instance)
-            logger.info("pihole: anytime action 'show Pihole' triggered")
+            logger.info("pihole: anytime action 'show Pihole' triggered for instance '%s'", instance.name)
         else:
-            logger.warning("pihole: no instance found for 'show Pihole' action")
+            # No pihole instance exists - gracefully do nothing
+            logger.debug("pihole: anytime action 'show Pihole' - no pihole instance found, doing nothing")
 
     def _set_blocking(refs, blocking, timer_seconds=None):
         """Set Pi-hole blocking status via API. Uses the instance that is currently displayed."""
