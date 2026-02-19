@@ -53,10 +53,10 @@ def get_plugin_instance(plugin_config):
 
 def register_plugin_blueprints(app):
     """Register blueprints from plugins that expose them via get_blueprint() method.
-    
+
     This is a generic mechanism that allows any plugin to register Flask blueprints
     by implementing a get_blueprint() class method that returns a Blueprint instance.
-    
+
     Args:
         app: Flask application instance to register blueprints with
     """

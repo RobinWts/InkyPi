@@ -63,14 +63,14 @@
                         "refresh": {
                             "interval": 120
                         },
-                        "latest_refresh_time": "2026-02-18T11:41:47.443961+00:00"
+                        "latest_refresh_time": "2026-02-19T07:01:49.944675+00:00"
                     },
                     {
                         "plugin_id": "pihole",
                         "name": "ph",
                         "plugin_settings": {
                             "piholeUrl": "http://192.168.2.200",
-                            "customTitle": "",
+                            "customTitle": "Pi-Hole Statistics",
                             "showTitle": "true",
                             "showStatus": "true",
                             "showQueries": "true",
@@ -79,7 +79,7 @@
                             "showBlocklist": "true",
                             "fontFamily": "Jost",
                             "fontWeight": "bold",
-                            "fontSize": "normal",
+                            "fontSize": "x-large",
                             "selectedFrame": "None",
                             "topMargin": "",
                             "bottomMargin": "",
@@ -92,17 +92,17 @@
                         "refresh": {
                             "interval": 60
                         },
-                        "latest_refresh_time": "2026-02-18T13:24:10.882557+00:00"
+                        "latest_refresh_time": "2026-02-19T09:43:21.322428+00:00"
                     }
                 ],
-                "current_plugin_index": null
+                "current_plugin_index": 1
             }
         ],
-        "active_playlist": null
+        "active_playlist": "Default"
     },
     "refresh_info": {
-        "refresh_time": "2026-02-18T13:24:10.882557+00:00",
-        "image_hash": "3a286c918d3ac0a7549ee9c761b7c29f2248af0890567913165ad4ca1375f6f5",
+        "refresh_time": "2026-02-19T09:43:21.322428+00:00",
+        "image_hash": "ad899cc1b1505ee876741c42f7e1ce2af211c8c6d407cf28d9181c1d19738f96",
         "refresh_type": "Playlist",
         "plugin_id": "pihole",
         "playlist": "Default",
