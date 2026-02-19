@@ -159,6 +159,34 @@ body {
     margin-top: 0.5vh;
 }
 
+/* Clients + Blocklist combined box - left and right */
+.pihole-clients-blocklist .clients-blocklist-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: stretch;
+    gap: 2vw;
+    width: 100%;
+}
+
+.pihole-clients-blocklist .clients-blocklist-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+}
+
+.pihole-clients-blocklist .clients-blocklist-item:first-child {
+    align-items: flex-start;
+    text-align: left;
+}
+
+.pihole-clients-blocklist .clients-blocklist-item:last-child {
+    align-items: flex-end;
+    text-align: right;
+}
+
 /* Top clients list */
 .pihole-top-clients .top-clients-list {
     list-style: none;
@@ -318,5 +346,10 @@ body {
     .pihole-history-chart {
         flex: 2 1 100%;
         min-width: min(80vw, 400px);
+    }
+
+    .pihole-clients-blocklist {
+        flex: 1 1 calc(33% - 1vw);
+        min-width: min(25vw, 120px);
     }
 }

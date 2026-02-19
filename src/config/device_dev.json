@@ -75,11 +75,10 @@
                             "showStatus": "true",
                             "showQueries": "true",
                             "showQueriesGraph": "false",
-                            "showQueriesForwarded": "true",
-                            "showClients": "false",
+                            "showQueriesForwarded": "false",
+                            "showClientsBlocklist": "true",
                             "showTopClients": "false",
                             "showHistoryChart": "true",
-                            "showBlocklist": "false",
                             "fontFamily": "Jost",
                             "fontWeight": "bold",
                             "fontSize": "x-large",
@@ -101,7 +100,7 @@
                         "refresh": {
                             "interval": 60
                         },
-                        "latest_refresh_time": "2026-02-19T11:33:22.243425+00:00"
+                        "latest_refresh_time": "2026-02-19T16:19:01.133226+00:00"
                     }
                 ],
                 "current_plugin_index": 1
@@ -110,8 +109,8 @@
         "active_playlist": "Default"
     },
     "refresh_info": {
-        "refresh_time": "2026-02-19T11:33:22.243425+00:00",
-        "image_hash": "aeaa9f3a0445c45cf5e759c29aadc7d73ea14a8536120656832123262ebb82b1",
+        "refresh_time": "2026-02-19T16:19:01.133226+00:00",
+        "image_hash": "cfc3d6fa3d4e783ec3f8b5c1db462fcb88d28952eb701f85043bea880ddd4f53",
         "refresh_type": "Playlist",
         "plugin_id": "pihole",
         "playlist": "Default",

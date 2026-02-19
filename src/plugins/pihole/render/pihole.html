@@ -76,10 +76,18 @@
     </div>
     {% endif %}
 
-    {% if show_clients %}
-    <div class="pihole-section pihole-clients">
-        <div class="section-label">Active Clients</div>
-        <div class="section-value">{{ stats.active_clients or 0 }}</div>
+    {% if show_clients_blocklist %}
+    <div class="pihole-section pihole-clients-blocklist">
+        <div class="clients-blocklist-row">
+            <div class="clients-blocklist-item">
+                <div class="section-label">Active Clients</div>
+                <div class="section-value">{{ stats.active_clients or 0 }}</div>
+            </div>
+            <div class="clients-blocklist-item">
+                <div class="section-label">Blocklist</div>
+                <div class="section-value">{{ stats.domains_being_blocked or 0 }}</div>
+            </div>
+        </div>
     </div>
     {% endif %}
 
@@ -135,13 +143,6 @@
         {% else %}
         <div class="top-clients-unavailable">not available</div>
         {% endif %}
-    </div>
-    {% endif %}
-
-    {% if show_blocklist %}
-    <div class="pihole-section pihole-blocklist">
-        <div class="section-label">Blocklist</div>
-        <div class="section-value">{{ stats.domains_being_blocked or 0 }}</div>
     </div>
     {% endif %}
 </div>
