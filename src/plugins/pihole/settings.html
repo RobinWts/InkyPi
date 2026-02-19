@@ -65,6 +65,38 @@
 .pihole-info-box-body a:hover {
     color: rgba(33, 150, 243, 1);
 }
+
+/* Display options: align left, checkboxes in a column */
+.pihole-display-options {
+    align-items: flex-start;
+}
+.pihole-display-options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+    width: 100%;
+}
+.pihole-option-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+.pihole-checkbox-row {
+    flex-wrap: nowrap;
+}
+.pihole-checkbox-row .form-checkbox {
+    flex-shrink: 0;
+    margin: 0;
+}
+.pihole-checkbox-row .form-label {
+    margin: 0;
+}
+.pihole-option-label {
+    min-width: 140px;
+    flex-shrink: 0;
+}
 </style>
 
 <div class="form-group">
@@ -83,57 +115,57 @@
     </div>
 </div>
 
-<div class="form-group">
+<div class="form-group pihole-display-options">
     <label class="form-label">Display Options:</label>
-    <div class="form-group" style="display: flex; flex-direction: column; gap: 8px;">
-        <div class="form-group nowrap">
-            <label for="customTitle" class="form-label">Custom Title (optional):</label>
+    <div class="pihole-display-options-list">
+        <div class="form-group nowrap pihole-option-row">
+            <label for="customTitle" class="form-label pihole-option-label">Custom Title (optional):</label>
             <input type="text" id="customTitle" name="customTitle" class="form-input" placeholder="e.g. Pi-hole Statistics">
         </div>
-        <div class="form-group nowrap">
+        <div class="form-group nowrap pihole-option-row pihole-checkbox-row">
             <input type="checkbox" id="showTitle" name="showTitle" value="true" class="form-checkbox" checked>
             <input type="hidden" name="showTitle" value="false">
-            <label for="showTitle" class="form-label" style="margin-left: 8px;">Show title row</label>
+            <label for="showTitle" class="form-label">Show title row</label>
         </div>
-        <div class="form-group nowrap">
+        <div class="form-group nowrap pihole-option-row pihole-checkbox-row">
             <input type="checkbox" id="showStatus" name="showStatus" value="true" class="form-checkbox" checked>
             <input type="hidden" name="showStatus" value="false">
-            <label for="showStatus" class="form-label" style="margin-left: 8px;">Show status (Enabled/Disabled)</label>
+            <label for="showStatus" class="form-label">Show status (Enabled/Disabled)</label>
         </div>
-        <div class="form-group nowrap">
+        <div class="form-group nowrap pihole-option-row pihole-checkbox-row">
             <input type="checkbox" id="showQueries" name="showQueries" value="true" class="form-checkbox" checked>
             <input type="hidden" name="showQueries" value="false">
-            <label for="showQueries" class="form-label" style="margin-left: 8px;">Show queries (total, blocked, %)</label>
+            <label for="showQueries" class="form-label">Show queries (total, blocked, %)</label>
         </div>
-        <div class="form-group nowrap">
+        <div class="form-group nowrap pihole-option-row pihole-checkbox-row">
             <input type="checkbox" id="showQueriesGraph" name="showQueriesGraph" value="true" class="form-checkbox" checked>
             <input type="hidden" name="showQueriesGraph" value="false">
-            <label for="showQueriesGraph" class="form-label" style="margin-left: 8px;">Show queries bar graph</label>
+            <label for="showQueriesGraph" class="form-label">Show queries bar graph</label>
         </div>
-        <div class="form-group nowrap">
+        <div class="form-group nowrap pihole-option-row pihole-checkbox-row">
             <input type="checkbox" id="showQueriesForwarded" name="showQueriesForwarded" value="true" class="form-checkbox" checked>
             <input type="hidden" name="showQueriesForwarded" value="false">
-            <label for="showQueriesForwarded" class="form-label" style="margin-left: 8px;">Show queries forwarded and cached</label>
+            <label for="showQueriesForwarded" class="form-label">Show queries forwarded and cached</label>
         </div>
-        <div class="form-group nowrap">
+        <div class="form-group nowrap pihole-option-row pihole-checkbox-row">
             <input type="checkbox" id="showClients" name="showClients" value="true" class="form-checkbox" checked>
             <input type="hidden" name="showClients" value="false">
-            <label for="showClients" class="form-label" style="margin-left: 8px;">Show active clients</label>
+            <label for="showClients" class="form-label">Show active clients</label>
         </div>
-        <div class="form-group nowrap">
+        <div class="form-group nowrap pihole-option-row pihole-checkbox-row">
             <input type="checkbox" id="showTopClients" name="showTopClients" value="true" class="form-checkbox" checked>
             <input type="hidden" name="showTopClients" value="false">
-            <label for="showTopClients" class="form-label" style="margin-left: 8px;">Show top 5 clients</label>
+            <label for="showTopClients" class="form-label">Show top 5 clients</label>
         </div>
-        <div class="form-group nowrap">
+        <div class="form-group nowrap pihole-option-row pihole-checkbox-row">
             <input type="checkbox" id="showHistoryChart" name="showHistoryChart" value="true" class="form-checkbox" checked>
             <input type="hidden" name="showHistoryChart" value="false">
-            <label for="showHistoryChart" class="form-label" style="margin-left: 8px;">Show 24h queries chart</label>
+            <label for="showHistoryChart" class="form-label">Show 24h queries chart</label>
         </div>
-        <div class="form-group nowrap">
+        <div class="form-group nowrap pihole-option-row pihole-checkbox-row">
             <input type="checkbox" id="showBlocklist" name="showBlocklist" value="true" class="form-checkbox" checked>
             <input type="hidden" name="showBlocklist" value="false">
-            <label for="showBlocklist" class="form-label" style="margin-left: 8px;">Show blocklist domains</label>
+            <label for="showBlocklist" class="form-label">Show blocklist domains</label>
         </div>
     </div>
 </div>
