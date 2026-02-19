@@ -83,6 +83,12 @@
                             "fontFamily": "Jost",
                             "fontWeight": "bold",
                             "fontSize": "x-large",
+                            "displayAction1": "off_5m",
+                            "displayAction2": "off",
+                            "displayAction3": "on",
+                            "displayAction4": "off_5m",
+                            "displayAction5": "off_30m",
+                            "displayAction6": "off_1h",
                             "selectedFrame": "None",
                             "topMargin": "",
                             "bottomMargin": "",
@@ -95,7 +101,7 @@
                         "refresh": {
                             "interval": 60
                         },
-                        "latest_refresh_time": "2026-02-19T11:20:43.697639+00:00"
+                        "latest_refresh_time": "2026-02-19T11:33:22.243425+00:00"
                     }
                 ],
                 "current_plugin_index": 1
@@ -104,8 +110,8 @@
         "active_playlist": "Default"
     },
     "refresh_info": {
-        "refresh_time": "2026-02-19T11:20:43.697639+00:00",
-        "image_hash": "d5a1548875248fb88c210d465bd001a4596c8e59bb22e7e63dd54cf01a3ba8ba",
+        "refresh_time": "2026-02-19T11:33:22.243425+00:00",
+        "image_hash": "aeaa9f3a0445c45cf5e759c29aadc7d73ea14a8536120656832123262ebb82b1",
         "refresh_type": "Playlist",
         "plugin_id": "pihole",
         "playlist": "Default",
@@ -123,7 +129,7 @@
                 "gpio_pin": 27,
                 "short_action": "hardwarebuttonsregtest_force_display",
                 "double_action": "pihole_show_pihole",
-                "long_action": "display_action_1",
+                "long_action": "display_action_0",
                 "script_path_short": null,
                 "script_path_double": null,
                 "script_path_long": null,

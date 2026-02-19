@@ -19,7 +19,7 @@ The plugin uses the **Pi-hole v6+ REST API** (`/api/*`). No API token in the UI;
 **Hardware button actions** (requires the [Hardware Buttons](https://github.com/RobinWts/InkyPi-Plugin-hardwarebuttons) plugin):
 
 - **Anytime:** *Show Pihole* — Forces the Pi-hole view to display (requires at least one Pi-hole instance in a playlist).
-- **Display actions** (when Pi-hole is on screen): toggle blocking, blocking on, blocking off, or disable blocking for 5 / 30 / 60 minutes. Each display action triggers a refresh after changing the setting.
+- **Display actions** (when Pi-hole is on screen): Map the 6 Display Action slots to Pi-hole actions (toggle blocking, blocking on, blocking off, or disable blocking for 5 / 30 / 60 minutes). Configure the mapping in the plugin settings; changes apply immediately after save (no reload).
 
 **Requirements:**
 
@@ -40,7 +40,7 @@ No additional Python dependencies.
 - **Display options** — Optional custom title; toggles for title row, status, queries, queries bar graph, queries forwarded/cached, active clients, top 5 clients, 24h queries chart, blocklist. All can be on by default.
 - **Font** — Family (default: Jost), weight (default: bold), size (x-small to x-large, default: normal).
 
-See the collapsible info boxes in the settings for Pi-hole version/configuration notes and hardware button registration details.
+See the collapsible info boxes in the settings for Pi-hole version/configuration notes, hardware button registration, and display action mapping (which Pi-hole action runs for each Display Action 1–6).
 
 ---
 
