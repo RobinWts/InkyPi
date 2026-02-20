@@ -2,6 +2,9 @@
 
 import os
 import subprocess
+import threading
+import uuid
+import time
 from urllib.parse import urlparse
 
 from flask import Blueprint, request, jsonify, current_app
@@ -10,6 +13,85 @@ import logging
 logger = logging.getLogger(__name__)
 
 plugin_manage_bp = Blueprint("pluginmanager_api", __name__)
+
+# ---------------------------------------------------------------------------
+# Job registry — thread-safe in-memory store for background operation output
+# ---------------------------------------------------------------------------
+
+_JOBS: dict = {}         # job_id -> job dict
+_JOBS_LOCK = threading.Lock()
+_JOB_TTL = 300           # auto-expire jobs after 5 minutes
+
+
+def _create_job():
+    """Create a new job entry and return (job_id, job)."""
+    job_id = str(uuid.uuid4())
+    job = {
+        "lines": [],
+        "done": False,
+        "success": None,
+        "error": None,
+        "created_at": time.time(),
+        "lock": threading.Lock(),
+    }
+    with _JOBS_LOCK:
+        _JOBS[job_id] = job
+    return job_id, job
+
+
+def _get_job(job_id):
+    """Return the job dict for job_id, or None if not found."""
+    with _JOBS_LOCK:
+        return _JOBS.get(job_id)
+
+
+def _purge_old_jobs():
+    """Remove jobs older than _JOB_TTL. Called lazily before each new operation."""
+    cutoff = time.time() - _JOB_TTL
+    with _JOBS_LOCK:
+        expired = [jid for jid, j in _JOBS.items() if j["created_at"] < cutoff]
+        for jid in expired:
+            del _JOBS[jid]
+
+
+# ---------------------------------------------------------------------------
+# Background subprocess runner
+# ---------------------------------------------------------------------------
+
+def _run_subprocess_job(job_id, cmd, env, cwd, success_marker):
+    """Run cmd in a background thread, streaming stdout/stderr lines into the job buffer."""
+    job = _get_job(job_id)
+    if not job:
+        return
+    try:
+        proc = subprocess.Popen(
+            cmd,
+            env=env,
+            cwd=cwd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,  # merge stderr into stdout for a single stream
+            text=True,
+            bufsize=1,                 # line-buffered
+        )
+        for raw_line in proc.stdout:
+            line = raw_line.rstrip("\n")
+            if line:
+                with job["lock"]:
+                    job["lines"].append(line)
+        proc.wait()
+        all_output = "\n".join(job["lines"])
+        succeeded = success_marker in all_output or proc.returncode == 0
+        with job["lock"]:
+            job["done"] = True
+            job["success"] = succeeded
+            job["error"] = None if succeeded else "Operation failed — see output above"
+    except Exception as e:
+        logger.exception("Background job %s raised an exception", job_id)
+        with job["lock"]:
+            job["lines"].append(f"[ERROR] Unexpected error: {e}")
+            job["done"] = True
+            job["success"] = False
+            job["error"] = str(e)
 
 
 def _project_dir():
@@ -58,7 +140,7 @@ def _validate_install_url(url):
 
 @plugin_manage_bp.route("/pluginmanager-api/install", methods=["POST"])
 def install_plugin():
-    """Install a plugin from a Git repository URL. Uses CLI install-from-url."""
+    """Install a plugin from a Git repository URL. Launches a background job and returns job_id."""
     data = request.get_json() or {}
     url = data.get("url", "")
 
@@ -73,42 +155,20 @@ def install_plugin():
     project_dir = _project_dir()
     env = {**os.environ, "PROJECT_DIR": project_dir}
 
-    try:
-        result = subprocess.run(
-            ["bash", cli, "install-from-url", url.strip()],
-            env=env,
-            cwd=project_dir,
-            capture_output=True,
-            text=True,
-            timeout=120,
-        )
-    except subprocess.TimeoutExpired:
-        return jsonify({"success": False, "error": "Install timed out"}), 500
-    except Exception as e:
-        logger.exception("Plugin install subprocess failed")
-        return jsonify({"success": False, "error": str(e)}), 500
-
-    # Check if install succeeded by looking for "[INFO] Done" in output
-    # This handles cases where restart fails but plugin was installed
-    output = (result.stdout or "") + "\n" + (result.stderr or "")
-    install_succeeded = "[INFO] Done" in output or result.returncode == 0
-    
-    if not install_succeeded:
-        err_msg = result.stderr.strip() or result.stdout.strip() or "Install failed"
-        logger.warning("Plugin install failed: %s", err_msg)
-        return jsonify({"success": False, "error": err_msg}), 400
-    
-    # Log any warnings but still return success if plugin was installed
-    if result.returncode != 0:
-        logger.warning("Plugin install completed but CLI exited with code %d: %s", 
-                      result.returncode, output.strip())
-    
-    return jsonify({"success": True})
+    _purge_old_jobs()
+    job_id, _ = _create_job()
+    thread = threading.Thread(
+        target=_run_subprocess_job,
+        args=(job_id, ["bash", cli, "install-from-url", url.strip()], env, project_dir, "[INFO] Done"),
+        daemon=True,
+    )
+    thread.start()
+    return jsonify({"success": True, "job_id": job_id})
 
 
 @plugin_manage_bp.route("/pluginmanager-api/uninstall", methods=["POST"])
 def uninstall_plugin():
-    """Uninstall a third-party plugin by id. Only allows plugins with repository set."""
+    """Uninstall a third-party plugin by id. Launches a background job and returns job_id."""
     data = request.get_json() or {}
     plugin_id = (data.get("plugin_id") or "").strip()
 
@@ -127,36 +187,15 @@ def uninstall_plugin():
     project_dir = _project_dir()
     env = {**os.environ, "PROJECT_DIR": project_dir}
 
-    try:
-        result = subprocess.run(
-            ["bash", cli, "uninstall", plugin_id],
-            env=env,
-            cwd=project_dir,
-            capture_output=True,
-            text=True,
-            timeout=60,
-        )
-    except subprocess.TimeoutExpired:
-        return jsonify({"success": False, "error": "Uninstall timed out"}), 500
-    except Exception as e:
-        logger.exception("Plugin uninstall subprocess failed")
-        return jsonify({"success": False, "error": str(e)}), 500
-
-    # Check if uninstall succeeded by looking for success message in output
-    output = (result.stdout or "") + "\n" + (result.stderr or "")
-    uninstall_succeeded = "Plugin successfully uninstalled" in output or result.returncode == 0
-    
-    if not uninstall_succeeded:
-        err_msg = result.stderr.strip() or result.stdout.strip() or "Uninstall failed"
-        logger.warning("Plugin uninstall failed: %s", err_msg)
-        return jsonify({"success": False, "error": err_msg}), 400
-    
-    # Log any warnings but still return success if plugin was uninstalled
-    if result.returncode != 0:
-        logger.warning("Plugin uninstall completed but CLI exited with code %d: %s", 
-                      result.returncode, output.strip())
-    
-    return jsonify({"success": True})
+    _purge_old_jobs()
+    job_id, _ = _create_job()
+    thread = threading.Thread(
+        target=_run_subprocess_job,
+        args=(job_id, ["bash", cli, "uninstall", plugin_id], env, project_dir, "Plugin successfully uninstalled"),
+        daemon=True,
+    )
+    thread.start()
+    return jsonify({"success": True, "job_id": job_id})
 
 
 @plugin_manage_bp.route("/pluginmanager-api/check-updates", methods=["POST"])
@@ -279,7 +318,7 @@ def check_updates():
 
 @plugin_manage_bp.route("/pluginmanager-api/update", methods=["POST"])
 def update_plugin():
-    """Update a third-party plugin by reinstalling from its repository. Only allows plugins with repository set."""
+    """Update a third-party plugin by reinstalling from its repository. Launches a background job and returns job_id."""
     data = request.get_json() or {}
     plugin_id = (data.get("plugin_id") or "").strip()
 
@@ -302,36 +341,35 @@ def update_plugin():
     project_dir = _project_dir()
     env = {**os.environ, "PROJECT_DIR": project_dir}
 
-    try:
-        result = subprocess.run(
-            ["bash", cli, "install", plugin_id, repo_url],
-            env=env,
-            cwd=project_dir,
-            capture_output=True,
-            text=True,
-            timeout=120,
-        )
-    except subprocess.TimeoutExpired:
-        return jsonify({"success": False, "error": "Update timed out"}), 500
-    except Exception as e:
-        logger.exception("Plugin update subprocess failed")
-        return jsonify({"success": False, "error": str(e)}), 500
+    _purge_old_jobs()
+    job_id, _ = _create_job()
+    thread = threading.Thread(
+        target=_run_subprocess_job,
+        args=(job_id, ["bash", cli, "install", plugin_id, repo_url], env, project_dir, "[INFO] Done"),
+        daemon=True,
+    )
+    thread.start()
+    return jsonify({"success": True, "job_id": job_id})
 
-    # Check if update succeeded by looking for "[INFO] Done" in output
-    output = (result.stdout or "") + "\n" + (result.stderr or "")
-    update_succeeded = "[INFO] Done" in output or result.returncode == 0
-    
-    if not update_succeeded:
-        err_msg = result.stderr.strip() or result.stdout.strip() or "Update failed"
-        logger.warning("Plugin update failed: %s", err_msg)
-        return jsonify({"success": False, "error": err_msg}), 400
-    
-    # Log any warnings but still return success if plugin was updated
-    if result.returncode != 0:
-        logger.warning("Plugin update completed but CLI exited with code %d: %s", 
-                      result.returncode, output.strip())
-    
-    return jsonify({"success": True})
+
+@plugin_manage_bp.route("/pluginmanager-api/job/<job_id>/output", methods=["GET"])
+def job_output(job_id):
+    """Poll for background job output. Returns lines from 'since' offset onwards."""
+    job = _get_job(job_id)
+    if not job:
+        return jsonify({"success": False, "error": "Job not found"}), 404
+
+    since = request.args.get("since", 0, type=int)
+    with job["lock"]:
+        new_lines = job["lines"][since:]
+        return jsonify({
+            "success": True,
+            "lines": new_lines,
+            "offset": since + len(new_lines),
+            "done": job["done"],
+            "job_success": job["success"],
+            "error": job["error"],
+        })
 
 
 @plugin_manage_bp.route("/pluginmanager-api/core-changes", methods=["GET"])

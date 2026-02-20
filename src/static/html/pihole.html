@@ -1,0 +1,471 @@
+<html>
+    <head>
+    
+        <link rel="stylesheet" href="/Users/robinglave/random_code/InkyPy/InkyPi/src/plugins/base_plugin/render/plugin.css">
+    
+        <link rel="stylesheet" href="/Users/robinglave/random_code/InkyPy/InkyPi/src/plugins/pihole/render/pihole.css">
+    
+    <style>
+        
+        @font-face {
+            font-family: "Dogica";
+            font-weight: normal;
+            font-style:  normal;
+            src: url(/Users/robinglave/random_code/InkyPy/InkyPi/src/static/fonts/dogicapixel.ttf) format("truetype");
+        }
+        
+        @font-face {
+            font-family: "Dogica";
+            font-weight: bold;
+            font-style:  normal;
+            src: url(/Users/robinglave/random_code/InkyPy/InkyPi/src/static/fonts/dogicapixelbold.ttf) format("truetype");
+        }
+        
+        @font-face {
+            font-family: "Jost";
+            font-weight: normal;
+            font-style:  normal;
+            src: url(/Users/robinglave/random_code/InkyPy/InkyPi/src/static/fonts/Jost.ttf) format("truetype");
+        }
+        
+        @font-face {
+            font-family: "Jost";
+            font-weight: bold;
+            font-style:  normal;
+            src: url(/Users/robinglave/random_code/InkyPy/InkyPi/src/static/fonts/Jost-SemiBold.ttf) format("truetype");
+        }
+        
+        @font-face {
+            font-family: "Napoli";
+            font-weight: normal;
+            font-style:  normal;
+            src: url(/Users/robinglave/random_code/InkyPy/InkyPi/src/static/fonts/Napoli.ttf) format("truetype");
+        }
+        
+        @font-face {
+            font-family: "DS-Digital";
+            font-weight: normal;
+            font-style:  normal;
+            src: url(/Users/robinglave/random_code/InkyPy/InkyPi/src/static/fonts/DS-DIGI/DS-DIGI.TTF) format("truetype");
+        }
+        
+    </style>
+    </head>
+    <body 
+        class="
+        
+        
+        "
+        style="padding: 1.5vw;
+        
+            background-color: #ffffff;
+        
+        color: #000000;
+
+        margin-top: 5px;
+        margin-bottom: 5px;
+        margin-left: 5px;
+        margin-right: 5px;
+    ">
+        <div class="container">
+            
+
+<div class="pihole-dashboard" style="
+    --font-family: Jost;
+    --font-weight: bold;
+    --font-scale: 1.3;
+    font-family: var(--font-family);
+    font-weight: var(--font-weight);
+">
+    
+    <div class="pihole-title">Pi-Hole Statistics</div>
+    
+
+    
+    <div class="pihole-status status-enabled">
+        
+        BLOCKING ENABLED
+        
+    </div>
+    
+
+    
+    <div class="pihole-section pihole-queries">
+        <div class="section-label">Queries</div>
+        
+        <div class="queries-row">
+            <div class="query-item">
+                <span class="query-value">74119</span>
+                <span class="query-label">Total</span>
+            </div>
+            <div class="query-item">
+                <span class="query-value blocked">17551</span>
+                <span class="query-label">Blocked</span>
+            </div>
+            <div class="query-item">
+                <span class="query-value">23.7%</span>
+                <span class="query-label">Blocked %</span>
+            </div>
+        </div>
+        
+        
+        
+    </div>
+    
+
+    
+    <div class="pihole-section pihole-clients-blocklist">
+        <div class="clients-blocklist-row">
+            <div class="clients-blocklist-item">
+                <div class="section-label">Active Clients</div>
+                <div class="section-value">43</div>
+            </div>
+            <div class="clients-blocklist-item">
+                <div class="section-label">Blocklist</div>
+                <div class="section-value">79079</div>
+            </div>
+        </div>
+    </div>
+    
+
+    
+
+    
+    <div class="pihole-section pihole-history-chart">
+        <div class="section-label">Queries per hour (24h)</div>
+        
+        <div class="history-chart-container">
+            <div class="history-chart-bars">
+                
+                
+                
+                
+                
+                
+                
+                <div class="history-bar-wrap" title="0h: 3063 (555 blocked)">
+                    <div class="history-bar" style="height: 60.76175362031343%;">
+                        <div class="history-bar-segment history-bar-allowed" style="height: 81.88050930460334%;"></div>
+                        <div class="history-bar-segment history-bar-blocked" style="height: 18.11949069539667%;"></div>
+                    </div>
+                </div>
+                
+                
+                
+                
+                
+                
+                
+                <div class="history-bar-wrap" title="1h: 3411 (686 blocked)">
+                    <div class="history-bar" style="height: 67.66514580440389%;">
+                        <div class="history-bar-segment history-bar-allowed" style="height: 79.88859571973028%;"></div>
+                        <div class="history-bar-segment history-bar-blocked" style="height: 20.111404280269713%;"></div>
+                    </div>
+                </div>
+                
+                
+                
+                
+                
+                
+                
+                <div class="history-bar-wrap" title="2h: 3284 (676 blocked)">
+                    <div class="history-bar" style="height: 65.14580440388812%;">
+                        <div class="history-bar-segment history-bar-allowed" style="height: 79.41534713763703%;"></div>
+                        <div class="history-bar-segment history-bar-blocked" style="height: 20.584652862362972%;"></div>
+                    </div>
+                </div>
+                
+                
+                
+                
+                
+                
+                
+                <div class="history-bar-wrap" title="3h: 2633 (459 blocked)">
+                    <div class="history-bar" style="height: 52.231700059512%;">
+                        <div class="history-bar-segment history-bar-allowed" style="height: 82.5674135966578%;"></div>
+                        <div class="history-bar-segment history-bar-blocked" style="height: 17.432586403342196%;"></div>
+                    </div>
+                </div>
+                
+                
+                
+                
+                
+                
+                
+                <div class="history-bar-wrap" title="4h: 2406 (448 blocked)">
+                    <div class="history-bar" style="height: 47.728625272763345%;">
+                        <div class="history-bar-segment history-bar-allowed" style="height: 81.37988362427265%;"></div>
+                        <div class="history-bar-segment history-bar-blocked" style="height: 18.62011637572735%;"></div>
+                    </div>
+                </div>
+                
+                
+                
+                
+                
+                
+                
+                <div class="history-bar-wrap" title="5h: 2308 (442 blocked)">
+                    <div class="history-bar" style="height: 45.78456655425511%;">
+                        <div class="history-bar-segment history-bar-allowed" style="height: 80.84922010398613%;"></div>
+                        <div class="history-bar-segment history-bar-blocked" style="height: 19.150779896013866%;"></div>
+                    </div>
+                </div>
+                
+                
+                
+                
+                
+                
+                
+                <div class="history-bar-wrap" title="6h: 2626 (692 blocked)">
+                    <div class="history-bar" style="height: 52.0928387224757%;">
+                        <div class="history-bar-segment history-bar-allowed" style="height: 73.64813404417364%;"></div>
+                        <div class="history-bar-segment history-bar-blocked" style="height: 26.351865955826355%;"></div>
+                    </div>
+                </div>
+                
+                
+                
+                
+                
+                
+                
+                <div class="history-bar-wrap" title="7h: 5041 (1014 blocked)">
+                    <div class="history-bar" style="height: 100.0%;">
+                        <div class="history-bar-segment history-bar-allowed" style="height: 79.88494346359849%;"></div>
+                        <div class="history-bar-segment history-bar-blocked" style="height: 20.115056536401507%;"></div>
+                    </div>
+                </div>
+                
+                
+                
+                
+                
+                
+                
+                <div class="history-bar-wrap" title="8h: 2824 (517 blocked)">
+                    <div class="history-bar" style="height: 56.02063082721682%;">
+                        <div class="history-bar-segment history-bar-allowed" style="height: 81.69263456090651%;"></div>
+                        <div class="history-bar-segment history-bar-blocked" style="height: 18.307365439093484%;"></div>
+                    </div>
+                </div>
+                
+                
+                
+                
+                
+                
+                
+                <div class="history-bar-wrap" title="9h: 2007 (585 blocked)">
+                    <div class="history-bar" style="height: 39.81352906169411%;">
+                        <div class="history-bar-segment history-bar-allowed" style="height: 70.85201793721974%;"></div>
+                        <div class="history-bar-segment history-bar-blocked" style="height: 29.14798206278027%;"></div>
+                    </div>
+                </div>
+                
+                
+                
+                
+                
+                
+                
+                <div class="history-bar-wrap" title="10h: 2053 (511 blocked)">
+                    <div class="history-bar" style="height: 40.72604641936124%;">
+                        <div class="history-bar-segment history-bar-allowed" style="height: 75.10959571358987%;"></div>
+                        <div class="history-bar-segment history-bar-blocked" style="height: 24.89040428641013%;"></div>
+                    </div>
+                </div>
+                
+                
+                
+                
+                
+                
+                
+                <div class="history-bar-wrap" title="11h: 2748 (921 blocked)">
+                    <div class="history-bar" style="height: 54.512993453679826%;">
+                        <div class="history-bar-segment history-bar-allowed" style="height: 66.48471615720524%;"></div>
+                        <div class="history-bar-segment history-bar-blocked" style="height: 33.51528384279476%;"></div>
+                    </div>
+                </div>
+                
+                
+                
+                
+                
+                
+                
+                <div class="history-bar-wrap" title="12h: 2606 (792 blocked)">
+                    <div class="history-bar" style="height: 51.69609204522912%;">
+                        <div class="history-bar-segment history-bar-allowed" style="height: 69.60859554873369%;"></div>
+                        <div class="history-bar-segment history-bar-blocked" style="height: 30.391404451266308%;"></div>
+                    </div>
+                </div>
+                
+                
+                
+                
+                
+                
+                
+                <div class="history-bar-wrap" title="13h: 1657 (409 blocked)">
+                    <div class="history-bar" style="height: 32.870462209878994%;">
+                        <div class="history-bar-segment history-bar-allowed" style="height: 75.31683765841883%;"></div>
+                        <div class="history-bar-segment history-bar-blocked" style="height: 24.683162341581173%;"></div>
+                    </div>
+                </div>
+                
+                
+                
+                
+                
+                
+                
+                <div class="history-bar-wrap" title="14h: 3797 (743 blocked)">
+                    <div class="history-bar" style="height: 75.32235667526285%;">
+                        <div class="history-bar-segment history-bar-allowed" style="height: 80.43191993679221%;"></div>
+                        <div class="history-bar-segment history-bar-blocked" style="height: 19.568080063207795%;"></div>
+                    </div>
+                </div>
+                
+                
+                
+                
+                
+                
+                
+                <div class="history-bar-wrap" title="15h: 2886 (714 blocked)">
+                    <div class="history-bar" style="height: 57.250545526681215%;">
+                        <div class="history-bar-segment history-bar-allowed" style="height: 75.25987525987526%;"></div>
+                        <div class="history-bar-segment history-bar-blocked" style="height: 24.74012474012474%;"></div>
+                    </div>
+                </div>
+                
+                
+                
+                
+                
+                
+                
+                <div class="history-bar-wrap" title="16h: 2757 (499 blocked)">
+                    <div class="history-bar" style="height: 54.69152945844079%;">
+                        <div class="history-bar-segment history-bar-allowed" style="height: 81.9006166122597%;"></div>
+                        <div class="history-bar-segment history-bar-blocked" style="height: 18.099383387740296%;"></div>
+                    </div>
+                </div>
+                
+                
+                
+                
+                
+                
+                
+                <div class="history-bar-wrap" title="17h: 2604 (525 blocked)">
+                    <div class="history-bar" style="height: 51.65641737750446%;">
+                        <div class="history-bar-segment history-bar-allowed" style="height: 79.83870967741935%;"></div>
+                        <div class="history-bar-segment history-bar-blocked" style="height: 20.161290322580644%;"></div>
+                    </div>
+                </div>
+                
+                
+                
+                
+                
+                
+                
+                <div class="history-bar-wrap" title="18h: 4857 (1502 blocked)">
+                    <div class="history-bar" style="height: 96.34993056933148%;">
+                        <div class="history-bar-segment history-bar-allowed" style="height: 69.07556104591312%;"></div>
+                        <div class="history-bar-segment history-bar-blocked" style="height: 30.924438954086884%;"></div>
+                    </div>
+                </div>
+                
+                
+                
+                
+                
+                
+                
+                <div class="history-bar-wrap" title="19h: 2784 (230 blocked)">
+                    <div class="history-bar" style="height: 55.22713747272366%;">
+                        <div class="history-bar-segment history-bar-allowed" style="height: 91.73850574712644%;"></div>
+                        <div class="history-bar-segment history-bar-blocked" style="height: 8.261494252873563%;"></div>
+                    </div>
+                </div>
+                
+                
+                
+                
+                
+                
+                
+                <div class="history-bar-wrap" title="20h: 4012 (1306 blocked)">
+                    <div class="history-bar" style="height: 79.58738345566357%;">
+                        <div class="history-bar-segment history-bar-allowed" style="height: 67.44765702891326%;"></div>
+                        <div class="history-bar-segment history-bar-blocked" style="height: 32.55234297108674%;"></div>
+                    </div>
+                </div>
+                
+                
+                
+                
+                
+                
+                
+                <div class="history-bar-wrap" title="21h: 3747 (836 blocked)">
+                    <div class="history-bar" style="height: 74.3304899821464%;">
+                        <div class="history-bar-segment history-bar-allowed" style="height: 77.68881772084335%;"></div>
+                        <div class="history-bar-segment history-bar-blocked" style="height: 22.311182279156657%;"></div>
+                    </div>
+                </div>
+                
+                
+                
+                
+                
+                
+                
+                <div class="history-bar-wrap" title="22h: 3423 (854 blocked)">
+                    <div class="history-bar" style="height: 67.90319381075184%;">
+                        <div class="history-bar-segment history-bar-allowed" style="height: 75.05112474437627%;"></div>
+                        <div class="history-bar-segment history-bar-blocked" style="height: 24.948875255623722%;"></div>
+                    </div>
+                </div>
+                
+                
+                
+                
+                
+                
+                
+                <div class="history-bar-wrap" title="23h: 4585 (1635 blocked)">
+                    <div class="history-bar" style="height: 90.95417575877802%;">
+                        <div class="history-bar-segment history-bar-allowed" style="height: 64.340239912759%;"></div>
+                        <div class="history-bar-segment history-bar-blocked" style="height: 35.659760087241004%;"></div>
+                    </div>
+                </div>
+                
+            </div>
+            <div class="history-chart-labels">
+                <span>24h ago</span>
+                <span>12h</span>
+                <span>now</span>
+            </div>
+            <div class="history-chart-legend">
+                <span class="history-legend-item"><span class="history-legend-swatch history-legend-allowed"></span> Allowed</span>
+                <span class="history-legend-item"><span class="history-legend-swatch history-legend-blocked"></span> Blocked</span>
+            </div>
+        </div>
+        
+    </div>
+    
+</div>
+
+
+        </div>
+    </body>
+</html>
