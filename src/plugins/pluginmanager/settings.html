@@ -419,14 +419,14 @@
     let _terminalPollInterval = null;
 
     function openTerminalModal(title, jobId, { reloadOnSuccess = false } = {}) {
-        const overlay   = document.getElementById('pm-terminal-overlay');
-        const titleEl   = document.getElementById('pm-terminal-title');
-        const dotEl     = document.getElementById('pm-terminal-dot');
-        const outputEl  = document.getElementById('pm-terminal-output');
-        const footer    = document.getElementById('pm-terminal-footer');
+        const overlay = document.getElementById('pm-terminal-overlay');
+        const titleEl = document.getElementById('pm-terminal-title');
+        const dotEl = document.getElementById('pm-terminal-dot');
+        const outputEl = document.getElementById('pm-terminal-output');
+        const footer = document.getElementById('pm-terminal-footer');
         const statusMsg = document.getElementById('pm-terminal-status-msg');
         const reloadBtn = document.getElementById('pm-terminal-reload-btn');
-        const closeBtn  = document.getElementById('pm-terminal-close-btn');
+        const closeBtn = document.getElementById('pm-terminal-close-btn');
 
         // Reset state
         titleEl.textContent = title;
@@ -454,9 +454,13 @@
             try {
                 const resp = await fetch(`/pluginmanager-api/job/${jobId}/output?since=${offset}`);
                 if (!resp.ok) {
-                    // Job not found or server error — stop polling
                     _stopTerminalPoll();
-                    _finishTerminalModal(false, 'Lost connection to job', reloadOnSuccess);
+                    if (reloadOnSuccess) {
+                        // A non-OK response while the service is expected to restart is normal
+                        _handleServiceRestart(outputEl);
+                    } else {
+                        _finishTerminalModal(false, 'Lost connection to job', false);
+                    }
                     return;
                 }
                 const data = await resp.json();
@@ -473,9 +477,13 @@
                     _finishTerminalModal(data.job_success, data.error, reloadOnSuccess);
                 }
             } catch (e) {
-                // Network error — stop polling and report
                 _stopTerminalPoll();
-                _finishTerminalModal(false, 'Network error: ' + e.message, reloadOnSuccess);
+                if (reloadOnSuccess) {
+                    // Fetch threw (e.g. "Load failed") — almost certainly the service restarted
+                    _handleServiceRestart(outputEl);
+                } else {
+                    _finishTerminalModal(false, 'Network error: ' + e.message, false);
+                }
             }
         }, 1000);
     }
@@ -487,14 +495,23 @@
         }
     }
 
-    const _RELOAD_COUNTDOWN_SEC = 15;
+    function _handleServiceRestart(outputEl) {
+        // Append a notice and treat as success — the service restart drops the connection
+        outputEl.textContent += '\n[INFO] Network connection lost — service is restarting, do not worry.\n';
+        const body = document.getElementById('pm-terminal-body');
+        body.scrollTop = body.scrollHeight;
+        // Treat as success: show the countdown reload button
+        _finishTerminalModal(true, null, true);
+    }
+
+    const _RELOAD_COUNTDOWN_SEC = 20;
 
     function _finishTerminalModal(success, errorMsg, reloadOnSuccess) {
-        const dotEl     = document.getElementById('pm-terminal-dot');
-        const footer    = document.getElementById('pm-terminal-footer');
+        const dotEl = document.getElementById('pm-terminal-dot');
+        const footer = document.getElementById('pm-terminal-footer');
         const statusMsg = document.getElementById('pm-terminal-status-msg');
         const reloadBtn = document.getElementById('pm-terminal-reload-btn');
-        const closeBtn  = document.getElementById('pm-terminal-close-btn');
+        const closeBtn = document.getElementById('pm-terminal-close-btn');
 
         dotEl.className = success ? 'success' : 'failure';
         footer.style.display = 'flex';
@@ -625,7 +642,7 @@
     }
 
     async function installPlugin() {
-        const urlInput  = document.getElementById('plugin-url');
+        const urlInput = document.getElementById('plugin-url');
         const installBtn = document.getElementById('install-btn');
 
         if (installBtn.disabled) {
