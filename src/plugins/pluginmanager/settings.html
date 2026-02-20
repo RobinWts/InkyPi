@@ -283,6 +283,90 @@
     #pm-terminal-status-msg.failure {
         color: #ef4444;
     }
+
+    /* Collapsible info box at top (same styling as pihole plugin) */
+    .pm-info-box {
+        padding: 16px;
+        background: rgba(33, 150, 243, 0.1);
+        border: 1px solid rgba(33, 150, 243, 0.3);
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .pm-info-box-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: bold;
+        color: var(--text-primary, #333);
+        font-size: 14px;
+        cursor: pointer;
+        list-style: none;
+        user-select: none;
+    }
+
+    .pm-info-box-header::-webkit-details-marker {
+        display: none;
+    }
+
+    .pm-info-box-header::marker {
+        display: none;
+    }
+
+    .pm-info-box-icon {
+        font-size: 20px;
+        flex-shrink: 0;
+    }
+
+    .pm-info-box-title {
+        flex: 1;
+    }
+
+    .pm-info-box-body {
+        margin-top: 12px;
+        padding-left: 32px;
+    }
+
+    .pm-info-box-body p {
+        margin: 0 0 8px 0;
+        color: var(--text-secondary, #666);
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .pm-info-box-body p:last-child {
+        margin-bottom: 0;
+    }
+
+    .pm-info-box-body code {
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 12px;
+        padding: 1px 4px;
+        background: rgba(33, 150, 243, 0.15);
+        border-radius: 3px;
+    }
+
+    .pm-info-box-body pre {
+        margin: 8px 0 0 0;
+        padding: 12px 14px;
+        background: rgba(33, 150, 243, 0.08);
+        border: 1px solid rgba(33, 150, 243, 0.2);
+        border-radius: 6px;
+        font-size: 12px;
+        overflow-x: auto;
+        white-space: pre-wrap;
+        word-break: break-all;
+        color: var(--text-secondary, #666);
+    }
+
+    .pm-info-box-body a {
+        color: rgba(33, 150, 243, 0.9);
+        text-decoration: underline;
+    }
+
+    .pm-info-box-body a:hover {
+        color: rgba(33, 150, 243, 1);
+    }
 </style>
 
 <div class="plugin-manage-container">
@@ -326,6 +410,33 @@
         </div>
     </div>
     {% else %}
+
+    <details class="pm-info-box">
+        <summary class="pm-info-box-header">
+            <span class="pm-info-box-icon" aria-hidden="true">ℹ️</span>
+            <span class="pm-info-box-title">About third-party plugins and recovery (click to expand)</span>
+        </summary>
+        <div class="pm-info-box-body">
+            <p>Third-party plugins can cause InkyPi to fail to start, for example if they rely on dependencies that are
+                not installed. The install process installs dependencies from the plugin’s
+                <code>requirements.txt</code>, but if there are more, fixing the issue by installing missing packages
+                yourself can be tricky. This is something the plugin developer can address, so consider opening an issue
+                on the plugin’s GitHub repository.
+            </p>
+            <p>In most cases you can recover by connecting via SSH, removing the plugin folder, and restarting the
+                service. Use the commands below (replace <code>PLUGIN_FOLDER</code> with the folder name you got from
+                the first
+                command), be careful not to delete the wrong folder, rm -rf is a destructive command and cannot be
+                undone:</p>
+            <pre>ls ~/InkyPi/src/plugins
+
+sudo rm -rf ~/InkyPi/src/plugins/PLUGIN_FOLDER
+
+sudo systemctl restart inkypi.service</pre>
+            <p><strong>Recommendation:</strong> Copy these commands to a safe place. If
+                InkyPi does not start, this page will not be available.</p>
+        </div>
+    </details>
 
     <h2 class="form-label" style="margin-bottom: 12px;">Installed third-party plugins</h2>
     <div id="plugins-list">
