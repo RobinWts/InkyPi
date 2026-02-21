@@ -112,11 +112,11 @@ install_plugin() {
         echo "[INFO] No requirements.txt found, skipping dependency install"
     fi
 
-    # print DONE before actually restarting the service so we know before the subprocess is killed!
+    # Print DONE and pause so the UI can poll and display it before the service restart kills the process
     echo "[INFO] Done"
-    
     if [[ -n "${APPNAME:-}" ]]; then
-        echo "[INFO] Restarting $APPNAME service."
+        echo "[INFO] Restarting $APPNAME service in 3 seconds."
+        sleep 3
         sudo systemctl restart "$APPNAME.service" 2>&1 || echo "[WARN] Service restart failed"
     else
         echo "[INFO] APPNAME not set, skipping service restart (e.g. development mode)"
@@ -203,9 +203,9 @@ uninstall_plugin() {
 
     echo "[INFO] Plugin successfully uninstalled"
     echo "[INFO] Done"
-    
     if [[ -n "${APPNAME:-}" ]]; then
-        echo "[INFO] Restarting $APPNAME service."
+        echo "[INFO] Restarting $APPNAME service in 3 seconds."
+        sleep 3
         sudo systemctl restart "$APPNAME.service" 2>&1 || echo "[WARN] Service restart failed"
     else
         echo "[INFO] APPNAME not set, skipping service restart (e.g. development mode)"
