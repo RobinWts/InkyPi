@@ -56,12 +56,14 @@ Use the same URL and JSON body from Python (`requests.post(...)`), shell scripts
 Install the plugin using the InkyPi CLI with the plugin ID and repository URL:
 
 ```bash
-inkypi plugin install noderedpush https://github.com/YOUR_USERNAME/InkyPi-Plugin-nodeRedPush
+inkypi plugin install noderedpush https://github.com/RobinWts/InkyPi-Plugin-NodeRedPush
 ```
 
 Or install the [Plugin Manager](https://github.com/RobinWts/InkyPi-Plugin-PluginManager) first and install this plugin via the Web UI.
 
-Then add a Node Red Push instance to a playlist (optional, for placeholder display) or use the push API from any program (see [Push from other programs](#push-from-other-programs) above).
+Open the plugin settings page to apply the blueprint registration patch if needed.
+
+Then use the push API from any program (see [Push from other programs](#push-from-other-programs) above).
 
 ---
 
