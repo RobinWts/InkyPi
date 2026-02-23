@@ -88,12 +88,10 @@
         <div class="form-group nowrap" style="margin-top: 8px;">
             <label for="pushUrl" class="form-label">Address:</label>
             <input type="text" id="pushUrl" readonly class="form-input" style="font-family: monospace;"
-                value="{{ push_api_path }}"
-                title="Prepend your InkyPi base URL (e.g. http://raspberrypi.local or http://192.168.1.10)">
+                value="{{ push_full_url or push_api_path }}"
+                title="Copy this URL for Node-RED or curl">
         </div>
-        <p class="form-hint" style="margin-top: 6px;">Full URL = your InkyPi base URL + this path. On the device InkyPi
-            uses port <strong>80</strong> (e.g. <code>http://192.168.1.10{{ push_api_path }}</code>); in dev mode it
-            uses port <strong>8080</strong>.</p>
+        <p class="form-hint" style="margin-top: 6px;">Shown for the current host (port 80 on device, 8080 in dev). Copy and use in Node-RED or curl.</p>
     </div>
 
     <div class="form-group" style="margin-top: 16px;">

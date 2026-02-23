@@ -33,6 +33,14 @@ class NodeRedPush(BasePlugin):
         template_params["push_api_path"] = PUSH_API_PATH
         template_params["font_html_snippet"] = _FONT_HTML_SNIPPET
 
+        # Build full push URL from request (works on dev :8080 and device :80)
+        try:
+            from flask import request
+            push_full_url = (request.url_root or "").rstrip("/") + PUSH_API_PATH
+        except RuntimeError:
+            push_full_url = None
+        template_params["push_full_url"] = push_full_url
+
         # Check if core has blueprint registration (same as pluginmanager); offer autopatch
         try:
             from flask import current_app
