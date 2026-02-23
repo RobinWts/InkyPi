@@ -45,11 +45,12 @@
                             "calendarURLs[]": [
                                 "https://calendars.icloud.com/holidays/de_de.ics/"
                             ],
-                            "viewMode": "listMonth",
+                            "viewMode": "dayGridMonth",
                             "language": "en",
                             "displayTitle": "true",
                             "displayWeekends": "true",
                             "displayEventTime": "true",
+                            "weekStartDay": "0",
                             "fontSize": "x-small",
                             "selectedFrame": "None",
                             "topMargin": "",
@@ -63,7 +64,20 @@
                         "refresh": {
                             "interval": 120
                         },
-                        "latest_refresh_time": "2026-02-08T17:06:25.025375+00:00"
+                        "latest_refresh_time": "2026-02-23T12:10:22.187867+00:00"
+                    },
+                    {
+                        "plugin_id": "clock",
+                        "name": "uztrew",
+                        "plugin_settings": {
+                            "selectedClockFace": "Digital Clock",
+                            "primaryColor": "#ffffff",
+                            "secondaryColor": "#000000"
+                        },
+                        "refresh": {
+                            "interval": 60
+                        },
+                        "latest_refresh_time": "2026-02-23T12:10:20.829252+00:00"
                     }
                 ],
                 "current_plugin_index": null
@@ -72,8 +86,8 @@
         "active_playlist": null
     },
     "refresh_info": {
-        "refresh_time": "2026-02-08T17:06:25.025375+00:00",
-        "image_hash": "5a03f721af246e24db3623832bdfbc569fd8dc50b3a9935f4521b0f038fcd7ef",
+        "refresh_time": "2026-02-23T12:10:22.187867+00:00",
+        "image_hash": "08705a316dee684af6c02a0a449d6223b3ea69a7f37f3d5acd32587d4a5a1db8",
         "refresh_type": "Playlist",
         "plugin_id": "calendar",
         "playlist": "Default",

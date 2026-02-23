@@ -1,0 +1,152 @@
+<style>
+    /* Hide core "Update Now" and "Add to Playlist" buttons for this plugin (API-only, no display/playlist use) */
+    #settingsForm > .buttons-container {
+        display: none !important;
+    }
+
+    /* Theme-aware text for dark/light mode (same pattern as pluginmanager and main.css) */
+    .noderedpush-settings .form-hint,
+    .noderedpush-settings .form-hint code {
+        color: var(--text-secondary, #555);
+        transition: color 0.3s ease;
+    }
+    .noderedpush-settings .form-label {
+        color: var(--text-primary, #333);
+    }
+    .noderedpush-settings ol,
+    .noderedpush-settings ol li {
+        color: var(--text-primary, #333);
+        transition: color 0.3s ease;
+    }
+    .noderedpush-settings ol code {
+        color: var(--text-secondary, #555);
+    }
+
+    .core-patch-warning {
+        background: rgba(255, 152, 0, 0.15) !important;
+        border: 1px solid rgba(255, 152, 0, 0.4) !important;
+    }
+    [data-theme="dark"] .core-patch-warning {
+        background: rgba(255, 152, 0, 0.2) !important;
+        border-color: rgba(255, 152, 0, 0.5) !important;
+    }
+    [data-theme="dark"] .core-patch-warning p {
+        color: #eee !important;
+    }
+    [data-theme="dark"] .core-patch-warning ul {
+        color: #aaa !important;
+    }
+</style>
+
+{% if core_needs_patch %}
+<div class="core-patch-warning"
+    style="padding: 32px 24px; border-radius: 8px; text-align: center; max-width: 600px; margin: 40px auto;">
+    <div style="font-size: 64px; margin-bottom: 20px;">⚠️</div>
+    <p style="margin: 0 0 16px 0; color: var(--text-primary, #333); font-weight: bold; font-size: 20px;">
+        Core files need to be patched
+    </p>
+    <p style="margin: 0 0 16px 0; color: var(--text-secondary, #666); font-size: 15px; line-height: 1.6;">
+        The Node Red Push plugin requires core changes (blueprint registration) to work properly.<br>
+        The patch is being applied automatically now.
+    </p>
+    <p style="margin: 0 0 24px 0; color: var(--text-secondary, #666); font-size: 13px; line-height: 1.6;">
+        The InkyPi service will restart during this process. Please wait about 30 seconds, then use the button
+        below to reload this page.
+    </p>
+    {% if core_patch_missing %}
+    <div
+        style="margin: 0 0 24px 0; padding: 16px; background: rgba(0, 0, 0, 0.05); border-radius: 6px; text-align: left;">
+        <p style="margin: 0 0 10px 0; font-weight: bold; font-size: 13px; color: var(--text-primary, #333);">
+            Missing components before patch:
+        </p>
+        <ul
+            style="margin: 0; padding-left: 24px; color: var(--text-secondary, #666); font-size: 13px; line-height: 1.8;">
+            {% for missing in core_patch_missing %}
+            <li>{{ missing }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+        <button type="button" id="reload-btn" class="action-button" onclick="forceReload()" disabled>
+            Reload (30s)
+        </button>
+    </div>
+</div>
+{% else %}
+<div class="noderedpush-settings">
+<div class="form-group">
+    <p class="form-label"><strong>Push URL</strong></p>
+    <p class="form-hint">Send a POST request with JSON <code>{"html": "&lt;div&gt;...&lt;/div&gt;"}</code> to update the display immediately.</p>
+    <div class="form-group nowrap" style="margin-top: 8px;">
+        <label for="pushUrl" class="form-label">Address:</label>
+        <input type="text" id="pushUrl" readonly class="form-input" style="font-family: monospace;"
+               value="{{ push_api_path }}"
+               title="Prepend your InkyPi base URL (e.g. http://raspberrypi.local:8080)">
+    </div>
+    <p class="form-hint" style="margin-top: 6px;">Full URL = your InkyPi base URL + this path (e.g. <code>http://192.168.1.10:8080{{ push_api_path }}</code>).</p>
+</div>
+
+<div class="form-group" style="margin-top: 16px;">
+    <p class="form-label"><strong>Using from Node-RED</strong></p>
+    <ol style="margin: 8px 0; padding-left: 20px; line-height: 1.5;">
+        <li>Use an <strong>HTTP Request</strong> node: Method = POST, URL = your InkyPi base URL + the path above.</li>
+        <li>Set <code>msg.payload</code> to <code>{ "html": "&lt;div&gt;Your HTML here&lt;/div&gt;" }</code>.</li>
+        <li>Set <code>msg.headers["Content-Type"]</code> = <code>application/json</code> (or use a Function node to build the request).</li>
+    </ol>
+    <p class="form-label" style="margin-top: 12px;">Example flow (copy and paste into Node-RED → Import → Clipboard):</p>
+    <textarea id="nodeRedFlowSnippet" readonly class="form-input" rows="18" style="font-family: monospace; font-size: 12px; resize: vertical; margin-top: 6px;">[
+  {"id":"nrpush-inject","type":"inject","z":"","name":"Push HTML","props":[{"p":"payload"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"","payloadType":"date","x":150,"y":100,"wires":[["nrpush-func"]]},
+  {"id":"nrpush-func","type":"function","z":"","name":"Build HTML payload","func":"msg.payload = {\n  html: '<div style=\\\"font-family:sans-serif;padding:20px;text-align:center;\\\"><h1>Hello from Node-RED</h1><p>' + new Date().toLocaleString() + '</p></div>'\n};\nmsg.headers = { 'Content-Type': 'application/json' };\nreturn msg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":380,"y":100,"wires":[["nrpush-http"]]},
+  {"id":"nrpush-http","type":"http request","z":"","name":"InkyPi push","method":"POST","ret":"txt","paytoqs":"ignore","url":"http://YOUR_INKYPI_HOST:8080/noderedpush-api/push","tls":"","persist":false,"proxy":"","authType":"","x":620,"y":100,"wires":[["nrpush-debug"]]},
+  {"id":"nrpush-debug","type":"debug","z":"","name":"Response","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":830,"y":100,"wires":[]}
+]</textarea>
+    <button type="button" class="form-input" style="margin-top: 8px; cursor: pointer;" onclick="copyNodeRedSnippet()">Copy flow to clipboard</button>
+</div>
+</div>
+{% endif %}
+
+<script>
+    function forceReload() {
+        window.location.reload();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof loadPluginSettings !== 'undefined' && loadPluginSettings) {
+            // Prepopulate when editing plugin instance (no fields yet)
+        }
+
+        // Enable reload button after a 30s countdown when core patch is pending
+        const reloadBtn = document.getElementById('reload-btn');
+        if (!reloadBtn) {
+            return;
+        }
+        let remaining = 30;
+        const updateLabel = () => {
+            reloadBtn.textContent = 'Reload (' + remaining + 's)';
+        };
+        updateLabel();
+        const intervalId = setInterval(() => {
+            remaining -= 1;
+            if (remaining <= 0) {
+                clearInterval(intervalId);
+                reloadBtn.disabled = false;
+                reloadBtn.textContent = 'Reload now';
+            } else {
+                updateLabel();
+            }
+        }, 1000);
+    });
+
+    function copyNodeRedSnippet() {
+        var el = document.getElementById('nodeRedFlowSnippet');
+        if (!el) return;
+        el.select();
+        el.setSelectionRange(0, 99999);
+        try {
+            document.execCommand('copy');
+            var btn = document.querySelector('#nodeRedFlowSnippet + button');
+            if (btn) { btn.textContent = 'Copied!'; setTimeout(function(){ btn.textContent = 'Copy flow to clipboard'; }, 2000); }
+        } catch (e) {}
+    }
+</script>

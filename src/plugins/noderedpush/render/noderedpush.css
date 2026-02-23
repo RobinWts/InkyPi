@@ -1,0 +1,9 @@
+/* Node Red Push – dummy styles for HTML render path */
+
+.noderedpush-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+}
