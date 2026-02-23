@@ -2,11 +2,12 @@
 
 ![Example of InkyPi-Plugin-nodeRedPush](./example.png)
 
-*InkyPi-Plugin-nodeRedPush* is a plugin for [InkyPi](https://github.com/fatihak/InkyPi) that lets you push HTML content to the e-ink display from Node-RED or any HTTP client. Send a POST request with an HTML payload and the display updates immediately with the rendered content.
+*InkyPi-Plugin-nodeRedPush* is a plugin for [InkyPi](https://github.com/fatihak/InkyPi) that lets you push HTML content to the e-ink display from **any program**: Node-RED, scripts, cron jobs, Home Assistant, or any HTTP client. Send a POST request with a JSON body `{"html": "<div>...</div>"}` and the display updates immediately with the rendered content.
 
 **What it does:**
 
 - **Push API** — Exposes a POST endpoint (`/noderedpush-api/push`) that accepts JSON `{"html": "<div>...</div>"}` and renders it to the display.
+- **Use from any program** — Call the push URL from curl, Python, shell scripts, cron, or other automation. No Node-RED required (see example below).
 - **Node-RED integration** — Use an HTTP Request node to send HTML from your flows. The settings page includes a ready-to-import example flow.
 - **HTML rendering** — Your HTML is rendered to an image (same engine as other InkyPi plugins) and pushed to the display. Supports inline styles, responsive layout, and **InkyPi’s built-in fonts** (Jost, Dogica, Napoli, DS-Digital).
 - **Playlist mode** — When added to a playlist, shows a placeholder view; the main use is pushing content via the API.
@@ -32,6 +33,22 @@ The plugin requires **blueprint registration** in InkyPi core. On first open of 
 
 ---
 
+## Push from other programs
+
+You can update the display from any tool that can send HTTP POST requests. Replace `YOUR_INKYPI_HOST` with your device’s IP or hostname (e.g. `192.168.1.10` or `inkypi.local`). On the device InkyPi uses port **80**; in dev mode use port **8080**.
+
+**Example with curl:**
+
+```bash
+curl -X POST -H "Content-Type: application/json" \
+  -d '{"html":"<div style=\"padding:20px;text-align:center;font-family:sans-serif;\"><h1>Hello</h1><p>From curl</p></div>"}' \
+  http://YOUR_INKYPI_HOST/noderedpush-api/push
+```
+
+Use the same URL and JSON body from Python (`requests.post(...)`), shell scripts, cron, or Home Assistant REST commands.
+
+---
+
 ## Installation
 
 ### Install
@@ -44,13 +61,7 @@ inkypi plugin install noderedpush https://github.com/YOUR_USERNAME/InkyPi-Plugin
 
 Or install the [Plugin Manager](https://github.com/RobinWts/InkyPi-Plugin-PluginManager) first and install this plugin via the Web UI.
 
-Then add a Node Red Push instance to a playlist (optional, for placeholder display) or use the push API directly. Configure the push URL in the plugin settings and use it from Node-RED or curl. On the device use port 80 (default); in dev use port 8080:
-
-```bash
-curl -X POST -H "Content-Type: application/json" \
-  -d '{"html":"<div style=\"padding:20px;text-align:center;\"><h1>Hello</h1></div>"}' \
-  http://YOUR_INKYPI_HOST/noderedpush-api/push
-```
+Then add a Node Red Push instance to a playlist (optional, for placeholder display) or use the push API from any program (see [Push from other programs](#push-from-other-programs) above).
 
 ---
 

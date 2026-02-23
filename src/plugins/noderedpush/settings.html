@@ -1,6 +1,6 @@
 <style>
     /* Hide core "Update Now" and "Add to Playlist" buttons for this plugin (API-only, no display/playlist use) */
-    #settingsForm > .buttons-container {
+    #settingsForm>.buttons-container {
         display: none !important;
     }
 
@@ -10,14 +10,17 @@
         color: var(--text-secondary, #555);
         transition: color 0.3s ease;
     }
+
     .noderedpush-settings .form-label {
         color: var(--text-primary, #333);
     }
+
     .noderedpush-settings ol,
     .noderedpush-settings ol li {
         color: var(--text-primary, #333);
         transition: color 0.3s ease;
     }
+
     .noderedpush-settings ol code {
         color: var(--text-secondary, #555);
     }
@@ -26,13 +29,16 @@
         background: rgba(255, 152, 0, 0.15) !important;
         border: 1px solid rgba(255, 152, 0, 0.4) !important;
     }
+
     [data-theme="dark"] .core-patch-warning {
         background: rgba(255, 152, 0, 0.2) !important;
         border-color: rgba(255, 152, 0, 0.5) !important;
     }
+
     [data-theme="dark"] .core-patch-warning p {
         color: #eee !important;
     }
+
     [data-theme="dark"] .core-patch-warning ul {
         color: #aaa !important;
     }
@@ -75,42 +81,61 @@
 </div>
 {% else %}
 <div class="noderedpush-settings">
-<div class="form-group">
-    <p class="form-label"><strong>Push URL</strong></p>
-    <p class="form-hint">Send a POST request with JSON <code>{"html": "&lt;div&gt;...&lt;/div&gt;"}</code> to update the display immediately.</p>
-    <div class="form-group nowrap" style="margin-top: 8px;">
-        <label for="pushUrl" class="form-label">Address:</label>
-        <input type="text" id="pushUrl" readonly class="form-input" style="font-family: monospace;"
-               value="{{ push_api_path }}"
-               title="Prepend your InkyPi base URL (e.g. http://raspberrypi.local or http://192.168.1.10)">
+    <div class="form-group">
+        <p class="form-label"><strong>Push URL</strong></p>
+        <p class="form-hint">Send a POST request with JSON <code>{"html": "&lt;div&gt;...&lt;/div&gt;"}</code> to update
+            the display immediately.</p>
+        <div class="form-group nowrap" style="margin-top: 8px;">
+            <label for="pushUrl" class="form-label">Address:</label>
+            <input type="text" id="pushUrl" readonly class="form-input" style="font-family: monospace;"
+                value="{{ push_api_path }}"
+                title="Prepend your InkyPi base URL (e.g. http://raspberrypi.local or http://192.168.1.10)">
+        </div>
+        <p class="form-hint" style="margin-top: 6px;">Full URL = your InkyPi base URL + this path. On the device InkyPi
+            uses port <strong>80</strong> (e.g. <code>http://192.168.1.10{{ push_api_path }}</code>); in dev mode it
+            uses port <strong>8080</strong>.</p>
     </div>
-    <p class="form-hint" style="margin-top: 6px;">Full URL = your InkyPi base URL + this path. On the device InkyPi uses port <strong>80</strong> (e.g. <code>http://192.168.1.10{{ push_api_path }}</code>); in dev mode it uses port <strong>8080</strong>.</p>
-</div>
 
-<div class="form-group" style="margin-top: 16px;">
-    <p class="form-label"><strong>Using from Node-RED</strong></p>
-    <ol style="margin: 8px 0; padding-left: 20px; line-height: 1.5;">
-        <li>Use an <strong>HTTP Request</strong> node: Method = POST, URL = your InkyPi base URL + the path above.</li>
-        <li>Set <code>msg.payload</code> to <code>{ "html": "&lt;div&gt;Your HTML here&lt;/div&gt;" }</code>.</li>
-        <li>Set <code>msg.headers["Content-Type"]</code> = <code>application/json</code> (or use a Function node to build the request).</li>
-    </ol>
-    <p class="form-label" style="margin-top: 12px;">Example flow (copy and paste into Node-RED → Import → Clipboard):</p>
-    <textarea id="nodeRedFlowSnippet" readonly class="form-input" rows="18" style="font-family: monospace; font-size: 12px; resize: vertical; margin-top: 6px;">[
+    <div class="form-group" style="margin-top: 16px;">
+        <p class="form-label"><strong>Using from Node-RED</strong></p>
+        <ol style="margin: 8px 0; padding-left: 20px; line-height: 1.5;">
+            <li>Use an <strong>HTTP Request</strong> node: Method = POST, URL = your InkyPi base URL + the path above.
+            </li>
+            <li>Set <code>msg.payload</code> to <code>{ "html": "&lt;div&gt;Your HTML here&lt;/div&gt;" }</code>.</li>
+            <li>Set <code>msg.headers["Content-Type"]</code> = <code>application/json</code> (or use a Function node to
+                build the request).</li>
+        </ol>
+        <p class="form-label" style="margin-top: 12px;">Example flow (copy and paste into Node-RED → Import →
+            Clipboard):</p>
+        <textarea id="nodeRedFlowSnippet" readonly class="form-input" rows="18"
+            style="font-family: monospace; font-size: 12px; resize: vertical; margin-top: 6px;">[
   {"id":"nrpush-inject","type":"inject","z":"","name":"Push HTML","props":[{"p":"payload"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"","payloadType":"date","x":150,"y":100,"wires":[["nrpush-func"]]},
   {"id":"nrpush-func","type":"function","z":"","name":"Build HTML payload","func":"msg.payload = {\n  html: '<div style=\\\"font-family:sans-serif;padding:20px;text-align:center;\\\"><h1>Hello from Node-RED</h1><p>' + new Date().toLocaleString() + '</p></div>'\n};\nmsg.headers = { 'Content-Type': 'application/json' };\nreturn msg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":380,"y":100,"wires":[["nrpush-http"]]},
   {"id":"nrpush-http","type":"http request","z":"","name":"InkyPi push","method":"POST","ret":"txt","paytoqs":"ignore","url":"http://YOUR_INKYPI_HOST/noderedpush-api/push","tls":"","persist":false,"proxy":"","authType":"","x":620,"y":100,"wires":[["nrpush-debug"]]},
   {"id":"nrpush-debug","type":"debug","z":"","name":"Response","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":830,"y":100,"wires":[]}
 ]</textarea>
-    <button type="button" class="form-input" style="margin-top: 8px; cursor: pointer;" onclick="copyNodeRedSnippet()">Copy flow to clipboard</button>
-</div>
 
-<div class="form-group" style="margin-top: 16px;">
-    <p class="form-label"><strong>InkyPi fonts in your HTML</strong></p>
-    <p class="form-hint">The push API injects InkyPi's built-in fonts into your HTML. Use <code>font-family</code> with these names: <strong>Jost</strong>, <strong>Dogica</strong>, <strong>Napoli</strong>, <strong>DS-Digital</strong>. Jost and Dogica have bold variants (<code>font-weight: bold</code>).</p>
-    <p class="form-hint" style="margin-top: 6px;">Copy the snippet below and paste it into a Node-RED Function node (replaces the entire function body). Uses <code>\n</code> and escaped quotes so it works directly:</p>
-    <textarea id="fontsHtmlSnippet" readonly class="form-input" rows="12" style="font-family: monospace; font-size: 12px; resize: vertical; margin-top: 6px;">{{ font_html_snippet | safe }}</textarea>
-    <button type="button" class="form-input" style="margin-top: 8px; cursor: pointer;" onclick="copyFontsSnippet()">Copy HTML snippet</button>
-</div>
+    </div>
+    <div style="margin-top: 8px;">
+        <button type="button" class="form-input" style="cursor: pointer;"
+            onclick="copySnippet('nodeRedFlowSnippet', this, 'Copy flow to clipboard')">Copy flow to clipboard</button>
+    </div>
+    <div class="form-group" style="margin-top: 16px;">
+        <p class="form-label"><strong>InkyPi fonts in your HTML</strong></p>
+        <p class="form-hint">The push API injects InkyPi's built-in fonts into your HTML. Use <code>font-family</code>
+            with these names: <strong>Jost</strong>, <strong>Dogica</strong>, <strong>Napoli</strong>,
+            <strong>DS-Digital</strong>. Jost and Dogica have bold variants (<code>font-weight: bold</code>).
+        </p>
+        <p class="form-hint" style="margin-top: 6px;">Copy the snippet below and paste it into a Node-RED Function node
+            (replaces the entire function body). Uses <code>\n</code> and escaped quotes so it works directly:</p>
+        <textarea id="fontsHtmlSnippet" readonly class="form-input" rows="12"
+            style="font-family: monospace; font-size: 12px; resize: vertical; margin-top: 6px;">{{ font_html_snippet | safe }}</textarea>
+
+    </div>
+    <div style="margin-top: 8px;">
+        <button type="button" class="form-input" style="cursor: pointer;"
+            onclick="copySnippet('fontsHtmlSnippet', this, 'Copy HTML snippet')">Copy HTML snippet</button>
+    </div>
 </div>
 {% endif %}
 
@@ -146,21 +171,14 @@
         }, 1000);
     });
 
-    function copyNodeRedSnippet() {
-        copySnippet('nodeRedFlowSnippet', '#nodeRedFlowSnippet + button', 'Copy flow to clipboard');
-    }
-    function copyFontsSnippet() {
-        copySnippet('fontsHtmlSnippet', '#fontsHtmlSnippet + button', 'Copy HTML snippet');
-    }
-    function copySnippet(id, btnSel, restoreText) {
+    function copySnippet(id, btn, restoreText) {
         var el = document.getElementById(id);
         if (!el) return;
         el.select();
         el.setSelectionRange(0, 99999);
         try {
             document.execCommand('copy');
-            var btn = document.querySelector(btnSel);
-            if (btn) { btn.textContent = 'Copied!'; setTimeout(function(){ btn.textContent = restoreText; }, 2000); }
-        } catch (e) {}
+            if (btn) { btn.textContent = 'Copied!'; setTimeout(function () { btn.textContent = restoreText; }, 2000); }
+        } catch (e) { }
     }
 </script>
