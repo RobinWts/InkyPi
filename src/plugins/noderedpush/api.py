@@ -5,6 +5,7 @@ import logging
 
 from flask import Blueprint, request, jsonify, current_app
 
+from utils.app_utils import get_fonts
 from utils.image_utils import take_screenshot_html
 
 logger = logging.getLogger(__name__)
@@ -15,10 +16,35 @@ MAX_HTML_PAYLOAD_BYTES = 500 * 1024
 noderedpush_bp = Blueprint("noderedpush_api", __name__)
 
 
-def _wrap_html_for_screenshot(html_fragment: str, width: int, height: int) -> str:
+def _build_font_face_css() -> str:
+    """Build @font-face rules for InkyPi fonts so pushed HTML can use them."""
+    try:
+        fonts = get_fonts()
+        rules = []
+        for f in fonts:
+            url = f.get("url", "")
+            if url:
+                # Use file:// so fonts load when HTML is rendered from temp file
+                file_url = "file://" + url.replace("\\", "/")
+            else:
+                continue
+            rules.append(f'''@font-face {{
+    font-family: "{f.get("font_family", "")}";
+    font-weight: {f.get("font_weight", "normal")};
+    font-style: {f.get("font_style", "normal")};
+    src: url({file_url!r}) format("truetype");
+}}''')
+        return "\n".join(rules) if rules else ""
+    except Exception as e:
+        logger.warning(f"Could not build font CSS for push: {e}")
+        return ""
+
+
+def _wrap_html_for_screenshot(html_fragment: str, width: int, height: int, font_css: str = "") -> str:
     """Wrap a fragment in a full HTML document with viewport so screenshot matches dimensions."""
-    # Basic sanitization: escape </script> and similar to avoid breaking the wrapper
+    # Basic sanitization: escape </script> to avoid breaking the wrapper
     escaped = html_fragment.replace("</script>", r"<\/script>")
+    font_block = f"\n{font_css}\n" if font_css else ""
     return f"""<!DOCTYPE html>
 <html>
 <head>
@@ -27,6 +53,7 @@ def _wrap_html_for_screenshot(html_fragment: str, width: int, height: int) -> st
 <style>
   html, body {{ margin: 0; padding: 0; width: 100%; height: 100%; box-sizing: border-box; }}
   body {{ overflow: hidden; }}
+{font_block}
 </style>
 </head>
 <body>
@@ -71,7 +98,8 @@ def push():
     if device_config.get_config("orientation") == "vertical":
         dimensions = dimensions[::-1]
 
-    full_html = _wrap_html_for_screenshot(html_payload, dimensions[0], dimensions[1])
+    font_css = _build_font_face_css()
+    full_html = _wrap_html_for_screenshot(html_payload, dimensions[0], dimensions[1], font_css)
 
     try:
         image = take_screenshot_html(full_html, dimensions)

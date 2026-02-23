@@ -103,6 +103,14 @@
 ]</textarea>
     <button type="button" class="form-input" style="margin-top: 8px; cursor: pointer;" onclick="copyNodeRedSnippet()">Copy flow to clipboard</button>
 </div>
+
+<div class="form-group" style="margin-top: 16px;">
+    <p class="form-label"><strong>InkyPi fonts in your HTML</strong></p>
+    <p class="form-hint">The push API injects InkyPi's built-in fonts into your HTML. Use <code>font-family</code> with these names: <strong>Jost</strong>, <strong>Dogica</strong>, <strong>Napoli</strong>, <strong>DS-Digital</strong>. Jost and Dogica have bold variants (<code>font-weight: bold</code>).</p>
+    <p class="form-hint" style="margin-top: 6px;">Copy the snippet below and paste it into a Node-RED Function node (replaces the entire function body). Uses <code>\n</code> and escaped quotes so it works directly:</p>
+    <textarea id="fontsHtmlSnippet" readonly class="form-input" rows="12" style="font-family: monospace; font-size: 12px; resize: vertical; margin-top: 6px;">{{ font_html_snippet | safe }}</textarea>
+    <button type="button" class="form-input" style="margin-top: 8px; cursor: pointer;" onclick="copyFontsSnippet()">Copy HTML snippet</button>
+</div>
 </div>
 {% endif %}
 
@@ -139,14 +147,20 @@
     });
 
     function copyNodeRedSnippet() {
-        var el = document.getElementById('nodeRedFlowSnippet');
+        copySnippet('nodeRedFlowSnippet', '#nodeRedFlowSnippet + button', 'Copy flow to clipboard');
+    }
+    function copyFontsSnippet() {
+        copySnippet('fontsHtmlSnippet', '#fontsHtmlSnippet + button', 'Copy HTML snippet');
+    }
+    function copySnippet(id, btnSel, restoreText) {
+        var el = document.getElementById(id);
         if (!el) return;
         el.select();
         el.setSelectionRange(0, 99999);
         try {
             document.execCommand('copy');
-            var btn = document.querySelector('#nodeRedFlowSnippet + button');
-            if (btn) { btn.textContent = 'Copied!'; setTimeout(function(){ btn.textContent = 'Copy flow to clipboard'; }, 2000); }
+            var btn = document.querySelector(btnSel);
+            if (btn) { btn.textContent = 'Copied!'; setTimeout(function(){ btn.textContent = restoreText; }, 2000); }
         } catch (e) {}
     }
 </script>
