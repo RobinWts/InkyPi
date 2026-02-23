@@ -10,9 +10,9 @@
 - **Use from any program** — Call the push URL from curl, Python, shell scripts, cron, or other automation. No Node-RED required (see example below).
 - **Node-RED integration** — Use an HTTP Request node to send HTML from your flows. The settings page includes a ready-to-import example flow.
 - **HTML rendering** — Your HTML is rendered to an image (same engine as other InkyPi plugins) and pushed to the display. Supports inline styles, responsive layout, and **InkyPi’s built-in fonts** (Jost, Dogica, Napoli, DS-Digital).
-- **Playlist mode** — When added to a playlist, shows a placeholder view; the main use is pushing content via the API.
 
-The plugin requires **blueprint registration** in InkyPi core. On first open of the settings page, if core is not yet patched, the plugin will offer to apply the patch automatically and restart the service.
+
+The plugin requires **blueprint registration** in InkyPi core. On first open of the settings page, if core is not yet patched, the plugin will apply the patch automatically and restart the service. It's the same patch as the [Plugin Manager](https://github.com/RobinWts/InkyPi-Plugin-PluginManager) plugin, see [CORE_CHANGES.md](https://github.com/RobinWts/InkyPi-Plugin-PluginManager/blob/main/pluginmanager/CORE_CHANGES.md) for more information.
 
 **Requirements:**
 
