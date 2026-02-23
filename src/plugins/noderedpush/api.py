@@ -113,6 +113,13 @@ def push():
     plugin_config = device_config.get_plugin("noderedpush")
     image_settings = (plugin_config.get("image_settings", []) if plugin_config else [])
 
+    # Wait for any in-progress refresh to finish before pushing (avoids display race)
+    refresh_task = current_app.config.get("REFRESH_TASK")
+    if refresh_task and hasattr(refresh_task, "refresh_event"):
+        if not refresh_task.refresh_event.wait(timeout=120):
+            logger.warning("Timed out waiting for refresh to complete before push")
+            return jsonify({"success": False, "error": "Display busy (refresh in progress), try again"}), 503
+
     try:
         display_manager.display_image(image, image_settings=image_settings)
     except Exception as e:
