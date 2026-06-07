@@ -45,34 +45,56 @@ injects placeholders for empty today/tomorrow/day-after; fetches weather from Op
 `Intl.DateTimeFormat` so weekday/month names and date order are correct without extra work. Add a
 language by extending `LOCALE_MAP` + `LABELS` with the correct international code.
 
-## Offline handling & auto-reboot (added 2026-06-07)
+## Never-silently-fail + auto-reboot (added 2026-06-07, hardened later same day)
 
-Solves silent failure when Pi/router power-save kills the WLAN. Flow in `generate_image()`, before
-the normal work:
+The core guarantee: **`generate_image()` always returns an image** — the dashboard when all is well,
+otherwise a localized status/error screen showing the current date — and it auto-reboots to recover,
+**bounded by a consecutive-reboot cap** so a persistent problem can't loop forever.
 
-1. `_check_connectivity(calendar_urls)` — lightweight `requests.get(timeout=5, stream=True)` per URL.
-   Offline **only** when *all* URLs fail with a connection-level error (`ConnectionError`/`Timeout`).
-   Any HTTP response (even 404/500) ⇒ online (a reboot wouldn't fix a broken feed).
-2. **Online** → `reboot_manager.cancel_reboot()` (cancels any pending reboot), then normal render.
-3. **Offline** → `reboot_manager.schedule_reboot(...)` for `now + 10 min`, then
-   `_render_offline_image()` shows a localized screen with today's date, a "no internet" notice, and
-   the auto-restart time. At that time `reboot_manager._do_reboot()` runs `os.system("sudo reboot")`.
+`generate_image()` wraps the whole update in a `try/except` and routes every failure through
+`_handle_failure(reason)`:
 
-Design choices (confirmed with user): network-failure-only trigger; **self-contained** (no core files
-changed, no blueprint — same `sudo reboot` mechanism as core `settings.py`, relies on InkyPi's
-passwordless sudo); cancel-on-reconnect; 10-min delay to avoid boot-loops; displayed time stays stable
-across refreshes in one outage; one reboot per process (lock-guarded, idempotent scheduler in
-`reboot_manager.py`). Offline strings are `offlineTitle` / `offlineMessage` / `offlineClock` /
-`offlineReassure` in `LABELS`, and time respects the device 12h/24h format.
+1. **`config`** — no calendar URL configured → error screen (`errorTitle` + `configMessage`), **no
+   reboot** (a reboot can't add a URL).
+2. **`offline`** — `_check_connectivity()` finds *all* URLs unreachable at the connection level
+   (`ConnectionError`/`Timeout`; any HTTP response, even 404/500, counts as online) → offline screen +
+   reboot.
+3. **`error`** — anything else throws (calendar HTTP/parse error, malformed ICS, `recurring_ical_events`
+   raising, render returning None / Chromium crash). The handler **re-checks connectivity**: if the
+   network actually dropped mid-update it's treated as `offline`; otherwise it shows the generic error
+   screen. Reboots per the cap.
 
-## Dev-testing the offline path (without unplugging)
+**Reboot cap (loop protection).** A consecutive-reboot counter is persisted in device.json under
+`seniorDashboard_allDay_reboot_count`. Each new reboot episode increments it; after
+`MAX_CONSECUTIVE_REBOOTS` (3, in `reboot_manager.py`) it **stops rebooting** and just keeps showing the
+screen (with `noRebootNote` instead of the reboot line). A **successful** normal render calls
+`cancel_reboot()` and **resets the counter to 0**. Within one process the scheduler is idempotent so
+the displayed reboot time stays stable.
+
+**Belt-and-suspenders rendering.** `_render_status_image()` renders the screen via HTML
+(`render/offline.html` — a generic title/message/reboot-line/note template). If Chromium itself fails,
+it falls back to `_render_status_pil()` — a pure-PIL screen (numeric date + localized strings, no
+browser) — and ultimately a blank image. So even a broken renderer can't cause a silent failure.
+
+**Weather is already safe**: `fetch_weather_data()` catches everything and returns an empty block; the
+dashboard still renders without weather. Calendar fetch happens *before* weather, so weather can't break
+calendar handling.
+
+Self-contained (no core files, no blueprint; reboot via `os.system("sudo reboot")` from a
+`threading.Timer`, same mechanism as core `settings.py`, relies on passwordless sudo). Localized strings
+live in `LABELS` (`offlineTitle/offlineMessage/offlineClock/offlineReassure`, `errorTitle/errorMessage`,
+`rebootPrefix`, `configMessage`, `noRebootNote`); times respect the device 12h/24h format.
+
+## Dev-testing the failure paths (without unplugging)
 
 1. Temporarily stub `reboot_manager._do_reboot()` to log instead of `os.system("sudo reboot")` — **keep
    this in the fork only, never copy to the plugin repo** (otherwise you could reboot your dev Mac).
-2. Make the calendar unreachable: set the plugin's calendar URL to a dead address
-   (`http://127.0.0.1:1/x.ics` → refused; `https://10.255.255.1/x.ics` → timeout), or block the real
-   host via `/etc/hosts`.
-3. Trigger a manual update in the web UI; inspect `mock_display_output/latest.png` and the server log
-   (`reboot scheduled` / `reboot canceled`).
-4. To prove no false reboot on a bad feed, point at a reachable-but-404 URL and confirm it does **not**
-   show the offline screen.
+2. **Offline**: set the calendar URL to a dead address (`http://127.0.0.1:1/x.ics` → refused;
+   `https://10.255.255.1/x.ics` → timeout), or block the real host via `/etc/hosts`.
+3. **Error (network up)**: point at a reachable-but-404 URL, or feed malformed ICS → expect the *error*
+   screen (not offline), still + reboot.
+4. **Cap**: set `seniorDashboard_allDay_reboot_count` to 3 in device.json → next failure shows the screen
+   with the persistent-problem note and **no** reboot.
+5. **PIL fallback**: monkeypatch `render_image` to raise → still get a Chromium-free image.
+6. Trigger a manual update; inspect `mock_display_output/latest.png` and the server log
+   (`Reboot scheduled` / `reboot canceled` / `reboot cap (3) reached`).

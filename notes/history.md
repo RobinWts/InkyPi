@@ -14,6 +14,20 @@ Running log of notable work and decisions. **Read this to catch up on what chang
 
 ## 2026-06-07
 
+- **seniorDashboard_allDay: never-silently-fail hardening.** The first offline feature only caught a
+  *fully* dead network; reachable-but-erroring calendars, flapping WLAN, malformed ICS, and render
+  glitches still raised uncaught → silent failure. Now `generate_image()` wraps the whole update in
+  try/except and routes every failure through `_handle_failure(reason)` → always returns a localized
+  status/error screen (with current date). Reasons: `config` (no URL → no reboot), `offline` (network
+  down → reboot), `error` (anything else → re-checks connectivity, reboots only if actually offline,
+  else shows error screen). Added a **consecutive-reboot cap** (`MAX_CONSECUTIVE_REBOOTS=3`, persisted
+  in device.json key `seniorDashboard_allDay_reboot_count`, reset on success) to stop endless reboot
+  loops on a persistent problem (user-chosen policy). Added a **pure-PIL last-resort** screen so even a
+  broken Chromium can't fail silently. Confirmed weather fetch was already safe (caught internally) and
+  runs after the calendar fetch. New `LABELS`: `errorTitle/errorMessage/rebootPrefix/configMessage/noRebootNote`;
+  `render/offline.html` generalized to title/message/reboot-line/note. Verified all 6 paths locally
+  (reboot stubbed) incl. the German error/capped/PIL screens; `pytest` still 25 green. Files copied to
+  the standalone plugin repo for commit.
 - **Env + patch clarifications.** Noted that this workspace uses **conda** with a ready **`inkypi`**
   env for installed deps (in `development.md` + CLAUDE.md quick start). Also noted in
   [plugin-blueprints.md](plugin-blueprints.md) that **`pluginmanager`** is normally the first plugin to

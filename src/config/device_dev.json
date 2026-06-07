@@ -55,11 +55,9 @@
         "active_playlist": null
     },
     "refresh_info": {
-        "refresh_time": "2026-06-07T11:52:25.092552+00:00",
-        "image_hash": "517244d12ebac7baed511c6ccdf753fe3f49ca5b0c2d4743f8e47afdbececbf4",
-        "refresh_type": "Playlist",
-        "plugin_id": "clock",
-        "playlist": "Default",
-        "plugin_instance": "clock"
+        "refresh_time": "2026-06-07T14:49:38.312200+00:00",
+        "image_hash": "f14b4d842b4c966c5083980cba5a9383924f96dfda2bd718ebbca817891025a2",
+        "refresh_type": "Manual Update",
+        "plugin_id": "seniorDashboard_allDay"
     }
 }
